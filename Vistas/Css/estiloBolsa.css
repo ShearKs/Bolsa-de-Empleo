@@ -1,0 +1,134 @@
+html,
+body {
+    height: 100%;
+    background-color: azure;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Resto de tus estilos para el header */
+header {
+    background: black;
+    height: 70px;
+    border: 2px;
+    padding: 8px;
+    border-radius: 15px;
+    margin-top: 2%;
+}
+
+header ul {
+    font-family: Arial;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+header ul li {
+    display: inline-block;
+    margin: 5px;
+    padding: 5px;
+}
+
+header ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+header ul li:hover {
+    background: green;
+    border-radius: 5px;
+    color: #FFF;
+    animation: rubberBand 0.9s;
+    -webkit-animation: rubberBand 0.9s;
+}
+
+header ul li:hover a {
+    color: white;
+}
+
+/*   */
+
+#principal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 5%;
+    width: 50%;
+    padding: 0;
+    background-color: antiquewhite;
+    padding: 8px;
+}
+
+.contenedor {
+    display: grid;
+    grid-template-columns: 6fr 1fr;
+    justify-content: space-between;
+    /* Alinea los elementos con espacio entre ellos */
+    max-width: 400px;
+    margin: 0 auto;
+    width: 100%;
+    /* Ajusta según sea necesario */
+    box-sizing: border-box;
+}
+
+.formularioAlumnoBolsa {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+
+.formularioAlumnoBolsa label {
+    margin-bottom: 5px;
+}
+
+.formularioAlumnoBolsa input {
+    margin-bottom: 10px;
+}
+
+
+
+.divBoton {
+    width: 40px;
+    height: 40px;
+    margin-top: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.divBoton img{
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.botonProcesa {
+
+    margin-top: 10px;
+    /* Ajusta según sea necesario para agregar espacio entre el formulario y el botón */
+    padding: 8px;
+    background-color: #4CAF50;
+    /* Color de fondo del botón */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+}
+
+.botonEditar:hover {
+    background-color: #45a049;
+    /* Cambia el color de fondo al pasar el mouse sobre el botón */
+}
