@@ -1,9 +1,10 @@
 import { obtenerAlumnoBolsa, editarAlumnoBolsa, crearCursos } from './funcionesFetch.js';
-import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido,crearBotonImg } from './utilsDom.js';
+import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg } from './utilsDom.js';
 import { cadenaFormateada } from './funcionesGenerales.js';
 
 const datosAlumnos = document.getElementById('datosAlumno');
-const botonDispon = document.getElementById('disponibilidad');
+const cambioContrasena  = document.getElementById('cambioContrasena');
+const botonTitulacion = document.getElementById('anadirTitulacion');
 
 // Div sobre el que vamos a mostrar los contenidos según el botón que le indique el usuario
 const contenedor = document.getElementById('principal');
@@ -22,7 +23,12 @@ datosAlumnos.addEventListener('click', () => {
    crearFormularioAlumno(alumno)
 })
 
-botonDispon.addEventListener('click', () => {
+cambioContrasena.addEventListener('click',()=>{
+   limpiarContenido(contenedor)
+   crearDivContrasena();
+})
+
+botonTitulacion.addEventListener('click', () => {
    limpiarContenido(contenedor);
 })
 
@@ -35,11 +41,20 @@ async function obtenerAlumno() {
    }
 }
 
+function crearDivContrasena(){
+
+
+   let contnedor = crearNodo("div","holaaaa","contenedoriii","",contenedor)
+
+}
+
 
 async function crearFormularioAlumno(alumno) {
 
    let divContenedor = crearNodo("div", "", "contenedor", "", contenedor)
-   let formulario = crearNodo("form", "", "formularioAlumnoBolsa", "", divContenedor);
+
+   let contenido = crearNodo("div", "", "formEditarAlu", "", divContenedor)
+   let formulario = crearNodo("form", "", "formularioAlumnoBolsa", "", contenido);
 
    let modoEditar = false;
 
@@ -59,15 +74,21 @@ async function crearFormularioAlumno(alumno) {
 
    let lbCurso = document.getElementById('lbcurso');
    console.log("idCurso", alumno.idCurso)
-   await crearCursos(alumno.curso, lbCurso,true);
+   await crearCursos(alumno.curso, lbCurso, true);
 
    let select = document.getElementById("selectCursos");
    select.disabled = true
 
+   let botonOcultar = crearNodo("button", "Oculta el Contenido", "botonProcesa", "", divContenedor)
+   botonOcultar.addEventListener('click', () => {
+      divContenedor.remove()
+   })
+
    // Creamos el botón de editar
-   let botonEditarP = crearBotonImg(divContenedor,"divBoton","img","../Vistas/img/editar.png","antiquewhite");
+   let botonEditarP = crearBotonImg(contenido, "divBoton", "img", "../Vistas/img/editar.png", "#b3e6ff");
 
    botonEditarP.addEventListener('click', () => {
+      //botonOcultar.remove();
 
       if (!modoEditar) {
 
@@ -84,8 +105,11 @@ async function crearFormularioAlumno(alumno) {
          let alumnoBolsa = {}
 
          // Creamos un botón para actualizar los datos del alumno
-         let btnProcesar = crearNodo("button", "Edita tu información", "botonProcesa", "", divContenedor);
+         //let btnProcesar = crearNodo("button", "Edita tu información", "botonProcesa", "", divContenedor);
+         let btnProcesar = crearNodoDebajo("button", "Edita tu información", "botonProcesa", "", botonOcultar);
          btnProcesar.addEventListener("click", async () => {
+
+
             // Recogemos todos los campos del formulario
             let inputs = formulario.querySelectorAll('input');
             inputs.forEach(input => {
@@ -101,18 +125,5 @@ async function crearFormularioAlumno(alumno) {
    })
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

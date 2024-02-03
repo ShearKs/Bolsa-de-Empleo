@@ -11,15 +11,26 @@ export function cadenaFormateada(cadena) {
 
 }
 
-export function cambioRuta(esIndex){
-    let ruta='';
-    if(esIndex){
+export function cambioRuta(esIndex) {
+    let ruta = '';
+    if (esIndex) {
         ruta = '../'
     }
     return ruta;
 }
 
-export function eventoCheckBox(checkbox, elementoCreado, idNodo,nodo,nodoAnterior) {
+//comprueba que todos los campos están rellenados
+export function comprobarFormulario(inputs) {
+    for (let i = 0; i < inputs.length; i++) {
+        if (inputs[i].value.trim() === '') {
+            alert("Por favor rellene todos los campos");
+            return false; // Retorna false si algún campo está vacío
+        }
+    }
+    return true;
+}
+
+export function eventoCheckBox(checkbox, elementoCreado, idNodo, nodo, nodoAnterior) {
 
     //Le añadimos un evento al checkbox que si lo pulsas te salga un text area con la información
     checkbox.addEventListener('click', () => {

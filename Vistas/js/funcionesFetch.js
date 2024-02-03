@@ -55,6 +55,9 @@ export function crearUsuario(datosAlumno) {
         })
         .then(data => {
             console.log('Lo que devuelve el php:', data)
+            if (data.hasOwnProperty('Exito')) {
+                alert("Se ha creado el usuario satisfactoriamente")
+            }
         })
         .catch(error => {
             console.error("Error en la solicitud" + error)

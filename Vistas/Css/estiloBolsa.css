@@ -59,16 +59,20 @@ header ul li:hover a {
     flex-direction: column;
     align-items: center;
     margin-top: 5%;
-    width: 50%;
+    width: 75%;
     padding: 0;
-    background-color: antiquewhite;
+
     padding: 8px;
 }
 
-.contenedor {
+
+
+.formEditarAlu {
+
     display: grid;
     grid-template-columns: 6fr 1fr;
     justify-content: space-between;
+    justify-items: center;
     /* Alinea los elementos con espacio entre ellos */
     max-width: 400px;
     margin: 0 auto;
@@ -77,12 +81,31 @@ header ul li:hover a {
     box-sizing: border-box;
 }
 
+.contenedor{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 35px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #b3e6ff;
+    border-radius: 15px;
+}
+
 .formularioAlumnoBolsa {
     display: flex;
     flex-direction: column;
     max-width: 400px;
     margin: 0 auto;
     box-sizing: border-box;
+    padding: 10px;
+}
+.formularioAlumnoBolsa label{
+    font-weight: bold;
+}
+
+.formularioAlumnoBolsa input{
+    width: 200px;
+    border-radius: 5px;
 }
 
 
@@ -115,11 +138,10 @@ header ul li:hover a {
 }
 
 .botonProcesa {
-
     margin-top: 10px;
     /* Ajusta según sea necesario para agregar espacio entre el formulario y el botón */
     padding: 8px;
-    background-color: #4CAF50;
+    background-color: #1e5daa;
     /* Color de fondo del botón */
     color: white;
     border: none;

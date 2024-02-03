@@ -50,6 +50,7 @@ class DaoAlumno
         $sql .= $esbolsa ? ", alumno_bolsa b" : "";
         $sql .= " WHERE alu.dni = c.dniAlum and c.idCurso = cur.id and alu.dni = ?";
         $sql .= $esbolsa ? " and alu.dni = b.dni" : "";
+        $sql .= " GROUP BY alu.dni";
 
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s", $dni);

@@ -118,7 +118,9 @@ function crearFormularioAlta(datosAlumno) {
 
     let campoUser = crearNodo("div", "", "caja", "", formularioAlta)
     crearLabel("usuario", "Usuario ", "lbUsuario", campoUser)
-    crearInput("usuario", "input", "text", campoUser)
+    let inputUser = crearInput("usuario", "input", "text", campoUser)
+    inputUser.className = "inputAlta"
+    inputUser.setAttribute("required","true")
 
     //INSERTAMOS TODO LO QUE TENEMOS EN EL OBJETO ALUMNOS
     for (let alumn in datosAlumno) {
@@ -129,8 +131,12 @@ function crearFormularioAlta(datosAlumno) {
             let contenido = funciones.cadenaFormateada(alumn)
             crearLabel(alumn, contenido, "lbUsuario", divCampo)
             let input = crearInput(alumn, "input", "text", divCampo)
+            if(alumn == 'dni'){
+                input.disabled = true
+            }
             input.value = datosAlumno[alumn]
-            input.setAttribute("required","true")
+            input.className = "inputAlta"
+            input.setAttribute("required", "true")
         }
     }
     let divBolsa = crearNodo("div", "", "divBolsa", "", formularioAlta)
@@ -165,7 +171,12 @@ function crearFormularioAlta(datosAlumno) {
         event.preventDefault()
         let alumnos = alumnoFormularioAlta(formularioAlta, checkBoxExp, textExp)
         console.log(alumnos)
-        crearUsuario(alumnos);
+        let inputsComprueba = document.getElementsByClassName("inputAlta")
+        console.log(inputsComprueba)
+        if (funciones.comprobarFormulario(inputsComprueba)) {
+            crearUsuario(alumnos);
+        }
+
 
     })
     let botonVolver = crearNodo("button", "Volver", "formAlta", "formAlta", formularioAlta);

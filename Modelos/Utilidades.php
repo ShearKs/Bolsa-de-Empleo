@@ -79,10 +79,10 @@ class Utilidades
             //Content
             $mail->isHTML(true);
             $mail->Subject = 'Correo Enviado';
-            $mail->Body    = 'Tienes un nuevo mensaje' . $mensaje;
+            $mail->Body    = 'Tienes un nuevo mensaje\n' . $mensaje;
 
             $mail->send();
-            echo 'El correo ha sido enviado correctamente';
+            //echo 'El correo ha sido enviado correctamente';
         } catch (Exception $e) {
             echo "El mensanje no pudo ser enviado. Tipo de Error: {$mail->ErrorInfo}";
         }
