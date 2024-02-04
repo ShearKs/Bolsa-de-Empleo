@@ -147,7 +147,7 @@ function crearFormularioAlta(datosAlumno) {
     let labelCiclo = crearLabel("curso", "Ciclo", "lbUsuario", divCampo);
 
     //Creamos el select option y obtenemos todos los cursos que hay en la base de datos
-    crearCursos(datosAlumno.curso, labelCiclo, false);
+    crearCursos(datosAlumno.curso, labelCiclo, false,1);
 
     let campoExp = crearNodo("div", "", "cajaViaje", "", divBolsa);
     let checkExperiencia = crearLabel("experien", "Experiencia Laboral", "lbUsuario", campoExp);

@@ -148,7 +148,7 @@ class DaoAlumno
 
                         $this->utils->enviarCorreo($email, $mensaje);
                         $this->conexion->commit();
-                        return json_encode(array("Exito" => "Todo ha ido bien" . $contrasena));
+                        return json_encode(array("Exito" => "Se ha registrado correctamente el usuario en la bolsa de empleo"));
                     } else {
                         return json_encode(array("Error" => "No se ha podido insertar el alumno en la bolsa"));
                     }
@@ -222,16 +222,30 @@ class DaoAlumno
     }
 
 
-    public function devuelveCursos()
+    public function devuelveCursos($modo)
     {
-
-        //Información de todos los cursos que vamos a devolver
+        // Información de todos los cursos que vamos a devolver
         $cursos = array();
 
-        $sql = "SELECT id,nombre FROM curso order by id;";
+        switch ($modo) {
+            case 1:
+                // Modo 1: Incluye información adicional
+                $sql = "SELECT id, nombre FROM curso WHERE nombreCentroEstudio = 'Ies Leonardo Da Vinci' ORDER BY id;";
+                break;
+            case 2:
+                // Modo 2: Otra consulta específica
+                $sql = "SELECT id, nombre FROM curso WHERE nombreCentroEstudio != 'Ies Leonardo Da Vinci' ORDER BY id;";
+                break;
+                // Puedes agregar más casos según sea necesario
+            default:
+                // Modo por defecto o manejo de errores
+                $sql = "SELECT id, nombre FROM curso WHERE nombreCentroEstudio = 'Ies Leonardo Da Vinci' ORDER BY id;";
+                break;
+        }
+
         $resultado = $this->conexion->query($sql);
 
-        //Consulta exitosa
+        // Consulta exitosa
         if ($resultado) {
             while ($fila = $resultado->fetch_assoc()) {
                 $cursos[] = $fila;
@@ -241,5 +255,21 @@ class DaoAlumno
         }
 
         return $cursos;
+    }
+
+    public function insertaTitulo($idCurso, $dni)
+    {
+
+        $sql = "INSERT INTO cursa_alumn(dniAlum,idCurso) VALUES (? ,?)";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("sd", $dni, $idCurso);
+
+        $estado = $sentencia->execute();
+
+        if ($estado && $sentencia->affected_rows == 1) {
+            return json_encode(array("Exito" => "Se ha insertado el titulo correctamente"));
+        }
+
+        return json_encode(array("Error" => "Ha habido un problema al añadir el curso"));
     }
 }

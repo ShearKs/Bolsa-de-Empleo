@@ -55,7 +55,7 @@ export function crearUsuario(datosAlumno) {
         .then(data => {
             console.log('Lo que devuelve el php:', data)
             if (data.hasOwnProperty('Exito')) {
-                alert("Se ha creado el usuario satisfactoriamente")
+                alert(data.Exito)
             } else {
                 alert(data.Error)
             }
@@ -109,7 +109,7 @@ export function generarCodigoTemporal(correo) {
 
 export function cambioContrasena(solicitud) {
     return new Promise((resolve, reject) => {
-  
+
 
         const requestOptions = {
             method: 'POST',
@@ -195,12 +195,12 @@ export function editarAlumnoBolsa(alumnoBolsa) {
 }
 
 //Función que se encarga de ver todos los cursos que hay en la base de datos y mostrarlo con Dom
-export async function crearCursos(curso, div, esIndex) {
+export async function crearCursos(curso, div, esIndex, modo) {
     try {
 
         let ruta = cambioRuta(esIndex)
 
-        const response = await fetch(ruta + 'Controladores/devuelveCursos.php');
+        const response = await fetch(ruta + `Controladores/devuelveCursos.php?modo=${modo}`);
         if (!response.ok) {
             throw new Error('La solicitud no ha sido correcta');
         }
@@ -223,6 +223,32 @@ export async function crearCursos(curso, div, esIndex) {
     } catch (error) {
         console.error("Error en la solicitud:" + error);
     }
+}
+
+export function insertarTitulo(solicitudCurso) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(solicitudCurso)
+    }
+
+    fetch('../Controladores/addTitulo.php', requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La solicitud no ha sido correcta')
+            }
+            return response.json()
+        })
+        .then(data => {
+            console.log(data)
+            if (data.hasOwnProperty('Exito')) {
+                alert(data.Exito)
+            }
+        })
+        .catch(error => {
+            console.error("Error en la solicitud: " + error)
+        })
 }
 
 

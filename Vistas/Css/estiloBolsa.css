@@ -12,6 +12,10 @@ body {
 
 /* Resto de tus estilos para el header */
 header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     background: black;
     height: 70px;
     border: 2px;
@@ -21,16 +25,17 @@ header {
 }
 
 header ul {
+    cursor: pointer;
     font-family: Arial;
     margin: 0;
-    padding: 0;
+    padding: 10px;
     list-style: none;
 }
 
 header ul li {
     display: inline-block;
-    margin: 5px;
-    padding: 5px;
+    margin: 7px;
+    padding: 7px;
 }
 
 header ul li a {
@@ -64,7 +69,6 @@ header ul li:hover a {
 
     padding: 8px;
 }
-
 
 
 .formEditarAlu {
@@ -159,13 +163,48 @@ header ul li:hover a {
     align-items: center;
     justify-content: center;
 
-    margin: 15px;
-    padding: 5%;
-    background-color: #54cf5a;
+    padding: 2%;
+    background-color: #6dd472;
     border-radius: 15px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+}
+.contenedorContra lb{
+    padding: 10px;
+    font-family: 37px;
+    font-weight: bolder;
+    color:#0b5017;
+}
+.contenedorContra button{
+    padding: 10px;
+    margin: 25px;
+    padding: 15px;
+    background-color: #08691a;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }
 .contenedorContra input{
+    padding: 10px;
     margin-top: 5%;
-    width: 100%;
+    width: 50%;
+    border-radius: 5px;
+}
+
+/*Titulaciones   */
+
+.divTitulacion{
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5%;
+    background-color: #7267b4;
+    border-radius: 15px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+
 }
