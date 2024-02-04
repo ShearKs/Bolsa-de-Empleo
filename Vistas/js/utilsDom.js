@@ -57,6 +57,14 @@ export function crearNodoDebajo(elemento, contenido, clase, id, superior) {
     return nodo
 }
 
+//Si algo existe lo eliminamos
+export function eliminarExistente(idNodo){
+    let nodo = document.getElementById(idNodo);
+    if(nodo){
+        nodo.remove();
+    }
+}
+
 //Se encarga de eliminar todo el contenido de un div pero no elimina el elemento html que le introduces
 export function limpiarContenido(contenido) {
     let primero = contenido.firstChild

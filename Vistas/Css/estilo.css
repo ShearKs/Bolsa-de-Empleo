@@ -60,6 +60,42 @@ h1 {
     /* box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3); */
 }
 
+/* Select de Registro */
+.selectRegistro{
+    display: flex;
+    justify-content: center;
+    width: 75%;
+    height: 50px;
+    position: relative; /* Añadimos posición relativa para que podamos posicionar el icono */
+    margin-bottom: 5%;
+   
+}
+
+.selectRegistro{
+    
+    border: none;
+    appearance: none;
+    padding: 0 30px 0 15px;
+    color:white;
+    background-color: #36d2fa;
+    font-size: 20px;
+    width: 80%;
+    border-radius: 15px;
+}
+
+/* Icono del select */
+.selectRegistro::before {
+    content: url('../img/select.png');
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    pointer-events: none;
+    width: 20px; 
+    height: 20px; 
+}
+
+
+
 .formAltaAlum {
 
     display: flex;

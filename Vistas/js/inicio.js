@@ -1,4 +1,4 @@
-import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido } from './utilsDom.js';
+import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido,eliminarExistente } from './utilsDom.js';
 import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos } from './funcionesFetch.js';
 import * as funciones from './funcionesGenerales.js';
 
@@ -56,6 +56,8 @@ function crearInicio() {
 
     cambiarEstadoBotones(true);
 
+    eliminarExistente("selectRegistro")
+
     crearLabel("usuario", "Usuario", "lbUsuario", divInicio)
     crearInput("usuario", "inputUser", "text", divInicio)
 
@@ -88,18 +90,33 @@ function crearAlta() {
 
     cambiarEstadoBotones(false);
 
-    crearLabel("cif", "Introduce tu Cif para darte de alta", "lbUsuario", divInicio)
+    eliminarExistente("selectRegistro")
+
+    let select = crearNodoDebajo("select", "", "selectRegistro", "selectRegistro", tituloLogin)
+    let optionAlumn = crearNodo("option", "Alumnos", "optionRegistro", "", select)
+    optionAlumn.value = "alumno"
+    let optionEmpresa = crearNodo("option", "Empresas", "optionRegistro", "", select)
+    optionEmpresa.value = "empresa"
+
+    let labelAlta = crearLabel("cif", "Introduce tu dni para darte de alta en la bolsa", "lbUsuario", divInicio)
     let inputCif = crearInput("cif", "inputCif", "text", divInicio)
     inputCif.id = "inputCif"
-
     let botonAlta = crearNodo("button", "Date de Alta en la bolsa de Empleo", "btnInicioSesion", "", divInicio)
+
+    // Agregar el evento click fuera del evento change
     botonAlta.addEventListener('click', (event) => {
-        event.preventDefault()
+        event.preventDefault();
+        labelAlta.textContent = "Introduce tu cif para poder iniciarte en la bolsa";
+        console.log(select.value)
+        // Verificar la opción seleccionada en ese momento
+        if (select.value === 'alumno') {
+            // Función Fetch que nos devuelve el alumno titulado en la base de datos
+            alumnoDevuelto(inputCif.value, crearFormularioAlta, divInicio);
+        } else {
+            console.log("pa ti mi cola jejeje");
+        }
+    });
 
-
-        //Función Fetch que nos devuelve el alumno titulado en la base de datos
-        alumnoDevuelto(inputCif.value, crearFormularioAlta, divInicio)
-    })
 }
 
 
@@ -120,7 +137,7 @@ function crearFormularioAlta(datosAlumno) {
     crearLabel("usuario", "Usuario ", "lbUsuario", campoUser)
     let inputUser = crearInput("usuario", "input", "text", campoUser)
     inputUser.className = "inputAlta"
-    inputUser.setAttribute("required","true")
+    inputUser.setAttribute("required", "true")
 
     //INSERTAMOS TODO LO QUE TENEMOS EN EL OBJETO ALUMNOS
     for (let alumn in datosAlumno) {
@@ -131,7 +148,7 @@ function crearFormularioAlta(datosAlumno) {
             let contenido = funciones.cadenaFormateada(alumn)
             crearLabel(alumn, contenido, "lbUsuario", divCampo)
             let input = crearInput(alumn, "input", "text", divCampo)
-            if(alumn == 'dni'){
+            if (alumn == 'dni') {
                 input.disabled = true
             }
             input.value = datosAlumno[alumn]
@@ -147,7 +164,7 @@ function crearFormularioAlta(datosAlumno) {
     let labelCiclo = crearLabel("curso", "Ciclo", "lbUsuario", divCampo);
 
     //Creamos el select option y obtenemos todos los cursos que hay en la base de datos
-    crearCursos(datosAlumno.curso, labelCiclo, false,1);
+    crearCursos(datosAlumno.curso, labelCiclo, false, 1);
 
     let campoExp = crearNodo("div", "", "cajaViaje", "", divBolsa);
     let checkExperiencia = crearLabel("experien", "Experiencia Laboral", "lbUsuario", campoExp);

@@ -46,27 +46,3 @@ export function eventoCheckBox(checkbox, elementoCreado, idNodo, nodo, nodoAnter
     })
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
