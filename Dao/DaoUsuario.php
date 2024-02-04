@@ -1,17 +1,20 @@
 <?php
 
 include_once 'Conexion.php';
+include_once '../Modelos/Utilidades.php';
 
 
 class DaoUsuario
 {
 
     private $conexion;
+    private $utils;
 
     public function __construct()
     {
         $claseConexion = new Conexion();
         $this->conexion = $claseConexion->getConexion();
+        $this->utils = new Utilidades();
     }
 
     public function inicioSesion($nombreUsuario, $contrasena)
@@ -47,6 +50,27 @@ class DaoUsuario
         } else {
             return json_encode(array("Error" => "No se ha encontrado ese alumno en la base de datos"));
         }
+    }
+
+    public function cambioContrasena(Usuario $usuario)
+    {
+        $nombreuser = $usuario->getNombreUsuario();
+        $contrasena = $usuario->getContrasena();
+
+        $sql = "UPDATE usuario
+                    SET contrasena = ?
+                    WHERE nombre = ?";
+        $contrasenaEncriptada = password_hash($contrasena, PASSWORD_BCRYPT);
+
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("ss", $contrasenaEncriptada, $nombreuser);
+        $estado = $sentencia->execute();
+
+        if ($estado) {
+            return json_encode(array("Exito" => "Se ha actualizado la contraseña"));
+        }
+
+        return json_encode(array("Error" => "Ha habido un problema al cambiar la contraseña"));
     }
 
     public function devuelveDniUser($nombreUsuario)

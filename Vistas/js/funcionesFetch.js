@@ -25,7 +25,6 @@ export function inicioSesion(usuario, parrafoError) {
             //console.log('Devolución desde php',data)
             if (data.hasOwnProperty('Exito')) {
 
-
                 window.location.href = './Vistas/main.html';
             }
             console.log("Error :", data)
@@ -57,6 +56,8 @@ export function crearUsuario(datosAlumno) {
             console.log('Lo que devuelve el php:', data)
             if (data.hasOwnProperty('Exito')) {
                 alert("Se ha creado el usuario satisfactoriamente")
+            } else {
+                alert(data.Error)
             }
         })
         .catch(error => {
@@ -84,6 +85,89 @@ export function obtenerAlumnoBolsa($dni) {
     });
 }
 
+export function generarCodigoTemporal(correo) {
+    return new Promise((resolve, reject) => {
+        fetch(`../Controladores/generaCodigoSesion.php?correo=${correo}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La solicitud no ha sido correcta');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.hasOwnProperty('Exito')) {
+                    resolve("Se ha enviado un código a tu correo. Introduce el código para cambiar la contraseña");
+                } else {
+                    reject(new Error("La solicitud fue exitosa, pero no se recibió un resultado esperado."));
+                }
+            })
+            .catch(error => {
+                reject(new Error("Error en la solicitud: " + error));
+            });
+    });
+}
+
+export function cambioContrasena(solicitud) {
+    return new Promise((resolve, reject) => {
+  
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(solicitud)
+        }
+
+        fetch('../Controladores/cambioContrasena.php', requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La solicitud no fue exitosa');
+                }
+                return response.json();
+            })
+            .then(respuesta => {
+                console.log(respuesta);
+                if (respuesta.hasOwnProperty('Exito')) {
+                    resolve(); // Resolvemos la promesa
+                } else {
+                    reject(respuesta.Error); // Rechazamos la promesa con el mensaje de error
+                }
+            })
+            .catch(error => {
+                reject("Error en la solicitud: " + error); // Rechazamos la promesa con el mensaje de error
+            });
+    });
+}
+
+export function cambioContraseñaProcesa(solicitud) {
+
+    // Creamos un objeto con la solictud del usuario
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(solicitud)
+    }
+
+    fetch('../Controladores/cambioContrasena.php', requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La solicitud no fue exitosa');
+            }
+            return response.json()
+        })
+        .then(response => {
+            if (response.hasOwnProperty('Exito')) {
+                alert(response.Exito);
+            } else {
+                alert("Ha surgido algún problema al cambiar la contraseña, Error: ", response.Error)
+            }
+        })
+        .catch(error => {
+            console.error("Error en al solicitud: " + error)
+        })
+
+}
+
 export function editarAlumnoBolsa(alumnoBolsa) {
     const requestOptions = {
         method: 'POST',
@@ -101,11 +185,11 @@ export function editarAlumnoBolsa(alumnoBolsa) {
             })
             .then(respuesta => {
                 console.log(respuesta);
-                resolve();  
+                resolve();
             })
             .catch(error => {
                 console.error("Error en la solicitud: " + error)
-                reject(error); 
+                reject(error);
             })
     });
 }

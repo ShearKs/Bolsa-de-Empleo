@@ -1,10 +1,11 @@
-import { obtenerAlumnoBolsa, editarAlumnoBolsa, crearCursos } from './funcionesFetch.js';
+import { obtenerAlumnoBolsa, editarAlumnoBolsa, crearCursos, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg } from './utilsDom.js';
 import { cadenaFormateada } from './funcionesGenerales.js';
 
 const datosAlumnos = document.getElementById('datosAlumno');
-const cambioContrasena  = document.getElementById('cambioContrasena');
+const btnCambioContrasena = document.getElementById('cambioContrasena');
 const botonTitulacion = document.getElementById('anadirTitulacion');
+const botonSalir = document.getElementById('salir');
 
 // Div sobre el que vamos a mostrar los contenidos según el botón que le indique el usuario
 const contenedor = document.getElementById('principal');
@@ -23,13 +24,33 @@ datosAlumnos.addEventListener('click', () => {
    crearFormularioAlumno(alumno)
 })
 
-cambioContrasena.addEventListener('click',()=>{
-   limpiarContenido(contenedor)
-   crearDivContrasena();
+btnCambioContrasena.addEventListener('click', () => {
+   let preguntaCambio = window.confirm("¿Estás seguro de que quieres cambiar la contraseña?");
+
+   if (preguntaCambio) {
+      limpiarContenido(contenedor)
+      cambioContrasenaCli()
+   }
+
+})
+
+botonTitulacion.addEventListener('click',()=>{
+   limpiarContenido(contenedor);
+
+})
+
+botonSalir.addEventListener('click', () => {
+
+   //Eliminar la sesión antes
+
+   location.href="../index.html";
+
+
 })
 
 botonTitulacion.addEventListener('click', () => {
    limpiarContenido(contenedor);
+   anadirTitulacion();
 })
 
 async function obtenerAlumno() {
@@ -41,12 +62,78 @@ async function obtenerAlumno() {
    }
 }
 
-function crearDivContrasena(){
+function anadirTitulacion(){
+   console.log("Titulación")
+}
+
+function cambioContrasenaCli() {
 
 
-   let contnedor = crearNodo("div","holaaaa","contenedoriii","",contenedor)
+   generarCodigoTemporal(alumno.email)
+      .then(data => {
+         // Después de la generación del código, creamos el DOM
+         let containerCon = crearNodo("div", "", "contenedorContra", "", contenedor);
+         crearLabel("cambioPass", "Introduce la clave que te hemos mandado al correo para cambiar la contraseña", "lbCamPass", containerCon);
+         let inputPass = crearInput("cambioPass", "inputPass", "text", containerCon);
+         let botonVerifica = crearNodo("button", "Verifica el código", "btnChange", "", containerCon);
+         botonVerifica.addEventListener('click', () => {
+            let codigoIntro = inputPass.value;
+            let correo = alumno.email;
+            let solicitud = {
+               valor: codigoIntro,
+               correo: correo,
+               modo: 1
+            }
+
+            cambioContrasena(solicitud)
+               .then(() => {
+
+                  //Creamos el div para que el usuario pueda cambiar la contraseña
+                  crearCambioContrasena(containerCon)
+               })
+               .catch(error => {
+                  // Manejo de errores
+                  console.error("Error al cambiar la contraseña: " + error);
+                  alert(error);
+               });
+         });
+
+         alert("Se ha enviado un código a tu correo asociado. Introduce el código para cambiar la contraseña");
+      })
+      .catch(error => {
+         // Manejo de errores, si la promesa se rechaza
+         console.error("Error al generar código temporal: " + error.message);
+      });
 
 }
+
+function crearCambioContrasena(divContenedor) {
+
+   limpiarContenido(divContenedor)
+
+   crearNodo("h2", "Cambia la contraseña", "", "", divContenedor)
+
+   //Creamos dos label y dos inputs
+   crearLabel("clave", "Introduce tu contraseña", "", divContenedor)
+   let nuevaClave = crearInput("clave", "inputPass", "text", divContenedor)
+
+   let btnProcesaCambio = crearNodo("button", "Cambia la contraseña", "boton", "", divContenedor)
+   btnProcesaCambio.addEventListener('click', () => {
+      let usuario = alumno.usuario;
+      let contrasena = nuevaClave.value
+      let solicitud = {
+         contrasena: contrasena,
+         usuario: usuario,
+         modo: 2
+      }
+      cambioContraseñaProcesa(solicitud)
+
+   })
+
+}
+
+
+
 
 
 async function crearFormularioAlumno(alumno) {
@@ -59,7 +146,7 @@ async function crearFormularioAlumno(alumno) {
    let modoEditar = false;
 
    for (let propiedad in alumno) {
-      if (propiedad != "dni" && propiedad != "idCurso") {
+      if (propiedad != "dni" && propiedad != "idCurso" && propiedad != "usuario") {
 
          let label = crearLabel(propiedad, cadenaFormateada(propiedad), "lbAlumno", formulario)
          label.id = "lb" + propiedad

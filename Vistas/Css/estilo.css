@@ -121,6 +121,14 @@ h1 {
     transition: all ease 300ms;
 }
 
+.formAltaAlum button:hover{
+    background-color: #0b91ea;
+    cursor: pointer;
+
+}
+
+
+
 
 #contenedorLogin {
     display: flex;
@@ -150,6 +158,12 @@ img {
 }
 
 #divFormulario {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+
     width: 650px;
     margin: 50px auto;
 }

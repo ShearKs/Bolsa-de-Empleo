@@ -44,13 +44,16 @@ class DaoAlumno
 
     public function devuelveAlumno($dni, $esbolsa)
     {
-        $sql = "SELECT alu.dni, alu.nombre, apellidos, email,telefono, cur.nombre as 'curso'";
-        $sql .= $esbolsa ? ", idCurso, expLaboral as 'Experiencia Laboral', telefono as 'Teléfono'" : "";
-        $sql .= " FROM alumnoies alu, cursa_alumn c, curso cur";
-        $sql .= $esbolsa ? ", alumno_bolsa b" : "";
-        $sql .= " WHERE alu.dni = c.dniAlum and c.idCurso = cur.id and alu.dni = ?";
-        $sql .= $esbolsa ? " and alu.dni = b.dni" : "";
+        $sql = "SELECT alu.dni, alu.nombre, apellidos, email, telefono, cur.nombre as 'curso'";
+        $sql .= $esbolsa ? ", idCurso, expLaboral as 'Experiencia Laboral', telefono as 'Teléfono', usu.nombre as 'usuario'" : "";
+        $sql .= " FROM alumnoies alu";
+        $sql .= " JOIN cursa_alumn c ON alu.dni = c.dniAlum";
+        $sql .= " JOIN curso cur ON c.idCurso = cur.id";
+        $sql .= $esbolsa ? " LEFT JOIN alumno_bolsa b ON alu.dni = b.dni" : "";
+        $sql .= $esbolsa ? " LEFT JOIN usuario usu ON b.idUsuario = usu.id" : "";
+        $sql .= " WHERE alu.dni = ?";
         $sql .= " GROUP BY alu.dni";
+
 
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s", $dni);
@@ -92,7 +95,7 @@ class DaoAlumno
         return $idUsuario;
     }
 
-    private function introducirCamposBdd(AlumnoBolsa $alumnoB,$idUsuario)
+    private function introducirCamposBdd(AlumnoBolsa $alumnoB, $idUsuario)
     {
 
         //Todos los campos pasados
@@ -110,7 +113,7 @@ class DaoAlumno
     }
 
 
-    public function insertarAlumno(AlumnoBolsa $alumno,$nombreUsuario)
+    public function insertarAlumno(AlumnoBolsa $alumno, $nombreUsuario)
     {
         // Obtén todos los campos pasados
         $dni = $alumno->getDni();
@@ -126,32 +129,37 @@ class DaoAlumno
         // Iniciamos una transacción
         $this->conexion->autocommit(false);
 
-        //Creamos el objeto usuario
-        $usuario = new Usuario($nombreUsuario, $contrasena);
+        if (!$this->existeUsuario($nombreUsuario)) {
 
-        $idUsuario = $this->insertarUsuario($usuario);
+            //Creamos el objeto usuario
+            $usuario = new Usuario($nombreUsuario, $contrasena);
 
-        if ($idUsuario != -1 ) {
+            $idUsuario = $this->insertarUsuario($usuario);
 
-            // Actualizamos la información del alumno,incluido el nombre del curso si lo quiere
-            // Si se ha hecho bien la actualización llamamos a la función de insertarUsuario
-            if ($this->actualizaAlumno($alumno,false)) {
+            if ($idUsuario != -1) {
 
-                if ($this->introducirCamposBdd($alumno, $idUsuario)) {
+                // Actualizamos la información del alumno,incluido el nombre del curso si lo quiere
+                // Si se ha hecho bien la actualización llamamos a la función de insertarUsuario
+                if ($this->actualizaAlumno($alumno, false)) {
 
-                    $mensaje = "Es es tu usuario y contraseña ,usuario: ".$nombreUsuario." y tu contraseña: ". $contrasena;
+                    if ($this->introducirCamposBdd($alumno, $idUsuario)) {
 
-                    $this->utils->enviarCorreo($email, $mensaje);
-                    $this->conexion->commit();
-                    return json_encode(array("Exito" => "Todo ha ido bien".$contrasena));
+                        $mensaje = "Es es tu usuario y contraseña ,usuario: " . $nombreUsuario . " y tu contraseña: " . $contrasena;
+
+                        $this->utils->enviarCorreo($email, $mensaje);
+                        $this->conexion->commit();
+                        return json_encode(array("Exito" => "Todo ha ido bien" . $contrasena));
+                    } else {
+                        return json_encode(array("Error" => "No se ha podido insertar el alumno en la bolsa"));
+                    }
                 } else {
-                    return json_encode(array("Error" => "No se ha podido insertar el alumno en la bolsa"));
+                    return json_encode(array("Error" => "Ha habido un problema al actualizar la información del alumno"));
                 }
             } else {
-                return json_encode(array("Error" => "Ha habido un problema al actualizar la información del alumno"));
+                return json_encode(array("Error" => "Ha habido un problema al insertar el usuario"));
             }
         } else {
-            return json_encode(array("Error" => "Ha habido un problema al insertar el usuario"));
+            return json_encode(array("Error" => "Ya existe un usuario con ese nombre en la base de datos"));
         }
     }
 
@@ -191,6 +199,25 @@ class DaoAlumno
             $this->conexion->commit();
             return true;
         }
+        return false;
+    }
+
+    //Función que comprueba si el nombre que has introducido ya existía en la base de datos
+    public function existeUsuario($nombre)
+    {
+
+        $sql = "SELECT nombre FROM usuario where nombre = ? ";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("s", $nombre);
+
+        $estado = $sentencia->execute();
+        $resultado = $sentencia->get_result();
+
+        //Si existe retorna true
+        if ($estado && $resultado->num_rows == 1) {
+            return true;
+        }
+
         return false;
     }
 

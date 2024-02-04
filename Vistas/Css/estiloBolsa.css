@@ -117,8 +117,6 @@ header ul li:hover a {
     margin-bottom: 10px;
 }
 
-
-
 .divBoton {
     width: 40px;
     height: 40px;
@@ -153,4 +151,21 @@ header ul li:hover a {
 .botonEditar:hover {
     background-color: #45a049;
     /* Cambia el color de fondo al pasar el mouse sobre el botón */
+}
+
+.contenedorContra{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    margin: 15px;
+    padding: 5%;
+    background-color: #54cf5a;
+    border-radius: 15px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.contenedorContra input{
+    margin-top: 5%;
+    width: 100%;
 }
