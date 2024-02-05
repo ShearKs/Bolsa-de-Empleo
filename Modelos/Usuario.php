@@ -10,12 +10,14 @@ class Usuario implements JsonSerializable
     private $id;
     private $nombreUsuario;
     private $contrasena;
+    private $rol;
 
-    public function __construct($nombreUsuario, $contrasena, $id = null)
+    public function __construct($nombreUsuario, $contrasena,$rol = null ,$id = null)
     {
         $this->id = $id;
         $this->nombreUsuario = $nombreUsuario;
         $this->contrasena = $contrasena;
+        $this->rol = $rol;
     }
 
     public function getId()
@@ -30,6 +32,10 @@ class Usuario implements JsonSerializable
     public function getContrasena()
     {
         return $this->contrasena;
+    }
+
+    public function getRol(){
+        return $this->rol;
     }
 
     public function jsonSerialize()

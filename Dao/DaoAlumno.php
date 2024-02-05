@@ -73,12 +73,13 @@ class DaoAlumno
 
         $usuarioNombre = $usuario->getNombreUsuario();
         $contrasena = $usuario->getContrasena();
+        $rol = $usuario->getRol();
 
         $contrasenaEncriptada = password_hash($contrasena, PASSWORD_BCRYPT);
 
-        $sql = "INSERT INTO usuario(nombre,contrasena) VALUES (?,?)";
+        $sql = "INSERT INTO usuario(nombre,contrasena,rol) VALUES (?,?,?)";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("ss", $usuarioNombre, $contrasenaEncriptada);
+        $sentencia->bind_param("ssd", $usuarioNombre, $contrasenaEncriptada,$rol);
         $estado = $sentencia->execute();
 
         $idUsuario = -1;
@@ -113,7 +114,7 @@ class DaoAlumno
     }
 
 
-    public function insertarAlumno(AlumnoBolsa $alumno, $nombreUsuario)
+    public function insertarAlumno(AlumnoBolsa $alumno, $nombreUsuario,$rol)
     {
         // Obtén todos los campos pasados
         $dni = $alumno->getDni();
@@ -132,7 +133,7 @@ class DaoAlumno
         if (!$this->existeUsuario($nombreUsuario)) {
 
             //Creamos el objeto usuario
-            $usuario = new Usuario($nombreUsuario, $contrasena);
+            $usuario = new Usuario($nombreUsuario, $contrasena,$rol);
 
             $idUsuario = $this->insertarUsuario($usuario);
 

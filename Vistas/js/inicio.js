@@ -1,5 +1,5 @@
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, eliminarExistente } from './utilsDom.js';
-import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos, devuelveCamposEmpresa } from './funcionesFetch.js';
+import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos, devuelveCamposEmpresa,insertaEmpresa } from './funcionesFetch.js';
 import * as funciones from './funcionesGenerales.js';
 
 //Div donde se encuentra todo
@@ -144,29 +144,46 @@ function creaFormularioEmpresa(camposEmpresa, cif) {
 
     crearNodo("h2", "Formulario de Empresas", "formAlum", "", divFormulario)
 
-
     //Creamos el formulario de registro para empresas
     let formAltaEmpresa = crearNodo("form", "", "formAltaAlum", "", divFormulario)
 
     //camposEmpresa es un array donde tendremos todos los nombre de las columnas de empresa
-
+    //Introducimos todos los campos que serán todas las columnas en la base de datos
     Object.keys(camposEmpresa).forEach(key => {
         const campo = camposEmpresa[key].column_name;
-        let caja = crearNodo("div", "", "caja", "", formAltaEmpresa);
 
-        let campoFormat = funciones.cadenaFormateada(campo);
-        crearLabel(campo, campoFormat, "lbUsuario", caja);
-        let inputEmp = crearInput(campo, "input", "text", caja);
-        inputEmp.id = "inputEmp" + campo;
-        if(inputEmp.name == 'cif'){
-            
-            inputEmp.value = cif
-            inputEmp.disabled = true
+        if (campo != 'idUsuario') {
+            let caja = crearNodo("div", "", "caja", "caja" + campo, formAltaEmpresa);
+            let campoFormat = funciones.cadenaFormateada(campo);
+            crearLabel(campo, campoFormat, "lbUsuario", caja);
+            let inputEmp = crearInput(campo, "input", "text", caja);
+            inputEmp.id = "inputEmp" + campo;
+            if (inputEmp.name == 'cif') {
+
+                inputEmp.value = cif
+                inputEmp.setAttribute("readonly", "true")
+                inputEmp.style.backgroundColor = "#bfbfbf"
+            }
         }
     });
 
+    //Introducimos el label y el campo de usuario
+    let cajaCif = document.getElementById("cajacif")
+    let divUsuario = crearNodoDebajo("div", "", "caja", "", cajaCif)
+    crearLabel("usuario", "Usuario", "lbUsuario", divUsuario)
+    crearInput("usuario", "input", "text", divUsuario)
+
     let botonAlta = crearNodo("button", "Registrate en la bolsa de Empleo", "formAlta", "formAlta", formAltaEmpresa);
-    botonAlta.addEventListener('click', () => {
+    botonAlta.addEventListener('click', (event) => {
+        event.preventDefault()
+
+        let inputsForm = document.getElementsByClassName("input")
+        if (funciones.comprobarFormulario(inputsForm)) {
+            let formData = new FormData(formAltaEmpresa);
+            let empresa = recogeDatosEmpresa(formData)
+            console.log(empresa)
+            insertaEmpresa(empresa)
+        }
     })
 
     let botonVolver = crearNodo("button", "Volver", "formAlta", "formAlta", formAltaEmpresa);
@@ -178,6 +195,19 @@ function creaFormularioEmpresa(camposEmpresa, cif) {
         inicio.style.display = 'flex'
 
     })
+}
+
+//Función que recoge todo lo que la empresa ha escrito en el formulario
+function recogeDatosEmpresa(formData) {
+
+    let empresa = {}
+
+    //Recoremos 
+    formData.forEach((valor, clave) => {
+        empresa[clave] = valor
+    })
+
+    return empresa;
 }
 
 

@@ -260,7 +260,7 @@ export function insertarTitulo(solicitudCurso) {
 
 
 //Función Fetch que nos devuelve el alumno titulado en la base de datos
-export function alumnoDevuelto(cif, crearFormularioAlta,parrafoError) {
+export function alumnoDevuelto(cif, crearFormularioAlta, parrafoError) {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -280,7 +280,7 @@ export function alumnoDevuelto(cif, crearFormularioAlta,parrafoError) {
             //if (document.getElementById('mensajeError')) document.getElementById('mensajeError').remove()
 
             if (data.hasOwnProperty('Error')) {
-                parrafoError.textContent = "Error: " + data.Error 
+                parrafoError.textContent = "Error: " + data.Error
 
                 return
             }
@@ -292,25 +292,53 @@ export function alumnoDevuelto(cif, crearFormularioAlta,parrafoError) {
         })
 }
 
-export function devuelveCamposEmpresa(creaFormularioEmpresa,cif){
+export function devuelveCamposEmpresa(creaFormularioEmpresa, cif) {
     fetch('Controladores/devuelveCamposEmpresa.php')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('La solicitud no ha sido correcta')
-        }
-        return response.json()
-    })
-    .then(data => {
-        
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La solicitud no ha sido correcta')
+            }
+            return response.json()
+        })
+        .then(data => {
 
-        if (data.hasOwnProperty('Error')) {
-            parrafoError.textContent = "Error: " + data.Error 
-            return
-        }
-        creaFormularioEmpresa(data,cif)
 
-    })
-    .catch(error => {
-        console.error("Error en la solicitud: " + error)
-    })
+            if (data.hasOwnProperty('Error')) {
+                parrafoError.textContent = "Error: " + data.Error
+                return
+            }
+            creaFormularioEmpresa(data, cif)
+
+        })
+        .catch(error => {
+            console.error("Error en la solicitud: " + error)
+        })
+}
+
+export function insertaEmpresa(empresa) {
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(empresa)
+    }
+    fetch('./Controladores/insertaEmpresa.php', requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La solicitud no se ha enviado correctamente')
+            }
+            return response.json()
+        })
+        .then(mensaje => {
+            console.log(mensaje)
+            if (mensaje.hasOwnProperty('Exito')) {
+                alert(mensaje.Exito)
+            } else {
+                console.log(mensaje.Error);
+            }
+
+        })
+        .catch(error => {
+            console.error("Error en la solicitud: ", error)
+        })
 }

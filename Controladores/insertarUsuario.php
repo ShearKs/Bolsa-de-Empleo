@@ -16,7 +16,7 @@ $alumnoB = new AlumnoBolsa($alumnoJs['nombre'],$alumnoJs['apellidos'],$alumnoJs[
 
 $daoAlumno = new DaoAlumno();
 
-$mensaje = $daoAlumno->insertarAlumno($alumnoB,$nombreUser);
+$mensaje = $daoAlumno->insertarAlumno($alumnoB,$nombreUser,1);
 
 echo $mensaje;
 
