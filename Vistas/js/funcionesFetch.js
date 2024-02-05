@@ -291,3 +291,27 @@ export function alumnoDevuelto(cif, crearFormularioAlta,parrafoError) {
             console.error("Error en la solicitud: " + error)
         })
 }
+
+export function devuelveCamposEmpresa(){
+    fetch('Controladores/devuelveCamposEmpresa.php')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('La solicitud no ha sido correcta')
+        }
+        return response.json()
+    })
+    .then(data => {
+        console.log(data)
+
+        if (data.hasOwnProperty('Error')) {
+            parrafoError.textContent = "Error: " + data.Error 
+
+            return
+        }
+        creaFormularioEmpresa(data)
+
+    })
+    .catch(error => {
+        console.error("Error en la solicitud: " + error)
+    })
+}

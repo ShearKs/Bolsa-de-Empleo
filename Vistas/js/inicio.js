@@ -1,5 +1,5 @@
-import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido,eliminarExistente } from './utilsDom.js';
-import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos } from './funcionesFetch.js';
+import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, eliminarExistente } from './utilsDom.js';
+import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos,devuelveCamposEmpresa } from './funcionesFetch.js';
 import * as funciones from './funcionesGenerales.js';
 
 //Div donde se encuentra todo
@@ -15,6 +15,8 @@ const botonLogin = document.getElementById('btnInicioSesion');
 const divInicio = document.getElementById('contenidoLogin');
 
 const tituloLogin = document.getElementById('tituloLogin');
+//Creamos un div que será el que contendrá el formulario
+let divFormulario = document.getElementById("divFormulario");
 
 
 window.onload = (event) => {
@@ -71,13 +73,13 @@ function crearInicio() {
     botonInicioSesion.addEventListener('click', (event) => {
         event.preventDefault();
 
-        if(inputUsuario.value == "" || inputContra.value == ""){
+        if (inputUsuario.value == "" || inputContra.value == "") {
 
             parrafoError.textContent = "Tienes que introducir tanto usuario como contraseña"
             return;
         }
 
-        
+
         const formularioLogin = new FormData(formulario);
 
         let usuarioCampo = formularioLogin.get('usuario')
@@ -116,7 +118,7 @@ function crearAlta() {
     // Agregar el evento click fuera del evento change
     botonAlta.addEventListener('click', (event) => {
         event.preventDefault();
-        if(inputCif.value == ""){
+        if (inputCif.value == "") {
             parrafoError.textContent = "Debes de introducir algún campo..";
             //crearNodo("p", "Debes de introducir algún campo..", "mensajeError", "mensajeError", divInicio)
             return;
@@ -126,11 +128,41 @@ function crearAlta() {
         // Verificar la opción seleccionada en ese momento
         if (select.value === 'alumno') {
             // Función Fetch que nos devuelve el alumno titulado en la base de datos
-            alumnoDevuelto(inputCif.value, crearFormularioAlta,parrafoError);
+            alumnoDevuelto(inputCif.value, crearFormularioAlta, parrafoError);
         } else {
-            console.log("pa ti mi cola jejeje");
+
+            devuelveCamposEmpresa(creaFormularioEmpresa)
+            //creaFormularioEmpresa();
         }
     });
+
+}
+
+function creaFormularioEmpresa(camposEmpresa) {
+
+    inicio.style.display = 'none'
+
+    crearNodo("h2", "Formulario de Empresas", "formAlum", "", divFormulario)
+
+    //Creamos el formulario de registro para empresas
+    let formAltaEmpresa = crearNodo("form", "", "formAltaAlum", "", divFormulario)
+
+    let botonAlta = crearNodo("button", "Registrate en la bolsa de Empleo", "formAlta", "formAlta", formAltaEmpresa);
+    botonAlta.addEventListener('click', () => {
+        console.log("date de alta moreno")
+    })
+
+    let botonVolver = crearNodo("button", "Volver", "formAlta", "formAlta", formAltaEmpresa);
+    botonVolver.addEventListener('click', () => {
+        tituloLogin.textContent = "Inicia Sesión";
+        limpiarContenido(divInicio)
+        crearInicio();
+        limpiarContenido(divFormulario)
+        inicio.style.display = 'flex'
+
+    })
+
+
 
 }
 
@@ -139,9 +171,6 @@ function crearAlta() {
 function crearFormularioAlta(datosAlumno) {
 
     inicio.style.display = 'none';
-
-    //Creamos un div que será el que contendrá el formulario
-    let divFormulario = document.getElementById("divFormulario");
 
     crearNodo("h2", "Formulario de Alumno", "formAlum", "", divFormulario)
 

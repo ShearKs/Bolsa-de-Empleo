@@ -1,8 +1,6 @@
 <?php
 
 
-
-
 class AlumnoBolsa extends Alumno implements JsonSerializable
 {
 
