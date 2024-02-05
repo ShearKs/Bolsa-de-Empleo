@@ -1,5 +1,5 @@
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, eliminarExistente } from './utilsDom.js';
-import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos,devuelveCamposEmpresa } from './funcionesFetch.js';
+import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos, devuelveCamposEmpresa } from './funcionesFetch.js';
 import * as funciones from './funcionesGenerales.js';
 
 //Div donde se encuentra todo
@@ -131,25 +131,42 @@ function crearAlta() {
             alumnoDevuelto(inputCif.value, crearFormularioAlta, parrafoError);
         } else {
 
-            devuelveCamposEmpresa(creaFormularioEmpresa)
+            devuelveCamposEmpresa(creaFormularioEmpresa, inputCif.value)
             //creaFormularioEmpresa();
         }
     });
 
 }
 
-function creaFormularioEmpresa(camposEmpresa) {
+function creaFormularioEmpresa(camposEmpresa, cif) {
 
     inicio.style.display = 'none'
 
     crearNodo("h2", "Formulario de Empresas", "formAlum", "", divFormulario)
 
+
     //Creamos el formulario de registro para empresas
     let formAltaEmpresa = crearNodo("form", "", "formAltaAlum", "", divFormulario)
 
+    //camposEmpresa es un array donde tendremos todos los nombre de las columnas de empresa
+
+    Object.keys(camposEmpresa).forEach(key => {
+        const campo = camposEmpresa[key].column_name;
+        let caja = crearNodo("div", "", "caja", "", formAltaEmpresa);
+
+        let campoFormat = funciones.cadenaFormateada(campo);
+        crearLabel(campo, campoFormat, "lbUsuario", caja);
+        let inputEmp = crearInput(campo, "input", "text", caja);
+        inputEmp.id = "inputEmp" + campo;
+        if(inputEmp.name == 'cif'){
+            
+            inputEmp.value = cif
+            inputEmp.disabled = true
+        }
+    });
+
     let botonAlta = crearNodo("button", "Registrate en la bolsa de Empleo", "formAlta", "formAlta", formAltaEmpresa);
     botonAlta.addEventListener('click', () => {
-        console.log("date de alta moreno")
     })
 
     let botonVolver = crearNodo("button", "Volver", "formAlta", "formAlta", formAltaEmpresa);
@@ -161,9 +178,6 @@ function creaFormularioEmpresa(camposEmpresa) {
         inicio.style.display = 'flex'
 
     })
-
-
-
 }
 
 

@@ -292,7 +292,7 @@ export function alumnoDevuelto(cif, crearFormularioAlta,parrafoError) {
         })
 }
 
-export function devuelveCamposEmpresa(){
+export function devuelveCamposEmpresa(creaFormularioEmpresa,cif){
     fetch('Controladores/devuelveCamposEmpresa.php')
     .then(response => {
         if (!response.ok) {
@@ -301,14 +301,13 @@ export function devuelveCamposEmpresa(){
         return response.json()
     })
     .then(data => {
-        console.log(data)
+        
 
         if (data.hasOwnProperty('Error')) {
             parrafoError.textContent = "Error: " + data.Error 
-
             return
         }
-        creaFormularioEmpresa(data)
+        creaFormularioEmpresa(data,cif)
 
     })
     .catch(error => {

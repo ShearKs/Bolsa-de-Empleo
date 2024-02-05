@@ -21,7 +21,26 @@ class DaoEmpresa
         $this->utils = new Utilidades();
     }
 
+    public function devuelveCampos()
+    {
 
-    public function existeCifEmpresa($cifEmpresa){
+        $sql = "SELECT column_name FROM information_schema.columns WHERE table_name = 'Empresa'";
+        $query = $this->conexion->query($sql);
+
+        $campos = array();
+
+        if ($query->num_rows > 0) {
+
+            while ($fila = $query->fetch_assoc()) {
+                $campos[] = $fila;
+            }
+        }
+
+        return $campos;
+    }
+
+
+    public function existeCifEmpresa($cifEmpresa)
+    {
     }
 }

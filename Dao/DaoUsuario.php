@@ -40,8 +40,9 @@ class DaoUsuario
 
                 //Me creo una sesión con el nombre del usuario
                 session_start();
-                $dni = $this->devuelveDniUser($nombreUsuario);
-                $_SESSION['dni'] = $dni;
+                $idUsuario = $usuario['id'];
+                $dni = $this->devuelveDniUser($idUsuario);
+                $_SESSION['cif'] = $dni;
 
                 //Obtenemos el rol al iniciar sesión y se lo pasamos al cliente
                 $rol = $usuario['rol'];
@@ -76,12 +77,20 @@ class DaoUsuario
         return json_encode(array("Error" => "Ha habido un problema al cambiar la contraseña"));
     }
 
-    public function devuelveDniUser($nombreUsuario)
+    public function devuelveDniUser($idUsuario)
     {
-        $sql = " SELECT dni from usuario u ,alumno_bolsa al
-                 WHERE u.id = al.idUsuario and u.nombre = ? ";
+        $sql = " SELECT 
+                    CASE 
+                        WHEN al.idUsuario IS NOT NULL THEN al.dni -- Si es un alumno
+                        WHEN e.idUsuario IS NOT NULL THEN e.cif  -- Si es una empresa
+                    END AS cif
+                FROM usuario u
+                LEFT JOIN alumno_bolsa al ON u.id = al.idUsuario
+                LEFT JOIN empresa e ON u.id = e.idUsuario
+                WHERE u.id = ? ";
+
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("s", $nombreUsuario);
+        $sentencia->bind_param("d", $idUsuario);
 
         $estado = $sentencia->execute();
         $resultado = $sentencia->get_result();
@@ -89,7 +98,7 @@ class DaoUsuario
         if ($estado && $resultado->num_rows == 1) {
 
             $fila = $resultado->fetch_assoc();
-            $dni = $fila['dni'];
+            $dni = $fila['cif'];
         }
         return $dni;
     }
