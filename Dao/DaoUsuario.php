@@ -43,8 +43,11 @@ class DaoUsuario
                 $dni = $this->devuelveDniUser($nombreUsuario);
                 $_SESSION['dni'] = $dni;
 
+                //Obtenemos el rol al iniciar sesión y se lo pasamos al cliente
+                $rol = $usuario['rol'];
+
                 //return json_encode($usuario);
-                return json_encode(array("Exito" => "Has iniciado sesión correctamente"));
+                return json_encode(array("Exito" => $rol));
             }
             return json_encode(array("Error" => "La contraseña que has introducido es incorrecta"));
         } else {

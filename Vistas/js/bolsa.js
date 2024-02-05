@@ -2,56 +2,95 @@ import { obtenerAlumnoBolsa, editarAlumnoBolsa, crearCursos, generarCodigoTempor
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg } from './utilsDom.js';
 import { cadenaFormateada } from './funcionesGenerales.js';
 
-const datosAlumnos = document.getElementById('datosAlumno');
-const btnCambioContrasena = document.getElementById('cambioContrasena');
-const botonTitulacion = document.getElementById('anadirTitulacion');
-const botonSalir = document.getElementById('salir');
+//Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
+const listaMenu = document.getElementById('lista');
+
+// const datosAlumnos = document.getElementById('datosAlumno');
+// const btnCambioContrasena = document.getElementById('cambioContrasena');
+// const botonTitulacion = document.getElementById('anadirTitulacion');
+// const botonSalir = document.getElementById('salir');
 
 // Div sobre el que vamos a mostrar los contenidos según el botón que le indique el usuario
 const contenedor = document.getElementById('principal');
+
+//Obtenemos el rol el cual ha iniciado el usuario
+let rolUser = parseInt(sessionStorage.getItem('rol'));
+console.log("Rol del usuario: ", rolUser)
+
 
 // Alumno en bolsa
 let alumno = {};
 
 window.onload = async (event) => {
-   await obtenerAlumno();
-   crearFormularioAlumno(alumno)
+
+   switch (rolUser) {
+
+      case 1:
+         crearMenuAlumnos();
+         await obtenerAlumno();
+         crearFormularioAlumno(alumno)
+         break;
+      case 2:
+         crearMenuEmpresa();
+         console.log("la chupas jejeje")
+         break;
+
+      default:
+         console.log("Ha habido un error con el rol del Usuario");
+   }
 };
 
-datosAlumnos.addEventListener('click', () => {
-   limpiarContenido(contenedor);
-   console.log("Dni del alumno en Bolsa: " + alumno.dni)
-   crearFormularioAlumno(alumno)
-})
+function crearMenuAlumnos() {
 
-btnCambioContrasena.addEventListener('click', () => {
-   let preguntaCambio = window.confirm("¿Estás seguro de que quieres cambiar la contraseña?");
+   let datosAlumnos = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
+   crearNodo("a", "Ver datos del alumno", "", "", datosAlumnos)
 
-   if (preguntaCambio) {
-      limpiarContenido(contenedor)
-      cambioContrasenaCli()
-   }
+   datosAlumnos.addEventListener('click', () => {
+      limpiarContenido(contenedor);
+      crearFormularioAlumno(alumno)
+   })
 
-})
+   let btnCambioContrasena = crearNodo("li", "", "liAlumno", "cambioContrasena", listaMenu);
+   crearNodo("a", "Cambiar Contraseña", "", "", btnCambioContrasena)
 
-botonTitulacion.addEventListener('click', () => {
-   limpiarContenido(contenedor);
+   btnCambioContrasena.addEventListener('click', () => {
+      let preguntaCambio = window.confirm("¿Estás seguro de que quieres cambiar la contraseña?");
 
-})
-
-botonSalir.addEventListener('click', () => {
-
-   //Eliminar la sesión antes
-
-   location.href = "../index.html";
+      if (preguntaCambio) {
+         limpiarContenido(contenedor)
+         cambioContrasenaCli()
+      }
+   })
 
 
-})
+   let botonTitulacion = crearNodo("li", "", "liAlumno", "anadirTitulacion", listaMenu);
+   crearNodo("a", "Añadir Titulación", "", "", botonTitulacion)
 
-botonTitulacion.addEventListener('click', () => {
-   limpiarContenido(contenedor);
-   anadirTitulacion();
-})
+   botonTitulacion.addEventListener('click', () => {
+      limpiarContenido(contenedor);
+      anadirTitulacion();
+   })
+
+   let botonSalir = crearNodo("li", "", "liAlumno", "salir", listaMenu);
+   crearNodo("a", "Salir", "", "", botonSalir)
+
+   botonSalir.addEventListener('click', () => {
+
+      //Eliminar la sesión antes
+      location.href = "../index.html";
+   })
+
+}
+
+function crearMenuEmpresa(){
+   let datosEmpresa = crearNodo("li","","liEmpresa","datosEmpresa",listaMenu)
+   crearNodo("a","Ver datos de la empresa","","",datosEmpresa)
+   datosEmpresa.addEventListener('click',()=>{
+      console.log("la chupas jajajaa")
+   })
+}
+
+
 
 async function obtenerAlumno() {
    try {

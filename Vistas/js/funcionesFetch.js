@@ -26,9 +26,16 @@ export function inicioSesion(usuario, parrafoError) {
             if (data.hasOwnProperty('Exito')) {
 
                 window.location.href = './Vistas/main.html';
+
+                //Iniciamos una sesión en javascript con el rol del usuario
+                sessionStorage.setItem('rol', data.Exito)
+
+
+                return;
             }
             console.log("Error :", data)
             parrafoError.textContent = data.Error
+
         })
         .catch(error => {
             console.error("Error en la solicitud: " + error)
@@ -253,7 +260,7 @@ export function insertarTitulo(solicitudCurso) {
 
 
 //Función Fetch que nos devuelve el alumno titulado en la base de datos
-export function alumnoDevuelto(cif, crearFormularioAlta, divInicio) {
+export function alumnoDevuelto(cif, crearFormularioAlta,parrafoError) {
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -270,10 +277,11 @@ export function alumnoDevuelto(cif, crearFormularioAlta, divInicio) {
         })
         .then(data => {
             console.log(data)
-            if (document.getElementById('mensajeError')) document.getElementById('mensajeError').remove()
+            //if (document.getElementById('mensajeError')) document.getElementById('mensajeError').remove()
 
             if (data.hasOwnProperty('Error')) {
-                nodos.crearNodo("p", "Error: " + data.Error, "mensajeError", "mensajeError", divInicio)
+                parrafoError.textContent = "Error: " + data.Error 
+
                 return
             }
             crearFormularioAlta(data)

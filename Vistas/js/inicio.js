@@ -59,10 +59,10 @@ function crearInicio() {
     eliminarExistente("selectRegistro")
 
     crearLabel("usuario", "Usuario", "lbUsuario", divInicio)
-    crearInput("usuario", "inputUser", "text", divInicio)
+    let inputUsuario = crearInput("usuario", "inputUser", "text", divInicio)
 
     crearLabel("contrasena", "Contraseña", "", divInicio)
-    crearInput("contrasena", "inputContra", "password", divInicio)
+    let inputContra = crearInput("contrasena", "inputContra", "password", divInicio)
 
     //Insertamos el mensaje de Error por si hay error al logearnos
     let parrafoError = crearNodo("p", "", "mensajeError", "mensajeError", divInicio)
@@ -71,6 +71,13 @@ function crearInicio() {
     botonInicioSesion.addEventListener('click', (event) => {
         event.preventDefault();
 
+        if(inputUsuario.value == "" || inputContra.value == ""){
+
+            parrafoError.textContent = "Tienes que introducir tanto usuario como contraseña"
+            return;
+        }
+
+        
         const formularioLogin = new FormData(formulario);
 
         let usuarioCampo = formularioLogin.get('usuario')
@@ -98,20 +105,28 @@ function crearAlta() {
     let optionEmpresa = crearNodo("option", "Empresas", "optionRegistro", "", select)
     optionEmpresa.value = "empresa"
 
+
     let labelAlta = crearLabel("cif", "Introduce tu dni para darte de alta en la bolsa", "lbUsuario", divInicio)
     let inputCif = crearInput("cif", "inputCif", "text", divInicio)
     inputCif.id = "inputCif"
-    let botonAlta = crearNodo("button", "Date de Alta en la bolsa de Empleo", "btnInicioSesion", "", divInicio)
 
+    let parrafoError = crearNodo("p", "", "mensajeError", "mensajeError", divInicio)
+
+    let botonAlta = crearNodo("button", "Date de Alta en la bolsa de Empleo", "btnInicioSesion", "", divInicio)
     // Agregar el evento click fuera del evento change
     botonAlta.addEventListener('click', (event) => {
         event.preventDefault();
+        if(inputCif.value == ""){
+            parrafoError.textContent = "Debes de introducir algún campo..";
+            //crearNodo("p", "Debes de introducir algún campo..", "mensajeError", "mensajeError", divInicio)
+            return;
+        }
         labelAlta.textContent = "Introduce tu cif para poder iniciarte en la bolsa";
         console.log(select.value)
         // Verificar la opción seleccionada en ese momento
         if (select.value === 'alumno') {
             // Función Fetch que nos devuelve el alumno titulado en la base de datos
-            alumnoDevuelto(inputCif.value, crearFormularioAlta, divInicio);
+            alumnoDevuelto(inputCif.value, crearFormularioAlta,parrafoError);
         } else {
             console.log("pa ti mi cola jejeje");
         }
