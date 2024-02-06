@@ -1,4 +1,4 @@
-import { obtenerAlumnoBolsa, editarAlumnoBolsa, crearCursos, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa, insertarTitulo } from './funcionesFetch.js';
+import { obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa, insertarTitulo } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg } from './utilsDom.js';
 import { cadenaFormateada } from './funcionesGenerales.js';
 
@@ -19,35 +19,43 @@ console.log("Rol del usuario: ", rolUser)
 
 
 // Alumno en bolsa
-let alumno = {};
+let usuario = {};
 
 window.onload = async (event) => {
+   await obtenerUsuarioBolsa();
+   crearFormularioDatos(usuario);
+   menuGeneral();
 
    switch (rolUser) {
 
       case 1:
          crearMenuAlumnos();
-         await obtenerAlumno();
-         crearFormularioAlumno(alumno)
          break;
       case 2:
          crearMenuEmpresa();
-         console.log("la chupas jejeje")
          break;
 
       default:
          console.log("Ha habido un error con el rol del Usuario");
    }
+
+   let botonSalir = crearNodo("li", "", "liAlumno", "salir", listaMenu);
+   crearNodo("a", "Salir", "", "", botonSalir)
+
+   botonSalir.addEventListener('click', () => {
+
+      //Eliminar la sesión antes
+      location.href = "../index.html";
+   })
 };
 
-function crearMenuAlumnos() {
-
+function menuGeneral() {
    let datosAlumnos = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
    crearNodo("a", "Ver datos del alumno", "", "", datosAlumnos)
 
    datosAlumnos.addEventListener('click', () => {
       limpiarContenido(contenedor);
-      crearFormularioAlumno(alumno)
+      crearFormularioDatos(usuario);
    })
 
    let btnCambioContrasena = crearNodo("li", "", "liAlumno", "cambioContrasena", listaMenu);
@@ -63,6 +71,10 @@ function crearMenuAlumnos() {
    })
 
 
+}
+
+function crearMenuAlumnos() {
+
    let botonTitulacion = crearNodo("li", "", "liAlumno", "anadirTitulacion", listaMenu);
    crearNodo("a", "Añadir Titulación", "", "", botonTitulacion)
 
@@ -70,32 +82,22 @@ function crearMenuAlumnos() {
       limpiarContenido(contenedor);
       anadirTitulacion();
    })
-
-   let botonSalir = crearNodo("li", "", "liAlumno", "salir", listaMenu);
-   crearNodo("a", "Salir", "", "", botonSalir)
-
-   botonSalir.addEventListener('click', () => {
-
-      //Eliminar la sesión antes
-      location.href = "../index.html";
-   })
-
 }
 
-function crearMenuEmpresa(){
-   let datosEmpresa = crearNodo("li","","liEmpresa","datosEmpresa",listaMenu)
-   crearNodo("a","Ver datos de la empresa","","",datosEmpresa)
-   datosEmpresa.addEventListener('click',()=>{
+function crearMenuEmpresa() {
+   let datosEmpresa = crearNodo("li", "", "liEmpresa", "datosEmpresa", listaMenu)
+   crearNodo("a", "Ver datos de la empresa", "", "", datosEmpresa)
+   datosEmpresa.addEventListener('click', () => {
       console.log("la chupas jajajaa")
    })
 }
 
 
 
-async function obtenerAlumno() {
+async function obtenerUsuarioBolsa() {
    try {
-      alumno = await obtenerAlumnoBolsa();
-      console.log(alumno)
+      usuario = await obtenerUsuario(rolUser);
+      console.log(usuario)
    } catch (error) {
       console.error("Error al obtener alumno: " + error);
    }
@@ -131,14 +133,12 @@ function titulacion(divPadre, centro) {
    if (centro == 'centro') {
       //Si el centro cargaremos el combo con unos datos
       let parrafo = crearNodo("p", "Titulos del centro", "", "", divTitulacionesCentro)
-      crearCursos(alumno.curso, parrafo, true, 1);
+      crearCursos(usuario.curso, parrafo, true, 1);
    } else {
       //Si es de fuera el combo será con cursos cursados fuera
       let parrafo = crearNodo("p", "Titulos fuera del centro", "", "", divTitulacionesCentro)
-      crearCursos(alumno.curso, parrafo, true, 2);
+      crearCursos(usuario.curso, parrafo, true, 2);
    }
-
-
 
 
    let btnAnadirTitulacion = crearNodo("button", "Añade la titulación", "", "", divPadre)
@@ -148,7 +148,7 @@ function titulacion(divPadre, centro) {
 
       let solicitudCurso = {
          idCurso: selectCurso.value,
-         dni: alumno.dni
+         dni: usuario.dni
       }
       insertarTitulo(solicitudCurso)
 
@@ -157,17 +157,17 @@ function titulacion(divPadre, centro) {
 
 function cambioContrasenaCli() {
 
-   generarCodigoTemporal(alumno.email)
+   generarCodigoTemporal(usuario.email)
       .then(data => {
          // Después de la generación del código, creamos el DOM
          let containerCon = crearNodo("div", "", "contenedorContra", "", contenedor);
-         crearLabel("cambioPass", "Introduce la clave que te hemos mandado al correo(" + alumno.email + ") para cambiar la contraseña", "lbCamPass", containerCon);
+         crearLabel("cambioPass", "Introduce la clave que te hemos mandado al correo(" + usuario.email + ") para cambiar la contraseña", "lbCamPass", containerCon);
          let inputPass = crearInput("cambioPass", "inputPass", "text", containerCon);
          let botonVerifica = crearNodo("button", "Verifica el código", "btnChange", "", containerCon);
 
          botonVerifica.addEventListener('click', () => {
             let codigoIntro = inputPass.value;
-            let correo = alumno.email;
+            let correo = usuario.email;
             let solicitud = {
                valor: codigoIntro,
                correo: correo,
@@ -208,20 +208,20 @@ function crearCambioContrasena(divContenedor) {
 
    let btnProcesaCambio = crearNodo("button", "Cambia la contraseña", "boton", "", divContenedor)
    btnProcesaCambio.addEventListener('click', () => {
-      let usuario = alumno.usuario;
+      let user = usuario.usuario;
       let contrasena = nuevaClave.value
       let solicitud = {
          contrasena: contrasena,
-         usuario: usuario,
+         usuario: user,
          modo: 2
       }
       cambioContraseñaProcesa(solicitud)
-
    })
-
 }
 
-async function crearFormularioAlumno(alumno) {
+
+
+async function crearFormularioDatos(usuario) {
 
    let divContenedor = crearNodo("div", "", "contenedor", "", contenedor)
 
@@ -230,25 +230,18 @@ async function crearFormularioAlumno(alumno) {
 
    let modoEditar = false;
 
-   for (let propiedad in alumno) {
-      if (propiedad != "dni" && propiedad != "idCurso" && propiedad != "usuario") {
+   for (let propiedad in usuario) {
 
+      if (propiedad != 'idUsuario' && propiedad != 'usuario') {
          let label = crearLabel(propiedad, cadenaFormateada(propiedad), "lbAlumno", formulario)
          label.id = "lb" + propiedad
-         if (propiedad != "curso") {
-            let input = crearInput(propiedad, "inpFormAlum", "text", formulario)
-            input.value = alumno[propiedad]
-            input.disabled = true
-         }
+
+         let input = crearInput(propiedad, "inpFormAlum", "text", formulario)
+         input.value = usuario[propiedad]
+         input.id = "input" + propiedad
+         input.disabled = true
       }
    }
-
-   let lbCurso = document.getElementById('lbcurso');
-   console.log("idCurso", alumno.idCurso)
-   await crearCursos(alumno.curso, lbCurso, true, 1);
-
-   let select = document.getElementById("selectCursos");
-   select.disabled = true
 
    let botonOcultar = crearNodo("button", "Oculta el Contenido", "botonProcesa", "", divContenedor)
    botonOcultar.addEventListener('click', () => {
@@ -259,7 +252,7 @@ async function crearFormularioAlumno(alumno) {
    let botonEditarP = crearBotonImg(contenido, "divBoton", "img", "../Vistas/img/editar.png", "#b3e6ff");
 
    botonEditarP.addEventListener('click', () => {
-      //botonOcultar.remove();
+
 
       if (!modoEditar) {
 
@@ -268,29 +261,30 @@ async function crearFormularioAlumno(alumno) {
          let inputs = formulario.getElementsByTagName("input");
          console.log(inputs.length)
          for (let i = 0; i < inputs.length; i++) {
-            inputs[i].disabled = false
+            if (inputs[i].id != "inputdni" && inputs[i].id != "inputcif") {
+               inputs[i].disabled = false
+            }
          }
-         select.disabled = false
-
-         // Alumno que vamos a recoger
-         let alumnoBolsa = {}
 
          // Creamos un botón para actualizar los datos del alumno
          //let btnProcesar = crearNodo("button", "Edita tu información", "botonProcesa", "", divContenedor);
          let btnProcesar = crearNodoDebajo("button", "Edita tu información", "botonProcesa", "", botonOcultar);
          btnProcesar.addEventListener("click", async () => {
 
+            // Usuario que vamos a recoger
+            let usuarioBolsa = {}
 
             // Recogemos todos los campos del formulario
             let inputs = formulario.querySelectorAll('input');
             inputs.forEach(input => {
-               alumnoBolsa[input.name] = input.value;
+               usuarioBolsa[input.name] = input.value;
             });
-            alumnoBolsa['idCurso'] = select.value
 
-            console.log(alumnoBolsa)
-            await editarAlumnoBolsa(alumnoBolsa);
-            await obtenerAlumno();
+            console.log(usuarioBolsa)
+            const respuesta = await editarUsuarioBolsa(usuarioBolsa, rolUser);
+            // Si la respuesta fue exitosa, puedes mostrar un mensaje al usuario
+            alert(respuesta);
+            await obtenerUsuarioBolsa();
          })
       }
    })

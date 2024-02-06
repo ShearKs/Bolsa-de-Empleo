@@ -11,6 +11,13 @@ export function cadenaFormateada(cadena) {
 
 }
 
+export function eliminarDatosObjecto(){
+
+
+
+    
+}
+
 export function cambioRuta(esIndex) {
     let ruta = '';
     if (esIndex) {

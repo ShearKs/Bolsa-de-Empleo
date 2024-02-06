@@ -2,6 +2,8 @@
 
 include_once 'Conexion.php';
 include_once '../Modelos/Utilidades.php';
+include_once '../Modelos/Usuario.php';
+
 
 
 class DaoUsuario
@@ -115,12 +117,132 @@ class DaoUsuario
         $resultado = $sentencia->get_result();
         $usuario = "";
 
-        //La consulta va a ser un registro ya que el usuario es unico
+        //La consulta va a ser un registro ya que el usuario es único
         if ($estado && $resultado->num_rows == 1) {
             $usuario = $resultado->fetch_object();
             return $usuario;
         }
 
         return null;
+    }
+
+    public function obtenerDatosUsuario($cif, $rol)
+    {
+        $sql = "";
+        $sentencia = "";
+
+        //Según el rol que le pasemos(Tutor,Empresa o AlumnoBolsa) haremos una consulta u otra 
+        switch ($rol) {
+            case 1:
+                //Para alumno en bolsa
+                $sql = "SELECT al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario', expLaboral as 'Experiencia Laboral',c.nombre as 'curso',idCurso from alumno_bolsa al " .
+
+                    "INNER JOIN alumnoies a ON a.dni = al.dni " .
+                    "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
+                    "INNER JOIN curso c ON c.id = cur.idCurso " .
+                    "INNER JOIN usuario u ON u.id = al.idUsuario WHERE al.dni = ? " .
+                    "GROUP BY al.dni";
+
+                break;
+
+            case 2:
+                //Para empresa
+                $sql = "SELECT cif,e.nombre,lugar,idUsuario,u.nombre as 'usuario',direccion,correo as 'email',telefono from empresa e " .
+                    "INNER JOIN usuario u ON u.id = e.idUsuario WHERE e.cif = ?";
+                break;
+
+            case 3:
+                //Para tutor
+
+                break;
+
+            default:
+                break;
+        }
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("s", $cif);
+        $estado = $sentencia->execute();
+
+        $resultado = $sentencia->get_result();
+
+        if ($estado &&  $resultado->num_rows == 1) {
+            $usuario = $resultado->fetch_assoc();
+            return json_encode($usuario);
+        } else {
+            return json_encode(array("Error" => "No se ha encontrado el usuario en la base da datos"));
+        }
+    }
+
+
+    public function actualizarUsuarioBolsa($objeto, $rol)
+    {
+        $sentencia = null;
+
+        switch ($rol) {
+            case 1: // Alumno
+                if ($objeto instanceof AlumnoBolsa) {
+
+                    $nombre = $objeto->getNombre();
+                    $apellidos = $objeto->getApellidos();
+
+                    $curso = $objeto->getCurso();
+
+                    $email = $objeto->getEmail();
+                    $telefono = $objeto->getTelefono();
+                    $expLaboral = $objeto->getExperiencia();
+                    $dni = $objeto->getDni();
+
+
+                    // Actualizar datos del alumno en la base de datos
+                    $sql = "UPDATE AlumnoIES a
+                            JOIN alumno_bolsa ab ON a.dni = ab.dni
+                            SET 
+                        a.nombre = ?,
+                        a.apellidos = ?,
+                        a.email = ?,
+                        a.telefono = ?,
+                        ab.expLaboral = ?
+                    WHERE a.dni = ?;";
+                    $sentencia = $this->conexion->prepare($sql);
+                    $sentencia->bind_param("sssdss", $nombre, $apellidos, $email, $telefono, $expLaboral, $dni);
+                    break;
+                }
+            case 2: // Empresa
+                if ($objeto instanceof Empresa) {
+
+                    $nombre = $objeto->getNombre();
+                    $lugar = $objeto->getLugar();
+                    $telefono = $objeto->getTelefono();
+                    $direccion = $objeto->getDireccion();
+                    $correo = $objeto->getCorreo();
+                    $cif = $objeto->getCif();
+
+
+                    // Actualizar datos de la empresa en la base de datos
+                    $sql = "UPDATE empresa SET nombre = ?, lugar = ?, telefono = ?, direccion = ?, correo = ? WHERE cif = ?";
+                    $sentencia = $this->conexion->prepare($sql);
+                    $sentencia->bind_param("ssdsss", $nombre, $lugar, $telefono, $direccion, $correo, $cif);
+                    break;
+                }
+            case 3: // Tutor
+                // Aquí implementar la lógica para actualizar datos del tutor si es necesario
+                break;
+            default:
+                // Manejar el caso por defecto
+                break;
+        }
+        if ($sentencia != null) {
+            // Ejecutar la sentencia SQL
+            $resultado = $sentencia->execute();
+
+            // Verificar si la actualización fue exitosa
+            if ($resultado) {
+                return json_encode(array("Exito" => "Se actulizaron los datos correspondientes"));
+            }
+
+            return json_encode(array("Error" => "No se puedieron actulizar los datos..."));
+        } else {
+            return json_encode(array("Error" => "Rol no válido"));
+        }
     }
 }

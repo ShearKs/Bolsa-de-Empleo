@@ -123,7 +123,7 @@ function crearAlta() {
             //crearNodo("p", "Debes de introducir algún campo..", "mensajeError", "mensajeError", divInicio)
             return;
         }
-        labelAlta.textContent = "Introduce tu cif para poder iniciarte en la bolsa";
+        
         console.log(select.value)
         // Verificar la opción seleccionada en ese momento
         if (select.value === 'alumno') {
@@ -135,6 +135,16 @@ function crearAlta() {
             //creaFormularioEmpresa();
         }
     });
+
+    select.addEventListener('change',(event)=>{
+        event.preventDefault();
+
+        if(select.value === 'empresa'){
+            labelAlta.textContent = "Introduce tu cif para poder iniciarte en la bolsa";
+        }else{
+            labelAlta.textContent = "Introduce tu dni para darte de alta en la bolsa"; 
+        }
+    })
 
 }
 
@@ -209,7 +219,6 @@ function recogeDatosEmpresa(formData) {
 
     return empresa;
 }
-
 
 
 function crearFormularioAlta(datosAlumno) {

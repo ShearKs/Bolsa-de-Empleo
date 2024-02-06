@@ -30,11 +30,13 @@ export function inicioSesion(usuario, parrafoError) {
                 //Iniciamos una sesión en javascript con el rol del usuario
                 sessionStorage.setItem('rol', data.Exito)
 
-
                 return;
+            } else {
+                console.log("Error :", data)
+                parrafoError.textContent = data.Error
+                return
             }
-            console.log("Error :", data)
-            parrafoError.textContent = data.Error
+
 
         })
         .catch(error => {
@@ -72,9 +74,9 @@ export function crearUsuario(datosAlumno) {
         })
 }
 
-export function obtenerAlumnoBolsa($dni) {
+export function obtenerUsuario(rol) {
     return new Promise((resolve, reject) => {
-        fetch('../Controladores/devuelveAlumnoB.php')
+        fetch(`../Controladores/devuelveUsuarioB.php?rol=${rol}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('La solicitud no ha sido correcta');
@@ -175,15 +177,22 @@ export function cambioContraseñaProcesa(solicitud) {
 
 }
 
-export function editarAlumnoBolsa(alumnoBolsa) {
+export function editarUsuarioBolsa(usuario, rol) {
+    const data = {
+        usuario: usuario,
+        rol: rol
+    };
+
+    console.log(data)
+
     const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain; charset=ISO-8859-1' },
-        body: JSON.stringify(alumnoBolsa)
-    }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    };
 
     return new Promise((resolve, reject) => {
-        fetch('../Controladores/editaAlumnoB.php', requestOptions)
+        fetch('../Controladores/editaUsuarioB.php', requestOptions)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('La solicitud no ha sido correcta')
@@ -191,8 +200,12 @@ export function editarAlumnoBolsa(alumnoBolsa) {
                 return response.json()
             })
             .then(respuesta => {
-                console.log(respuesta);
-                resolve();
+                console.log(respuesta)
+                if (respuesta.hasOwnProperty('Exito')) {
+                    resolve(respuesta.Exito);
+                } else {
+                    reject('La respuesta del servidor no tiene la estructura esperada');
+                }
             })
             .catch(error => {
                 console.error("Error en la solicitud: " + error)
@@ -257,7 +270,6 @@ export function insertarTitulo(solicitudCurso) {
             console.error("Error en la solicitud: " + error)
         })
 }
-
 
 //Función Fetch que nos devuelve el alumno titulado en la base de datos
 export function alumnoDevuelto(cif, crearFormularioAlta, parrafoError) {
