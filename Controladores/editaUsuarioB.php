@@ -1,4 +1,4 @@
-<?php
+clear<?php
 session_start();
 
 
