@@ -79,7 +79,7 @@ class DaoAlumno
 
         $sql = "INSERT INTO usuario(nombre,contrasena,rol) VALUES (?,?,?)";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("ssd", $usuarioNombre, $contrasenaEncriptada,$rol);
+        $sentencia->bind_param("ssd", $usuarioNombre, $contrasenaEncriptada, $rol);
         $estado = $sentencia->execute();
 
         $idUsuario = -1;
@@ -109,14 +109,14 @@ class DaoAlumno
         $sql = "INSERT INTO Alumno_Bolsa (dni,expLaboral,otraResidencia,posiViajar,disponibilidad,idUsuario)
                     VALUES (?,?,?,?,?,?)";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("sssddd", $dni, $expLaboral,$residencia,$posViajar  ,$disponibilidad  , $idUsuario);
+        $sentencia->bind_param("sssddd", $dni, $expLaboral, $residencia, $posViajar, $disponibilidad, $idUsuario);
         $estado = $sentencia->execute();
 
         return $estado;
     }
 
 
-    public function insertarAlumno(AlumnoBolsa $alumno, $nombreUsuario,$rol)
+    public function insertarAlumno(AlumnoBolsa $alumno, $nombreUsuario, $rol)
     {
         // Obtén todos los campos pasados
         $dni = $alumno->getDni();
@@ -135,7 +135,7 @@ class DaoAlumno
         if (!$this->existeUsuario($nombreUsuario)) {
 
             //Creamos el objeto usuario
-            $usuario = new Usuario($nombreUsuario, $contrasena,$rol);
+            $usuario = new Usuario($nombreUsuario, $contrasena, $rol);
 
             $idUsuario = $this->insertarUsuario($usuario);
 
@@ -275,4 +275,45 @@ class DaoAlumno
 
         return json_encode(array("Error" => "Ha habido un problema al añadir el curso"));
     }
+
+
+    public function devuelveAlumnoOferta($criterios)
+    {
+        //Cursos que ha seleccionado la empresa
+        $cursos = $criterios['cursos[]'];
+
+        //Resto de valores que los tomaremos como si fueran booleanos
+        $posViajar = $criterios["posViajar"] === "Si" ? 1 : 0;
+        $residencia = $criterios["residencia"] === "Si" ? "residencia != ''" : "1";
+
+        $cadenaCursos = implode(',', $cursos);
+
+        $sql = "SELECT a.*, al.*, c.nombre as 'nombreCurso' ,c.id as 'idCurso' " .
+            "FROM alumno_bolsa al " .
+            "INNER JOIN alumnoies a ON al.dni = a.dni " .
+            "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
+            "INNER JOIN curso c ON c.id = cur.idCurso " .
+            "WHERE posiViajar = ? and disponibilidad = 1 and c.id IN ($cadenaCursos) and $residencia ";
+
+
+        $alumnosOferta = array();
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("i", $posViajar);
+        $estado = $sentencia->execute();
+
+        $resultados = $sentencia->get_result();
+
+        //Si la consulta ha sido exitosa
+        if ($resultados) {
+
+            while ($fila = $resultados->fetch_assoc()) {
+                $alumnosOferta[] = $fila;
+            }
+
+            return json_encode($alumnosOferta);
+        } else {
+            json_encode(array("Error" => "Error al realizar la consulta alumnos"));
+        }
+    }
+
 }

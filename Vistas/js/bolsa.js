@@ -1,5 +1,8 @@
-import { obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa, insertarTitulo } from './funcionesFetch.js';
-import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg } from './utilsDom.js';
+import {
+   obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal,
+   alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo, enviarSolicitudes
+} from './funcionesFetch.js';
+import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto } from './funcionesGenerales.js';
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
@@ -94,11 +97,92 @@ function crearMenuAlumnos() {
 }
 
 function crearMenuEmpresa() {
-   let datosEmpresa = crearNodo("li", "", "liEmpresa", "datosEmpresa", listaMenu)
-   crearNodo("a", "Ver datos de la empresa", "", "", datosEmpresa)
-   datosEmpresa.addEventListener('click', () => {
-      console.log("la chupas jajajaa")
+
+
+   let mandarOferta = crearNodo("li", "", "liEmpresa", "solicitudOferta", listaMenu)
+   crearNodo("a", "Mandar Oferta", "", "", mandarOferta)
+   mandarOferta.addEventListener('click', () => {
+      limpiarContenido(contenedor)
+      enviarOferta();
    })
+
+   let contratos = crearNodo("li", "", "liEmpresa", "contratosAlumnos", listaMenu)
+   crearNodo("a", "Formalizar Contratos", "", "", contratos)
+   contratos.addEventListener('click',()=>{
+      limpiarContenido(contenedor);
+   })
+
+}
+
+
+async function enviarOferta() {
+
+   let formularioOfertas = crearNodo("form", "", "", "", contenedor)
+   formularioOfertas.method = "POST"
+
+   let divMostrado = crearNodo("div","","","mostrarAlumnos",contenedor)
+
+   let divOferta = crearNodo("div", "", "divOferta", "", formularioOfertas)
+   let p = crearNodo("p", "Elige intervención profesional", "", "", divOferta)
+   let selectCursos = await crearCursos("DAW", p, true, 1);
+   selectCursos.setAttribute("multiple", "true")
+   selectCursos.setAttribute("name", "cursos[]")
+
+   for (let i = 0; i < selectCursos.length; i++) {
+      // let selectCurso = selectCursos.options[i];
+      // console.log(selectCurso)
+      selectCursos.options[i].setAttribute("name", "cursos");
+   }
+
+   crearCaja("ofertaViaje", "Disponibilidad para Viajar", divOferta);
+   crearSelect("selectOferta", "posViajar", ["Si", "No"], divOferta);
+
+   crearCaja("experienciaSector", "Experiencia en el sector", divOferta);
+   crearSelect("selectOferta", "experienciaLaboral", ["Si", "No"], divOferta);
+
+   crearCaja("residencia", "Otra residencia", divOferta);
+   crearSelect("selectOferta", "residencia", ["Sí", "No"], divOferta);
+
+   let botonSoliOferta = crearNodo("button", "Enviar solicitud", "btnOferta", "", divOferta)
+   botonSoliOferta.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      let solicitud = {}
+      let formData = new FormData(formularioOfertas);
+
+      // Iterar sobre los valores de formData
+      for (let [clave, valor] of formData.entries()) {
+         // Si la clave es "cursos[]", significa que es el elemento select múltiple
+         // y debes manejar sus valores seleccionados de manera especial
+         if (clave === "cursos[]") {
+            // Los valores de "cursos[]" se pueden recoger directamente de formData
+            // ya que FormData automáticamente maneja elementos select múltiples
+            solicitud[clave] = Array.from(formData.getAll(clave));
+         } else {
+            solicitud[clave] = valor;
+         }
+      }
+
+      alumnosOferta(solicitud, usuario,visualizarAlumnosOferta,divMostrado);
+   })
+
+}
+
+function visualizarAlumnosOferta(alumnosOfertados,divMostrado) {
+
+   let tabla = crearNodo("table", "", "", "", divMostrado)
+   for (let alumno of alumnosOfertados) {
+      let tr = crearNodo("tr", "", "", "", tabla)
+      for (let propiedad in alumno) {
+         crearNodo("td", alumno[propiedad], "", "", tr)
+      }
+   }
+
+   let btnProcesarSoli = crearNodo("button", "Confirma las solicitudes", "", "", divMostrado);
+   btnProcesarSoli.addEventListener('click', () => {
+      enviarSolicitudes(alumnosOfertados, usuario)
+   })
+
 }
 
 

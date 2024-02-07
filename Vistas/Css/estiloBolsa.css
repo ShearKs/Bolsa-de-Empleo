@@ -89,7 +89,7 @@ input[type="checkbox"] {
     box-sizing: border-box;
 }
 
-.contenedor{
+.contenedor {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -99,7 +99,7 @@ input[type="checkbox"] {
     border-radius: 15px;
 }
 
-.divCheck{
+.divCheck {
     display: grid;
     grid-template-columns: 3fr 1fr;
     justify-content: center;
@@ -114,12 +114,13 @@ input[type="checkbox"] {
     box-sizing: border-box;
     padding: 10px;
 }
-.formularioAlumnoBolsa label{
+
+.formularioAlumnoBolsa label {
     font-weight: bold;
     width: 100%;
 }
 
-.formularioAlumnoBolsa input{
+.formularioAlumnoBolsa input {
     width: 100%;
     border-radius: 5px;
 }
@@ -144,7 +145,7 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
-.divBoton img{
+.divBoton img {
     width: 40px;
     height: 40px;
     border-radius: 5px;
@@ -169,7 +170,7 @@ input[type="checkbox"] {
     /* Cambia el color de fondo al pasar el mouse sobre el botón */
 }
 
-.contenedorContra{
+.contenedorContra {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -181,13 +182,16 @@ input[type="checkbox"] {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
 }
-.contenedorContra lb{
+
+.contenedorContra lb {
     padding: 10px;
     font-family: 37px;
     font-weight: bolder;
-    color:#0b5017;
+    color: #0b5017;
 }
-.contenedorContra button{
+
+.contenedorContra button,
+.btnOferta {
     padding: 10px;
     margin: 25px;
     padding: 15px;
@@ -197,7 +201,8 @@ input[type="checkbox"] {
     border-radius: 5px;
     cursor: pointer;
 }
-.contenedorContra input{
+
+.contenedorContra input {
     padding: 10px;
     margin-top: 5%;
     width: 50%;
@@ -206,7 +211,7 @@ input[type="checkbox"] {
 
 /*Titulaciones   */
 
-.divTitulacion{
+.divTitulacion {
 
     display: flex;
     flex-direction: column;
@@ -219,4 +224,35 @@ input[type="checkbox"] {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
 
+}
+
+/* Ofertas */
+.divOferta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5%;
+    background-color: #daa9d7;
+    border-radius: 15px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table,
+th,
+td {
+    border: 1px solid black;
+}
+
+th,
+td {
+    padding: 8px;
+    text-align: left;
 }

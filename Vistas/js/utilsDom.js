@@ -34,7 +34,7 @@ export function crearNodo(elemento, contenido, clase, id, padre) {
     return nodo
 }
 
-export function crearBotonImg(contenedor, claseBoton,claseImg,rutaImagen,colorFondo) {
+export function crearBotonImg(contenedor, claseBoton, claseImg, rutaImagen, colorFondo) {
     let divBoton = document.createElement("button");
     divBoton.className = claseBoton
     divBoton.style.backgroundColor = colorFondo
@@ -57,10 +57,31 @@ export function crearNodoDebajo(elemento, contenido, clase, id, superior) {
     return nodo
 }
 
+export function crearCaja(id, labelText, container) {
+    let divCaja = crearNodo("div", "", "caja", id, container);
+    crearLabel(id, labelText, "lbOferta", divCaja);
+}
+
+export function crearSelect(className, name, options, container) {
+    let select = crearNodo("select", "", className, "", container);
+    select.name = name
+
+    options.forEach(option => {
+        crearNodo("option", option, "optionOferta", "", select);
+    });
+}
+
+export function selectCursosModificado(){
+
+
+    
+}
+
+
 //Si algo existe lo eliminamos
-export function eliminarExistente(idNodo){
+export function eliminarExistente(idNodo) {
     let nodo = document.getElementById(idNodo);
-    if(nodo){
+    if (nodo) {
         nodo.remove();
     }
 }

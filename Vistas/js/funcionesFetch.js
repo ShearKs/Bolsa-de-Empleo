@@ -240,6 +240,8 @@ export async function crearCursos(curso, div, esIndex, modo) {
                 option.selected = true;
             }
         }
+
+        return selectOption;
     } catch (error) {
         console.error("Error en la solicitud:" + error);
     }
@@ -270,6 +272,71 @@ export function insertarTitulo(solicitudCurso) {
             console.error("Error en la solicitud: " + error)
         })
 }
+
+export function alumnosOferta(criterios, empresa, visualizarAlumnosOferta,divMostrado) {
+    let solicitud = {
+        criterios: criterios,
+        empresa: empresa
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(solicitud)
+    }
+
+    fetch('../Controladores/devuelveAlumnoOferta.php', requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La solicitud no ha sido correcta')
+            }
+
+            return response.json()
+        })
+        .then(data => {
+            console.log(data)
+            nodos.limpiarContenido(divMostrado)
+            visualizarAlumnosOferta(data,divMostrado)
+
+        })
+        .catch(error => {
+            console.error("Error en la solicitud: " + error)
+        })
+}
+
+export function enviarSolicitudes(alumnos,empresa) {
+
+    let solicitud = {
+        alumnos:alumnos,
+        empresa:empresa
+    }
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(solicitud)
+    }
+
+    fetch('../Controladores/enviarSolicitudes.php', requestOptions)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('La solicitud no ha sido correcta')
+            }
+
+            return response.json()
+        })
+        .then(respuesta => {
+            
+            console.log(respuesta)
+
+        })
+        .catch(error => {
+            console.error("Error en la solicitud: " + error)
+        })
+}
+
+
+
 
 //Función Fetch que nos devuelve el alumno titulado en la base de datos
 export function alumnoDevuelto(cif, crearFormularioAlta, parrafoError) {

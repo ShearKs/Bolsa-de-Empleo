@@ -11,21 +11,32 @@ export function cadenaFormateada(cadena) {
 
 }
 
+export function eliminarSiExiste(idElimnado) {
+
+    let nodo = document.getElementById(idElimnado);
+    if (nodo) {
+
+        nodo.remove();
+
+    }
+
+}
+
 //Le pasamos un objeto y una array con las propiedades a borrar y nos devuelve una copia del objeto con los elementos eliminados
-export function eliminarDatosObjecto(objeto,arrayEliminados){
+export function eliminarDatosObjecto(objeto, arrayEliminados) {
 
     //Hacemos una copia del objeto pasado
-    let copiaObjeto ={... objeto}
+    let copiaObjeto = { ...objeto }
 
     //Iteramos el objeto y nos encargamos de eliminar lo que no desemos
-    arrayEliminados.forEach(propiedad =>{
+    arrayEliminados.forEach(propiedad => {
         delete copiaObjeto[propiedad]
     })
 
     //retornamos la copia del objeto
     return copiaObjeto;
 
-    
+
 }
 
 export function cambioRuta(esIndex) {
