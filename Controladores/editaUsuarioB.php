@@ -30,7 +30,10 @@ switch ($rol) {
             $usuario['curso'],
             $usuario['email'],
             $usuario['Teléfono'],
-            $usuario["Experiencia Laboral"]
+            $usuario['residencia'],
+            $usuario['posViaje'],
+            $usuario["Experiencia Laboral"],
+            $usuario['posDis']
         );
         break;
         //Empresas    

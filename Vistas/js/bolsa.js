@@ -1,6 +1,6 @@
 import { obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa, insertarTitulo } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg } from './utilsDom.js';
-import { cadenaFormateada } from './funcionesGenerales.js';
+import { cadenaFormateada, eliminarDatosObjecto } from './funcionesGenerales.js';
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
 const listaMenu = document.getElementById('lista');
@@ -49,6 +49,15 @@ window.onload = async (event) => {
    })
 };
 
+async function obtenerUsuarioBolsa() {
+   try {
+      usuario = await obtenerUsuario(rolUser);
+      console.log(usuario)
+   } catch (error) {
+      console.error("Error al obtener alumno: " + error);
+   }
+}
+
 function menuGeneral() {
    let datosAlumnos = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
    crearNodo("a", "Ver datos del alumno", "", "", datosAlumnos)
@@ -94,14 +103,7 @@ function crearMenuEmpresa() {
 
 
 
-async function obtenerUsuarioBolsa() {
-   try {
-      usuario = await obtenerUsuario(rolUser);
-      console.log(usuario)
-   } catch (error) {
-      console.error("Error al obtener alumno: " + error);
-   }
-}
+
 
 function anadirTitulacion() {
    //Sobre este div vamos a escribir todos nuestros nodos
@@ -219,9 +221,15 @@ function crearCambioContrasena(divContenedor) {
    })
 }
 
+let propEliminarAlum = ["idCurso", "disponibilidad", "posiViajar"]
 
+async function crearFormularioDatos() {
 
-async function crearFormularioDatos(usuario) {
+   let usuarioChanged = usuario
+   if (rolUser == 1) {
+      usuarioChanged = eliminarDatosObjecto(usuario, propEliminarAlum)
+   }
+
 
    let divContenedor = crearNodo("div", "", "contenedor", "", contenedor)
 
@@ -230,18 +238,39 @@ async function crearFormularioDatos(usuario) {
 
    let modoEditar = false;
 
-   for (let propiedad in usuario) {
+   for (let propiedad in usuarioChanged) {
 
       if (propiedad != 'idUsuario' && propiedad != 'usuario') {
          let label = crearLabel(propiedad, cadenaFormateada(propiedad), "lbAlumno", formulario)
          label.id = "lb" + propiedad
 
          let input = crearInput(propiedad, "inpFormAlum", "text", formulario)
-         input.value = usuario[propiedad]
+         input.value = usuarioChanged[propiedad]
          input.id = "input" + propiedad
          input.disabled = true
       }
    }
+
+   //Cargamos a mano si es para alumnos
+   if (rolUser == 1) {
+      let divViaje = crearNodo("div", "", "divCheck", "", formulario)
+      crearLabel("posViaje", "Posibilidad de Viajar", "lbAlumno", divViaje)
+      let inputViaje = crearInput("posViaje", "inpFormAlum", "checkBox", divViaje)
+      if (usuario.posiViajar == 1) {
+         inputViaje.checked = true;
+         inputViaje.disabled = true
+      }
+
+      let divDis = crearNodo("div", "", "divCheck", "", formulario)
+      crearLabel("posDis", "Disponibilidad", "lbAlumno", divDis)
+      console.log(usuario.disponibilidad)
+      let inputDipo = crearInput("posDis", "inpFormAlum", "checkBox", divDis)
+      if (usuario.disponibilidad == 1) {
+         inputDipo.checked = true;
+         inputDipo.disabled = true
+      }
+   }
+
 
    let botonOcultar = crearNodo("button", "Oculta el Contenido", "botonProcesa", "", divContenedor)
    botonOcultar.addEventListener('click', () => {
@@ -270,20 +299,33 @@ async function crearFormularioDatos(usuario) {
          //let btnProcesar = crearNodo("button", "Edita tu información", "botonProcesa", "", divContenedor);
          let btnProcesar = crearNodoDebajo("button", "Edita tu información", "botonProcesa", "", botonOcultar);
          btnProcesar.addEventListener("click", async () => {
-
-            // Usuario que vamos a recoger
-            let usuarioBolsa = {}
+            // Creamos un nuevo objeto FormData
+            let formData = new FormData();
 
             // Recogemos todos los campos del formulario
             let inputs = formulario.querySelectorAll('input');
             inputs.forEach(input => {
-               usuarioBolsa[input.name] = input.value;
+               // Si es un checkbox, añadimos su valor al FormData utilizando el nombre del campo
+               if (input.type === 'checkbox') {
+                  formData.append(input.name, input.checked ? 1 : 0); // true si está marcado, false si no
+               } else {
+                  formData.append(input.name, input.value);
+               }
             });
 
-            console.log(usuarioBolsa)
-            await editarUsuarioBolsa(usuarioBolsa, rolUser);
+            // Convertimos el FormData a un objeto plano
+            let usuarioBolsa = {};
+            formData.forEach((valor, clave) => {
+               usuarioBolsa[clave] = valor;
+            });
+
+            console.log(usuarioBolsa);
+
+            const respuesta = await editarUsuarioBolsa(usuarioBolsa, rolUser);
+            // Si la respuesta fue exitosa, puedes mostrar un mensaje al usuario
+            alert(respuesta);
             await obtenerUsuarioBolsa();
-         })
+         });
       }
    })
 

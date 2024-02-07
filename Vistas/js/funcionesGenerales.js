@@ -11,9 +11,19 @@ export function cadenaFormateada(cadena) {
 
 }
 
-export function eliminarDatosObjecto(){
+//Le pasamos un objeto y una array con las propiedades a borrar y nos devuelve una copia del objeto con los elementos eliminados
+export function eliminarDatosObjecto(objeto,arrayEliminados){
 
+    //Hacemos una copia del objeto pasado
+    let copiaObjeto ={... objeto}
 
+    //Iteramos el objeto y nos encargamos de eliminar lo que no desemos
+    arrayEliminados.forEach(propiedad =>{
+        delete copiaObjeto[propiedad]
+    })
+
+    //retornamos la copia del objeto
+    return copiaObjeto;
 
     
 }

@@ -70,6 +70,10 @@ header ul li:hover a {
     padding: 8px;
 }
 
+input[type="checkbox"] {
+    width: 30px;
+}
+
 
 .formEditarAlu {
 
@@ -95,6 +99,13 @@ header ul li:hover a {
     border-radius: 15px;
 }
 
+.divCheck{
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    justify-content: center;
+    align-items: center;
+}
+
 .formularioAlumnoBolsa {
     display: flex;
     flex-direction: column;
@@ -105,10 +116,11 @@ header ul li:hover a {
 }
 .formularioAlumnoBolsa label{
     font-weight: bold;
+    width: 100%;
 }
 
 .formularioAlumnoBolsa input{
-    width: 200px;
+    width: 100%;
     border-radius: 5px;
 }
 

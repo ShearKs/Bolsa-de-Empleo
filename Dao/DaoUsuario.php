@@ -135,7 +135,7 @@ class DaoUsuario
         switch ($rol) {
             case 1:
                 //Para alumno en bolsa
-                $sql = "SELECT al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario', expLaboral as 'Experiencia Laboral',c.nombre as 'curso',idCurso from alumno_bolsa al " .
+                $sql = "SELECT al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario',otraResidencia as 'residencia',posiViajar ,expLaboral as 'Experiencia Laboral',c.nombre as 'curso',idCurso ,disponibilidad from alumno_bolsa al " .
 
                     "INNER JOIN alumnoies a ON a.dni = al.dni " .
                     "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
@@ -190,8 +190,10 @@ class DaoUsuario
                     $email = $objeto->getEmail();
                     $telefono = $objeto->getTelefono();
                     $expLaboral = $objeto->getExperiencia();
+                    $residencia = $objeto->getResidencia();
+                    $posViajar = $objeto->getPosViajar();
                     $dni = $objeto->getDni();
-
+                    $disponibilidad = $objeto->getDisponibilidad();
 
                     // Actualizar datos del alumno en la base de datos
                     $sql = "UPDATE AlumnoIES a
@@ -201,10 +203,14 @@ class DaoUsuario
                         a.apellidos = ?,
                         a.email = ?,
                         a.telefono = ?,
-                        ab.expLaboral = ?
+                        ab.expLaboral = ?,
+                        ab.otraResidencia = ?,
+                        ab.posiViajar = ?,
+                        ab.disponibilidad = ?
                     WHERE a.dni = ?;";
                     $sentencia = $this->conexion->prepare($sql);
-                    $sentencia->bind_param("sssdss", $nombre, $apellidos, $email, $telefono, $expLaboral, $dni);
+                    $sentencia->bind_param("sssdssdds", $nombre, $apellidos, $email, $telefono,
+                                            $expLaboral, $residencia,$posViajar,$disponibilidad,$dni);
                     break;
                 }
             case 2: // Empresa

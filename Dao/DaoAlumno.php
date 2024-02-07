@@ -102,12 +102,14 @@ class DaoAlumno
         //Todos los campos pasados
         $dni = $alumnoB->getDni();
         $expLaboral = $alumnoB->getExperiencia();
+        $residencia = $alumnoB->getResidencia();
+        $posViajar = $alumnoB->getPosViajar();
+        $disponibilidad = $alumnoB->getDisponibilidad();
 
-
-        $sql = "INSERT INTO Alumno_Bolsa (dni,expLaboral,idUsuario)
-                    VALUES (?,?,?)";
+        $sql = "INSERT INTO Alumno_Bolsa (dni,expLaboral,otraResidencia,posiViajar,disponibilidad,idUsuario)
+                    VALUES (?,?,?,?,?,?)";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("ssd", $dni, $expLaboral, $idUsuario);
+        $sentencia->bind_param("sssddd", $dni, $expLaboral,$residencia,$posViajar  ,$disponibilidad  , $idUsuario);
         $estado = $sentencia->execute();
 
         return $estado;

@@ -269,7 +269,7 @@ function crearFormularioAlta(datosAlumno) {
 
     let divViaje = crearNodo("div", "", "cajaViaje", "", divBolsa);
     crearLabel("posV", "Posibilidad de Viajar: ", "lbUsuario", divViaje);
-    crearInput("posV", "check", "checkbox", divViaje);
+    let cbxViajar = crearInput("posV", "check", "checkbox", divViaje);
 
     let divRes = crearNodo("div", "", "cajaViaje", "", divBolsa);
     crearLabel("res", "Residencia en otra población: ", "lbUsuario", divRes);
@@ -278,22 +278,22 @@ function crearFormularioAlta(datosAlumno) {
     let textExp = { value: "" };
     funciones.eventoCheckBox(checkBoxExp, "textarea", "txtExpLaboral", textExp, campoExp);
     let textRes = { value: "" };
-    funciones.eventoCheckBox(checkBoxRes, "input", "id", textRes, divRes);
+    funciones.eventoCheckBox(checkBoxRes, "input", "txtResidencia", textRes, divRes);
 
-    let botonAlta = crearNodo("button", "Registrate en la bolsa de Empleo", "formAlta", "formAlta", formularioAlta);
+    let botonAlta = crearNodo("button", "Registrate en la bolsa de Empleo", "btnResgistroAlumn", "formAlta", formularioAlta);
     botonAlta.addEventListener('click', (event) => {
         event.preventDefault()
-        let alumnos = alumnoFormularioAlta(formularioAlta, checkBoxExp, textExp)
+        let alumnos = alumnoFormularioAlta(formularioAlta, checkBoxExp, checkBoxRes,cbxViajar)
         console.log(alumnos)
         let inputsComprueba = document.getElementsByClassName("inputAlta")
-        console.log(inputsComprueba)
+        //console.log(inputsComprueba)
         if (funciones.comprobarFormulario(inputsComprueba)) {
             crearUsuario(alumnos);
         }
 
 
     })
-    let botonVolver = crearNodo("button", "Volver", "formAlta", "formAlta", formularioAlta);
+    let botonVolver = crearNodo("button", "Volver", "formAlta", "btnVolver", formularioAlta);
     botonVolver.addEventListener('click', () => {
         tituloLogin.textContent = "Inicia Sesión";
         limpiarContenido(divInicio)
@@ -304,7 +304,7 @@ function crearFormularioAlta(datosAlumno) {
     })
 }
 //Devuelve un objeto alumno con los datos recogidos del formulario de 
-function alumnoFormularioAlta(formularioAlta, cbxExperiencia) {
+function alumnoFormularioAlta(formularioAlta, cbxExperiencia, checkBoxRes,cbxViajar) {
     let datosAlumno = {};
     let inputs = formularioAlta.querySelectorAll('input');
 
@@ -315,18 +315,29 @@ function alumnoFormularioAlta(formularioAlta, cbxExperiencia) {
     });
 
     //Recogemos el valor del textarea
-    let textArea = document.getElementById('txtExpLaboral');
+    let textAreaExp= document.getElementById('txtExpLaboral');
     // Si el checkbox de experiencia laboral está marcado, añadir el campo correspondiente
     if (cbxExperiencia.checked) {
         // Acceder al valor del textarea a través de textExp.value
-        datosAlumno['experienciaLaboral'] = textArea.value
+        datosAlumno['experienciaLaboral'] = textAreaExp.value
     } else {
         datosAlumno['experienciaLaboral'] = "";
     }
 
+    let textAreaRes = document.getElementById('txtResidencia');
+
+    if (checkBoxRes.checked){
+        datosAlumno['residencia'] = textAreaRes.value
+    }else{
+        datosAlumno['residencia'] = ""
+    }
+    datosAlumno['posViajar'] = cbxViajar.checked
+
     let cursoSeleccionado = formularioAlta.querySelector('select').value;
     //Le añadimos el curso seleccionado al objeto
     datosAlumno['curso'] = cursoSeleccionado;
+
+    
 
     // Luego, llama a la función crearUsuario con los datosAlumno
     return datosAlumno;

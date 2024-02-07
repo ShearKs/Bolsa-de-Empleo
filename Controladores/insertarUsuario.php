@@ -12,7 +12,9 @@ $nombreUser = $alumnoJs['usuario'];
 
 //Creamos el objeto alumno
 $alumnoB = new AlumnoBolsa($alumnoJs['nombre'],$alumnoJs['apellidos'],$alumnoJs['dni'],
-            $alumnoJs['curso'],$alumnoJs['email'],$alumnoJs['telefono'],$alumnoJs['experienciaLaboral']);
+            $alumnoJs['curso'],$alumnoJs['email'],$alumnoJs['telefono'],$alumnoJs['residencia'],$alumnoJs['posViajar']
+            //Como estamos dando de alta aal alumno le ponemos la disponibilildad a true
+            ,$alumnoJs['experienciaLaboral'],true);
 
 $daoAlumno = new DaoAlumno();
 
