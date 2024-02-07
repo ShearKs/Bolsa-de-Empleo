@@ -281,9 +281,7 @@ async function crearFormularioDatos(usuario) {
             });
 
             console.log(usuarioBolsa)
-            const respuesta = await editarUsuarioBolsa(usuarioBolsa, rolUser);
-            // Si la respuesta fue exitosa, puedes mostrar un mensaje al usuario
-            alert(respuesta);
+            await editarUsuarioBolsa(usuarioBolsa, rolUser);
             await obtenerUsuarioBolsa();
          })
       }
