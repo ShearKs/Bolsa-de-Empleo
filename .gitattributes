@@ -1,4 +1,2 @@
-lib/PHPMailer/language/* linguist-vendored  
-lib/PHPMailer/src/* linguist-vendored 
 lib/PHPMailer/**/* linguist-vendored
 
