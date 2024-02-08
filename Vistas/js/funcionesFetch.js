@@ -119,7 +119,6 @@ export function generarCodigoTemporal(correo) {
 export function cambioContrasena(solicitud) {
     return new Promise((resolve, reject) => {
 
-
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -146,6 +145,36 @@ export function cambioContrasena(solicitud) {
             });
     });
 }
+
+export function devuelveAlumnosOferta(cifEmpresa,idSol) {
+
+    let solicitud = {cif : cifEmpresa , id:idSol}
+
+    return new Promise((resolve, reject) => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(solicitud)
+        }
+
+        fetch('../Controladores/devuelveAlumSol.php', requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La solicitud no fue exitosa');
+                }
+                return response.json();
+            })
+            .then(respuesta => {
+                console.log(respuesta);
+                resolve(respuesta)
+            })
+            .catch(error => {
+                reject("Error en la solicitud: " + error); 
+            });
+    });
+}
+
 
 export function cambioContraseñaProcesa(solicitud) {
 
@@ -212,6 +241,38 @@ export function editarUsuarioBolsa(usuario, rol) {
                 reject(error);
             })
     });
+}
+
+
+export function solicitudes(cifEmpresa) {
+
+
+    return new Promise((resolve, reject) => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cif: cifEmpresa })
+        }
+
+        fetch('../Controladores/devuelveSolicitud.php', requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La solicitud no ha sido correcta')
+                }
+
+                return response.json()
+            })
+            .then(solicitudes => {
+                resolve(solicitudes)
+                //console.log(solicitudes)
+            })
+            .catch(error => {
+                //console.error("Error en la solicitud: " + error)
+                reject(error)
+            })
+    })
+
 }
 
 //Función que se encarga de ver todos los cursos que hay en la base de datos y mostrarlo con Dom
@@ -335,8 +396,6 @@ export function enviarSolicitudes(alumnos, empresa, criterios) {
             console.error("Error en la solicitud: " + error)
         })
 }
-
-
 
 
 //Función Fetch que nos devuelve el alumno titulado en la base de datos

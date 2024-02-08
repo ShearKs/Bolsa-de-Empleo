@@ -1,17 +1,13 @@
 import {
    obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal,
-   alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo, enviarSolicitudes
+   alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo,
+   enviarSolicitudes, solicitudes, devuelveAlumnosOferta
 } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto } from './funcionesGenerales.js';
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
 const listaMenu = document.getElementById('lista');
-
-// const datosAlumnos = document.getElementById('datosAlumno');
-// const btnCambioContrasena = document.getElementById('cambioContrasena');
-// const botonTitulacion = document.getElementById('anadirTitulacion');
-// const botonSalir = document.getElementById('salir');
 
 // Div sobre el que vamos a mostrar los contenidos según el botón que le indique el usuario
 const contenedor = document.getElementById('principal');
@@ -23,6 +19,9 @@ console.log("Rol del usuario: ", rolUser)
 
 // Alumno en bolsa
 let usuario = {};
+
+//Alumno pinchado para la solicitud(tramitar su contrato)
+let alumnoSolicitado = {}
 
 window.onload = async (event) => {
    await obtenerUsuarioBolsa();
@@ -110,9 +109,111 @@ function crearMenuEmpresa() {
    crearNodo("a", "Formalizar Contratos", "", "", contratos)
    contratos.addEventListener('click', () => {
       limpiarContenido(contenedor);
+      realizarContrato()
    })
 
 }
+
+async function visualizarSolicitudes(divMostrado) {
+
+   let elementoSeleccionado = null;
+
+   await solicitudes(usuario.cif)
+      .then((solicitud => {
+         let divSoli = crearNodo("div", "", "divSolicitud", "", divMostrado)
+
+         for (let soli of solicitud) {
+            let divInfo = crearNodo("div", "", "divInfo", "", divSoli)
+            let divSolci = crearNodo("div", "", "divSoli", "", divInfo)
+            crearNodo("p", soli.id, "numeroSolicitud", "", divSolci)
+            crearNodo("p", soli.cif_empresa, "", "", divSolci)
+            crearNodo("p", soli.cursos, "", "", divSolci)
+            //Me creo un div con los alumnos
+            let divAlums = crearNodo("div", "", "divAlumSol", "", divInfo)
+            devuelveAlumnosOferta(soli.cif_empresa, soli.id)
+               .then((alumnos) => {
+                  console.log(alumnos)
+                  for (let alum of alumnos) {
+                     let divAlum = crearNodo("div", "", "divAlumno", "", divAlums)
+                     crearNodo("p", alum.nombre, "", "nombre", divAlum)
+                     crearNodo("p", alum.apellidos, "", "apellido", divAlum)
+                     let pDni = crearNodo("p", alum.dni, "", "dni", divAlum)
+                     pDni.style.display = "none";
+
+
+                     // Agregar evento de clic al elemento divAlum
+                     divAlum.addEventListener('click', (event) => {
+
+                        // Si el elemento clicado es igual al elemento seleccionado
+                        if (elementoSeleccionado === divAlum) {
+                           // Limpiar el elemento seleccionado
+                           divAlum.style.backgroundColor = '';
+                           // Vaciar el objeto alumnoSolicitado
+                           alumnoSolicitado = {};
+                           elementoSeleccionado = null; // Actualizar el elemento seleccionado a null
+                           console.log("Elemento deseleccionado");
+                           return; // Salir de la función
+                        }
+
+                        // Si hay un elemento seleccionado previamente, revertir su estilo
+                        if (elementoSeleccionado !== null) {
+                           elementoSeleccionado.style.backgroundColor = '';
+                        }
+
+                        // Cambiar el estilo del elemento actualmente seleccionado
+                        divAlum.style.backgroundColor = '#0040ff';
+
+                        // Actualizar el elemento seleccionado
+                        elementoSeleccionado = divAlum;
+
+                        const nombre = event.currentTarget.querySelector("p#nombre").textContent;
+                        const apellido = event.currentTarget.querySelector("p#apellido").textContent;
+                        const dni = event.currentTarget.querySelector("p#dni").textContent;
+                        const numSolicitud = event.currentTarget.closest(".divInfo").querySelector(".numeroSolicitud").textContent;
+
+
+                        alumnoSolicitado = {
+                           nombre: nombre,
+                           apellidos: apellido,
+                           dni: dni,
+                           numSolicitud: numSolicitud
+                        }
+
+                     });
+                  }
+
+               })
+         }
+      }))
+}
+
+
+async function realizarContrato() {
+
+   let alumno = {}
+
+   let divMostrado = crearNodo("div", "", "soliAlumno", "soliAlumno", contenedor)
+
+   crearNodo("h2", "Solicitudes", "", "", divMostrado)
+
+   await visualizarSolicitudes(divMostrado)
+
+   let btnContrato = crearNodo("button", "Contratar", "", "", divMostrado)
+   btnContrato.addEventListener('click', () => {
+      if (Object.keys(alumnoSolicitado).length === 0) {
+         alert("Tienes que seleccionar un alumno...")
+         return
+      }
+      let solicitud = {
+         cif: usuario.cif,
+         alumno: alumnoSolicitado
+      }
+      procesaContrato(solicitud)
+   })
+
+}
+
+
 
 
 async function enviarOferta() {
@@ -182,11 +283,7 @@ function visualizarAlumnosOferta(alumnosOfertados, divMostrado, criterios) {
    btnProcesarSoli.addEventListener('click', () => {
       enviarSolicitudes(alumnosOfertados, usuario, criterios)
    })
-
 }
-
-
-
 
 
 function anadirTitulacion() {

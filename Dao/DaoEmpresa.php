@@ -68,7 +68,7 @@ class DaoEmpresa
             $sentencia->bind_param("sssdssd", $cif, $nombre, $lugar, $telefono, $direccion, $correo, $idUsuario);
             $estado = $sentencia->execute();
             if ($estado && $sentencia->affected_rows == 1) {
-                $this->utils->enviarCorreo($correo, "Esta es tu contraseña empresa de mierda: " . $contrasena);
+                $this->utils->enviarCorreo($correo, "Esta es tu contraseña : " . $contrasena);
                 $this->conexion->commit();
                 echo json_encode(array("Exito" => "Se ha insertado la empresa correctamente"));
             } else {
@@ -170,7 +170,7 @@ class DaoEmpresa
                 }
 
                 //Si todo ha ido bien nos encargamos de mandarle la oferta a los alumnos
-                $mensaje = "Hola " . $nombre . " " . $apellidos . " has sido seleccionado para una oferta de empleo de la empresa: ".$nombreEmpresa;
+                $mensaje = "Hola " . $nombre . " " . $apellidos . " has sido seleccionado para una oferta de empleo de la empresa: " . $nombreEmpresa;
                 //Enviamos el correo a todos los candidatos
                 $this->utils->enviarCorreo($correo, $mensaje);
             }
@@ -186,12 +186,111 @@ class DaoEmpresa
     }
 
 
-    public function obtenerSolicitudes($cifEmpresa){
+    public function obtenerSolicitud($cifEmpresa)
+    {
 
+        $sql = "SELECT s.id, s.cif_empresa,e.nombre, s.fecha_solicitud, GROUP_CONCAT(c.nombre SEPARATOR ', ') AS cursos " .
+            "FROM solicitud s " .
+            "JOIN empresa e ON s.cif_empresa = e.cif " .
+            "JOIN solicitud_curso sc ON s.id = sc.idSolicitud " .
+            "JOIN curso c ON sc.idCurso = c.id WHERE cif_empresa = ? " .
+            "GROUP BY s.id;";
 
+        $sentecia = $this->conexion->prepare($sql);
+        $sentecia->bind_param("s", $cifEmpresa);
+        $estado = $sentecia->execute();
+        $resultado = $sentecia->get_result();
 
+        $solicitud = array();
 
+        if ($estado & $resultado->num_rows > 1) {
+
+            while ($fila = $resultado->fetch_assoc()) {
+
+                $solicitud[] = $fila;
+            }
+            return json_encode($solicitud);
+        }
+
+        echo json_encode(array("Error" => "Ha habido un problema no se ha podido obtener nada de la consulta"));
     }
+
+    public function obtenerAlumnosSolici($cifEmpresa, $idSoli)
+    {
+
+       
+
+        $sql = "SELECT distinct al.nombre,al.apellidos,al.dni
+                    FROM alumno_bolsa a
+                    JOIN alumnoies al ON al.dni = a.dni
+                    JOIN solicitud_alumno sa ON a.dni = sa.dniAlumno
+                    JOIN solicitud s ON sa.idSolicitud = s.id
+                    WHERE s.cif_empresa = ? and s.id = ? ";
+
+        $sentecia = $this->conexion->prepare($sql);
+        $sentecia->bind_param("si", $cifEmpresa, $idSoli);
+        $estado = $sentecia->execute();
+        $resultado = $sentecia->get_result();
+
+        $alumnosSoli = array();
+
+        if ($estado & $resultado->num_rows > 1) {
+
+            while ($fila = $resultado->fetch_assoc()) {
+
+                $alumnosSoli[] = $fila;
+            }
+            return json_encode($alumnosSoli);
+        }
+
+        echo json_encode(array("Error" => "Ha habido un problema no se ha podido obtener nada de la consulta"));
+    }
+
+    public function realizarContratacion($contratoAlumno, $cif)
+    {
+
+        //Obtenemos los campos que necesitamos
+        $idSolicitud = $contratoAlumno['numSolicitud'];
+        $dniAlum = $contratoAlumno['dni'];
+
+        //Desactivamso el autocommit
+        $this->conexion->autocommit(false);
+
+        $sql = "INSERT INTO Empleadora(dniAlum,cifEmpresa) VALUES(?,?)";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("ss", $dniAlum, $cif);
+
+        $resultado = $sentencia->execute();
+
+        if ($resultado) {
+            $sentencia->close();
+            //Al hacer el insert en empleadora nos encargamos de eliminar la solictud de esa empresa
+            //Para hacer este delete hemos hecho en nuestra base de datos un eliminado en cascada para cuando eliminamos una solicitud podamos borrar en las otras 2 tablas
+            //tambien se podría haber hecho realizando 3 deletes cada una para las 3 tablas
+            $sqlDelete = "DELETE solicitud, solicitud_curso, solicitud_alumno
+                            FROM solicitud
+                            LEFT JOIN solicitud_curso ON solicitud.id = solicitud_curso.idSolicitud
+                            LEFT JOIN solicitud_alumno ON solicitud.id = solicitud_alumno.idSolicitud
+                            WHERE solicitud.id = ?";
+            $senteciaElim = $this->conexion->prepare($sqlDelete);
+            $senteciaElim->bind_param("i", $idSolicitud);
+            $estado = $senteciaElim->execute();
+            if ($estado) {
+
+
+                $this->conexion->commit();
+                return json_encode($dniAlum);
+            } else {
+                return json_encode(array("Error" => "No se pudo realizar la el borrado de solicitud"));
+            }
+        } else {
+
+            $this->conexion->rollback();
+            return json_encode(array("Error" => "No se pudo realizar la contratación"));
+        }
+    }
+
+
 
     public function existeCifEmpresa($cifEmpresa)
     {

@@ -231,17 +231,17 @@ class DaoUsuario
                     break;
                 }
             case 3: // Tutor
-                // Aquí implementar la lógica para actualizar datos del tutor si es necesario
+              
                 break;
             default:
                 // Manejar el caso por defecto
                 break;
         }
         if ($sentencia != null) {
-            // Ejecutar la sentencia SQL
+           
             $resultado = $sentencia->execute();
 
-            // Verificar si la actualización fue exitosa
+          
             if ($resultado) {
                 return json_encode(array("Exito" => "Se actulizaron los datos correspondientes"));
             }
