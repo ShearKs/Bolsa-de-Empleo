@@ -104,56 +104,94 @@ class DaoEmpresa
         return $idUser;
     }
 
-    public function realizarSolicitud($alumnosOferta, $empresa)
+
+    public function realizarSolicitud($alumnosOferta, $empresa, $criterios)
     {
         // Deshabilitar autocommit para iniciar una transacción
         $this->conexion->autocommit(false);
 
+        //Obtenemos el cif de la empresa
+        $cifEmpresa = $empresa['cif'];
+        $nombreEmpresa = $empresa['nombre'];
 
-        try {
-            // Insertar una fila en la tabla solicitud para cada alumno
-            foreach ($alumnosOferta as $alumno) {
+        //Obtenemos todos los cursos para los que va la solicitud
+        $cursos = $criterios['cursos[]'];
 
+        $expLaboral = $criterios['experienciaLaboral'] === "Si" ? 1 : 0;
+        $posViajar = $criterios['posViajar'] === "Si" ? 1 : 0;
+        $residencia = $criterios['residencia'] === "Sí" ? 1 : 0;
 
-                // Obtener el ID del alumno y sus cursos
-                $dniAlum = $alumno['dni'];
-                $idCurso = $alumno['idCurso'];
-                $cifEmpresa = $empresa['cif'];
+        $sql = "INSERT INTO solicitud(cif_empresa,expLaboral,dispuestoViajar,otraResidencia) VALUES (?,?,?,?)";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("siii", $cifEmpresa, $expLaboral, $posViajar, $residencia);
 
-                // Insertar la solicitud para el alumno actual
-                $sqlInsertSolicitud = "INSERT INTO solicitud (cif_empresa, dni_alumno) VALUES (?, ?)";
-                $stmtInsertSolicitud = $this->conexion->prepare($sqlInsertSolicitud);
-                $stmtInsertSolicitud->bind_param("ss", $cifEmpresa, $dniAlum);
-                $stmtInsertSolicitud->execute();
-                $idSolicitud = $stmtInsertSolicitud->insert_id;
-                $stmtInsertSolicitud->close();
+        $estado = $sentencia->execute();
+        if ($estado) {
+            $idSoli = $sentencia->insert_id;
+            $sentencia->close();
+            //Nos encargamos de recorrer los cursos
+            foreach ($cursos as $curso) {
 
+                $sqlInsC = "INSERT INTO solicitud_curso VALUES (?,?)";
+                $senteciaSyC = $this->conexion->prepare($sqlInsC);
+                $senteciaSyC->bind_param("ii", $idSoli, $curso);
+                $estadoS = $senteciaSyC->execute();
+
+                if (!$estadoS) {
+                    // Si hay algún error al insertar un curso, hacemos rollback y retornamos el error
+                    $this->conexion->rollback();
+                    return json_encode(array("Error" => "Problema al añadir las solicitudes a los cursos"));
+                }
+                $senteciaSyC->close();
             }
 
-            // Commit de la transacción si todas las operaciones se realizaron correctamente
+            $dniAlumns = "";
+
+            //Nos encargamos de asignar las solicitudes con los alumnos
+            //Recorremos todos los alumnos de la oferta
+            foreach ($alumnosOferta as $alumno) {
+                $nombre = $alumno['nombre'];
+                $apellidos = $alumno['apellidos'];
+                $dniAlumn = $alumno['dni'];
+                $correo = $alumno['email'];
+
+                $dniAlumns .= " " . $dniAlumn;
+
+                //return json_encode($cifEmpresa);
+
+                $sqlIA = "INSERT INTO solicitud_alumno(idSolicitud,dniAlumno) VALUES (?,?)";
+                $sentenciaAlum = $this->conexion->prepare($sqlIA);
+                $sentenciaAlum->bind_param("is", $idSoli, $dniAlumn);
+                $estadoA = $sentenciaAlum->execute();
+
+                if (!$estadoA) {
+                    $this->conexion->rollback();
+                    return json_encode(array("Error" => "Problema a la añadir las solicitudes a los cursos"));
+                }
+
+                //Si todo ha ido bien nos encargamos de mandarle la oferta a los alumnos
+                $mensaje = "Hola " . $nombre . " " . $apellidos . " has sido seleccionado para una oferta de empleo de la empresa: ".$nombreEmpresa;
+                //Enviamos el correo a todos los candidatos
+                $this->utils->enviarCorreo($correo, $mensaje);
+            }
+
+            //Si todos las solicitudes se han insertado correctamente
             $this->conexion->commit();
 
-            // Habilitar autocommit nuevamente
-            $this->conexion->autocommit(true);
-
-            // Devolver un mensaje indicando que la solicitud ha sido realizada con éxito
-            return "La solicitud ha sido realizada con éxito";
-        } catch (Exception $e) {
-            // En caso de error, hacer un rollback para deshacer todas las operaciones
-            $this->conexion->rollback();
-
-            // Habilitar autocommit nuevamente
-            $this->conexion->autocommit(true);
-
-            // Devolver un mensaje de error
-            return "Error al realizar la solicitud: " . $e->getMessage();
+            return json_encode(array("Exito" => "Se enviaron las solicitudes"));
+            //return json_encode(array("Exito" => $dniAlumns . " para la solicitud: " . $idSoli));
         }
+
+        return json_encode(array("Error" => "Ha habido un error al enviar las solicitudes"));
     }
 
 
+    public function obtenerSolicitudes($cifEmpresa){
 
 
 
+
+    }
 
     public function existeCifEmpresa($cifEmpresa)
     {

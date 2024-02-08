@@ -293,7 +293,7 @@ class DaoAlumno
             "INNER JOIN alumnoies a ON al.dni = a.dni " .
             "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
             "INNER JOIN curso c ON c.id = cur.idCurso " .
-            "WHERE posiViajar = ? and disponibilidad = 1 and c.id IN ($cadenaCursos) and $residencia ";
+            "WHERE posiViajar = ? and disponibilidad = 1 and c.id IN ($cadenaCursos) and $residencia GROUP BY a.dni";
 
 
         $alumnosOferta = array();
@@ -315,5 +315,4 @@ class DaoAlumno
             json_encode(array("Error" => "Error al realizar la consulta alumnos"));
         }
     }
-
 }

@@ -27,19 +27,4 @@ $alumnoCriteria = $daoAlumno->devuelveAlumnoOferta($criterios);
 
 echo $alumnoCriteria;
 
-//$alumnoDeco = json_decode($alumnoCriteria);
 
-// $alumnoCri = new AlumnoBolsa(
-//     $alumnoCriteria['nombre'],
-//     $alumnoDeco['apellidos'],
-//     $alumnoDeco['dni'],
-//     $alumnoDeco['idCurso'],
-//     $alumnoDeco['email'],
-//     $alumnoDeco['telefono'],
-//     $alumnoDeco['otraResidencia'],
-//     $alumnoDeco['posiViajar'],
-//     $alumnoDeco['expLaboral'],
-//     $alumnoDeco['disponibilidad']
-// );
-
-// $mensaje = $daoEmpresa->realizarSolicitud($alumnoCri, $empresa);

@@ -273,7 +273,7 @@ export function insertarTitulo(solicitudCurso) {
         })
 }
 
-export function alumnosOferta(criterios, empresa, visualizarAlumnosOferta,divMostrado) {
+export function alumnosOferta(criterios, empresa, visualizarAlumnosOferta, divMostrado) {
     let solicitud = {
         criterios: criterios,
         empresa: empresa
@@ -296,7 +296,7 @@ export function alumnosOferta(criterios, empresa, visualizarAlumnosOferta,divMos
         .then(data => {
             console.log(data)
             nodos.limpiarContenido(divMostrado)
-            visualizarAlumnosOferta(data,divMostrado)
+            visualizarAlumnosOferta(data, divMostrado, criterios)
 
         })
         .catch(error => {
@@ -304,11 +304,12 @@ export function alumnosOferta(criterios, empresa, visualizarAlumnosOferta,divMos
         })
 }
 
-export function enviarSolicitudes(alumnos,empresa) {
+export function enviarSolicitudes(alumnos, empresa, criterios) {
 
     let solicitud = {
-        alumnos:alumnos,
-        empresa:empresa
+        alumnos: alumnos,
+        empresa: empresa,
+        criterios: criterios
     }
 
     const requestOptions = {
@@ -326,7 +327,7 @@ export function enviarSolicitudes(alumnos,empresa) {
             return response.json()
         })
         .then(respuesta => {
-            
+
             console.log(respuesta)
 
         })

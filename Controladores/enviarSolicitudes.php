@@ -8,10 +8,11 @@ $data = json_decode(file_get_contents('php://input'), true);
 
 $alumnos = $data['alumnos'];
 $empresa = $data['empresa'];
+$criterios = $data['criterios'];
 
 $daoEmpresa = new DaoEmpresa();
 
-$mensaje = $daoEmpresa->realizarSolicitud($alumnos,$empresa);
+$mensaje = $daoEmpresa->realizarSolicitud($alumnos,$empresa,$criterios);
 
 
 echo json_encode($mensaje);

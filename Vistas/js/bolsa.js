@@ -108,7 +108,7 @@ function crearMenuEmpresa() {
 
    let contratos = crearNodo("li", "", "liEmpresa", "contratosAlumnos", listaMenu)
    crearNodo("a", "Formalizar Contratos", "", "", contratos)
-   contratos.addEventListener('click',()=>{
+   contratos.addEventListener('click', () => {
       limpiarContenido(contenedor);
    })
 
@@ -120,7 +120,7 @@ async function enviarOferta() {
    let formularioOfertas = crearNodo("form", "", "", "", contenedor)
    formularioOfertas.method = "POST"
 
-   let divMostrado = crearNodo("div","","","mostrarAlumnos",contenedor)
+   let divMostrado = crearNodo("div", "", "", "mostrarAlumnos", contenedor)
 
    let divOferta = crearNodo("div", "", "divOferta", "", formularioOfertas)
    let p = crearNodo("p", "Elige intervención profesional", "", "", divOferta)
@@ -163,12 +163,12 @@ async function enviarOferta() {
          }
       }
 
-      alumnosOferta(solicitud, usuario,visualizarAlumnosOferta,divMostrado);
+      alumnosOferta(solicitud, usuario, visualizarAlumnosOferta, divMostrado);
    })
 
 }
 
-function visualizarAlumnosOferta(alumnosOfertados,divMostrado) {
+function visualizarAlumnosOferta(alumnosOfertados, divMostrado, criterios) {
 
    let tabla = crearNodo("table", "", "", "", divMostrado)
    for (let alumno of alumnosOfertados) {
@@ -180,7 +180,7 @@ function visualizarAlumnosOferta(alumnosOfertados,divMostrado) {
 
    let btnProcesarSoli = crearNodo("button", "Confirma las solicitudes", "", "", divMostrado);
    btnProcesarSoli.addEventListener('click', () => {
-      enviarSolicitudes(alumnosOfertados, usuario)
+      enviarSolicitudes(alumnosOfertados, usuario, criterios)
    })
 
 }
