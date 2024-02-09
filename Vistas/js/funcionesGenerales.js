@@ -15,9 +15,7 @@ export function eliminarSiExiste(idElimnado) {
 
     let nodo = document.getElementById(idElimnado);
     if (nodo) {
-
         nodo.remove();
-
     }
 
 }
@@ -72,5 +70,77 @@ export function eventoCheckBox(checkbox, elementoCreado, idNodo, nodo, nodoAnter
         }
 
     })
-
 }
+
+
+export function mensajeDialogo(respuesta) {
+
+    let exito = false
+
+    let dialog = crearNodo("dialog", "", "dialog", "dialog", document.body)
+    let tituloDia = crearNodo("h1","","","dialogoTitulo",dialog)
+
+    if (respuesta.hasOwnProperty('Exito')) {
+        tituloDia.textContent = "Acción Realizada"
+        dialog.innerHTML += "<p>" + respuesta.Exito + "</p>"
+        exito = true
+    } else {
+
+        tituloDia.textContent = "Error"
+        dialog.innerHTML += "<p>" + respuesta.Error + "</p>"
+
+        dialog.style.backgroundColor = "#ffe6e6";
+        dialog.style.border = "5px solid #e60000";
+        //Lo he tenido que hacer así porque con el tituloDia.style ...  no me funcionaba...
+        document.getElementById("dialogoTitulo").style.color = "#e60000"
+
+    }
+
+    let btnAceptar = crearNodo("button", "Aceptar", "botonMenDialogo", "botonMenDialogo", dialog)
+    if (!false) { btnAceptar.style.backgroundColor = "#e60000"; }
+
+    btnAceptar.addEventListener('click', () => {
+
+        dialog.close()
+        dialog.remove()
+
+        document.querySelectorAll("body > *").forEach(element => {
+            element.classList.remove("blur");
+        });
+
+    })
+    dialog.show()
+
+    // Cerrar el diálogo cuando fuera del dialogo lo quitamos y le quitamos el blur que contenga
+    //Evento click a todo el documento
+    document.addEventListener('click', (event) => {
+        //Hacemos que cuando 
+        if (!dialog.contains(event.target)) {
+            dialog.close();
+            dialog.remove();
+            document.querySelectorAll("body > *").forEach(element => {
+                element.classList.remove("blur");
+            });
+        }
+    });
+    // Cerrar el diálogo cuando se presiona una tecla de escape (con keydown nos referimos a clicamos en cualquier tecla)
+    window.addEventListener('keydown', (event) => {
+        //Si hacemos escape cerramos el dialogo y eliminamos el blur
+        if (event.key === 'Escape') {
+            dialog.close();
+            dialog.remove();
+            element.classList.remove("blur");
+        }
+    });
+
+    //Activamos el blur a toda la página menos al dialogo 
+                             //buscamos todos los que no son dialogos y le añadimos el blur
+    document.querySelectorAll("body > *:not(.dialog)").forEach(element => {
+        //El blur está está establecido en nuestro css
+        element.classList.add("blur");
+    });
+
+    return exito
+}
+
+

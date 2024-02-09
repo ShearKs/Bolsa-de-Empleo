@@ -61,8 +61,19 @@ async function obtenerUsuarioBolsa() {
 }
 
 function menuGeneral() {
+   let cadena = ""
+   switch (rolUser) {
+      case 1:
+         cadena = "Ver datos del alumno";
+         break;
+      case 2:
+         cadena = "Área de usuario";
+         break;    
+   }
+
+
    let datosAlumnos = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
-   crearNodo("a", "Ver datos del alumno", "", "", datosAlumnos)
+   crearNodo("a", cadena, "", "", datosAlumnos)
 
    datosAlumnos.addEventListener('click', () => {
       limpiarContenido(contenedor);
@@ -115,35 +126,33 @@ function crearMenuEmpresa() {
 }
 
 async function visualizarSolicitudes(divMostrado) {
-
-   let elementoSeleccionado = null;
+   let elementoSeleccionado = null; 
+   let alumnoSolicitado = {}; 
 
    await solicitudes(usuario.cif)
       .then((solicitud => {
-         let divSoli = crearNodo("div", "", "divSolicitud", "", divMostrado)
+         let divSoli = crearNodo("div", "", "divSolicitud", "", divMostrado);
 
          for (let soli of solicitud) {
-            let divInfo = crearNodo("div", "", "divInfo", "", divSoli)
-            let divSolci = crearNodo("div", "", "divSoli", "", divInfo)
-            crearNodo("p", soli.id, "numeroSolicitud", "", divSolci)
-            crearNodo("p", soli.cif_empresa, "", "", divSolci)
-            crearNodo("p", soli.cursos, "", "", divSolci)
-            //Me creo un div con los alumnos
-            let divAlums = crearNodo("div", "", "divAlumSol", "", divInfo)
+            let divInfo = crearNodo("div", "", "divInfo", "", divSoli);
+            let divSolci = crearNodo("div", "", "divSoli", "", divInfo);
+            crearNodo("p", soli.id, "numeroSolicitud", "", divSolci);
+            crearNodo("p", soli.cif_empresa, "", "", divSolci);
+            crearNodo("p", soli.cursos, "", "", divSolci);
+            // Me creo un div con los alumnos
+            let divAlums = crearNodo("div", "", "divAlumSol", "", divInfo);
             devuelveAlumnosOferta(soli.cif_empresa, soli.id)
                .then((alumnos) => {
-                  console.log(alumnos)
+                  console.log(alumnos);
                   for (let alum of alumnos) {
-                     let divAlum = crearNodo("div", "", "divAlumno", "", divAlums)
-                     crearNodo("p", alum.nombre, "", "nombre", divAlum)
-                     crearNodo("p", alum.apellidos, "", "apellido", divAlum)
-                     let pDni = crearNodo("p", alum.dni, "", "dni", divAlum)
+                     let divAlum = crearNodo("div", "", "divAlumno", "", divAlums);
+                     crearNodo("p", alum.nombre, "", "nombre", divAlum);
+                     crearNodo("p", alum.apellidos, "", "apellido", divAlum);
+                     let pDni = crearNodo("p", alum.dni, "", "dni", divAlum);
                      pDni.style.display = "none";
-
 
                      // Agregar evento de clic al elemento divAlum
                      divAlum.addEventListener('click', (event) => {
-
                         // Si el elemento clicado es igual al elemento seleccionado
                         if (elementoSeleccionado === divAlum) {
                            // Limpiar el elemento seleccionado
@@ -152,7 +161,7 @@ async function visualizarSolicitudes(divMostrado) {
                            alumnoSolicitado = {};
                            elementoSeleccionado = null; // Actualizar el elemento seleccionado a null
                            console.log("Elemento deseleccionado");
-                           return; // Salir de la función
+                           return; 
                         }
 
                         // Si hay un elemento seleccionado previamente, revertir su estilo
@@ -166,27 +175,27 @@ async function visualizarSolicitudes(divMostrado) {
                         // Actualizar el elemento seleccionado
                         elementoSeleccionado = divAlum;
 
-                        const nombre = event.currentTarget.querySelector("p#nombre").textContent;
-                        const apellido = event.currentTarget.querySelector("p#apellido").textContent;
-                        const dni = event.currentTarget.querySelector("p#dni").textContent;
-                        const numSolicitud = event.currentTarget.closest(".divInfo").querySelector(".numeroSolicitud").textContent;
+                        // Obtener datos del alumno seleccionado
+                        const nombre = alum.nombre;
+                        const apellido = alum.apellidos;
+                        const dni = alum.dni;
+                        const numSolicitud = soli.id;
 
-
+                        // Guardar datos del alumno en el objeto alumnoSolicitado
                         alumnoSolicitado = {
                            nombre: nombre,
                            apellidos: apellido,
                            dni: dni,
                            numSolicitud: numSolicitud
-                        }
+                        };
 
+                        console.log("Datos del alumno:", alumnoSolicitado);
                      });
                   }
-
-               })
+               });
          }
-      }))
+      }));
 }
-
 
 async function realizarContrato() {
 
@@ -212,8 +221,6 @@ async function realizarContrato() {
    })
 
 }
-
-
 
 
 async function enviarOferta() {
@@ -502,9 +509,7 @@ async function crearFormularioDatos() {
 
             console.log(usuarioBolsa);
 
-            const respuesta = await editarUsuarioBolsa(usuarioBolsa, rolUser);
-            // Si la respuesta fue exitosa, puedes mostrar un mensaje al usuario
-            alert(respuesta);
+            await editarUsuarioBolsa(usuarioBolsa, rolUser);
             await obtenerUsuarioBolsa();
          });
       }

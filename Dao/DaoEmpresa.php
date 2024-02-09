@@ -218,7 +218,6 @@ class DaoEmpresa
     public function obtenerAlumnosSolici($cifEmpresa, $idSoli)
     {
 
-       
 
         $sql = "SELECT distinct al.nombre,al.apellidos,al.dni
                     FROM alumno_bolsa a
@@ -241,9 +240,9 @@ class DaoEmpresa
                 $alumnosSoli[] = $fila;
             }
             return json_encode($alumnosSoli);
+        } else {
+            return json_encode(array("Error" => "Ha habido un problema no se ha podido obtener nada de la consulta"));
         }
-
-        echo json_encode(array("Error" => "Ha habido un problema no se ha podido obtener nada de la consulta"));
     }
 
     public function realizarContratacion($contratoAlumno, $cif)

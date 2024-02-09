@@ -11,7 +11,6 @@ $idSolicitud = $datos->id;
 
 $daoEmpresa = new DaoEmpresa();
 
-
 $alumnos = $daoEmpresa->obtenerAlumnosSolici($cifEmpresa,$idSolicitud);
 
 echo json_encode($alumnos);

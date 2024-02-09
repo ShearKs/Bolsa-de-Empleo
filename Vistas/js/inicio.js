@@ -132,7 +132,6 @@ function crearAlta() {
         } else {
 
             devuelveCamposEmpresa(creaFormularioEmpresa, inputCif.value)
-            //creaFormularioEmpresa();
         }
     });
 
@@ -290,8 +289,6 @@ function crearFormularioAlta(datosAlumno) {
         if (funciones.comprobarFormulario(inputsComprueba)) {
             crearUsuario(alumnos);
         }
-
-
     })
     let botonVolver = crearNodo("button", "Volver", "formAlta", "btnVolver", formularioAlta);
     botonVolver.addEventListener('click', () => {
@@ -337,9 +334,6 @@ function alumnoFormularioAlta(formularioAlta, cbxExperiencia, checkBoxRes,cbxVia
     //Le añadimos el curso seleccionado al objeto
     datosAlumno['curso'] = cursoSeleccionado;
 
-    
-
-    // Luego, llama a la función crearUsuario con los datosAlumno
     return datosAlumno;
 }
 

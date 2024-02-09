@@ -1,5 +1,5 @@
 import *  as nodos from './utilsDom.js';
-import { cambioRuta } from './funcionesGenerales.js';
+import { cambioRuta,mensajeDialogo } from './funcionesGenerales.js';
 
 //Función Fetch que se encarga de realizar el autenticado
 export function inicioSesion(usuario, parrafoError) {
@@ -63,11 +63,8 @@ export function crearUsuario(datosAlumno) {
         })
         .then(data => {
             console.log('Lo que devuelve el php:', data)
-            if (data.hasOwnProperty('Exito')) {
-                alert(data.Exito)
-            } else {
-                alert(data.Error)
-            }
+
+            mensajeDialogo(data);
         })
         .catch(error => {
             console.error("Error en la solicitud" + error)
@@ -146,9 +143,9 @@ export function cambioContrasena(solicitud) {
     });
 }
 
-export function devuelveAlumnosOferta(cifEmpresa,idSol) {
+export function devuelveAlumnosOferta(cifEmpresa, idSol) {
 
-    let solicitud = {cif : cifEmpresa , id:idSol}
+    let solicitud = { cif: cifEmpresa, id: idSol }
 
     return new Promise((resolve, reject) => {
 
@@ -170,7 +167,7 @@ export function devuelveAlumnosOferta(cifEmpresa,idSol) {
                 resolve(respuesta)
             })
             .catch(error => {
-                reject("Error en la solicitud: " + error); 
+                reject("Error en la solicitud: " + error);
             });
     });
 }
@@ -211,9 +208,6 @@ export function editarUsuarioBolsa(usuario, rol) {
         usuario: usuario,
         rol: rol
     };
-
-    console.log(data)
-
     const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -230,11 +224,13 @@ export function editarUsuarioBolsa(usuario, rol) {
             })
             .then(respuesta => {
                 console.log(respuesta)
-                if (respuesta.hasOwnProperty('Exito')) {
-                    resolve(respuesta.Exito);
-                } else {
-                    reject('La respuesta del servidor no tiene la estructura esperada');
+
+                if(mensajeDialogo(respuesta)){
+                    resolve(respuesta)
+                }else{
+                    reject(respuesta)
                 }
+
             })
             .catch(error => {
                 console.error("Error en la solicitud: " + error)
@@ -245,7 +241,6 @@ export function editarUsuarioBolsa(usuario, rol) {
 
 
 export function solicitudes(cifEmpresa) {
-
 
     return new Promise((resolve, reject) => {
 
@@ -265,7 +260,7 @@ export function solicitudes(cifEmpresa) {
             })
             .then(solicitudes => {
                 resolve(solicitudes)
-                //console.log(solicitudes)
+                console.log(solicitudes)
             })
             .catch(error => {
                 //console.error("Error en la solicitud: " + error)
@@ -396,7 +391,6 @@ export function enviarSolicitudes(alumnos, empresa, criterios) {
             console.error("Error en la solicitud: " + error)
         })
 }
-
 
 //Función Fetch que nos devuelve el alumno titulado en la base de datos
 export function alumnoDevuelto(cif, crearFormularioAlta, parrafoError) {

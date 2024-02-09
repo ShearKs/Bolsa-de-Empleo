@@ -11,4 +11,4 @@ $daoEmpresa = new DaoEmpresa();
 
 $solicitud = $daoEmpresa->obtenerSolicitud($cifEmpresa);
 
-echo json_encode($solicitud);
+echo $solicitud;

@@ -1,0 +1,47 @@
+.dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    background-color: rgb(229, 246, 228);;
+    transform: translate(-50%, -50%);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border-radius: 15px;
+    border: 5px solid rgb(17, 240, 25);
+}
+
+.dialog h1{
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 35px;
+    color:rgb(22, 231, 161);
+}
+
+/*De forma predeterminada está de forma de exxito  */
+.dialog button{
+    
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+
+    border-radius: 10px;
+    padding: 5px;
+    color:white;
+    background-color: rgb(115, 215, 95);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+
+.blur{
+
+    filter: blur(2px); 
+    pointer-events: none;
+}
+
+
+
+
+
+

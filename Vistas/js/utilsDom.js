@@ -71,12 +71,6 @@ export function crearSelect(className, name, options, container) {
     });
 }
 
-export function selectCursosModificado(){
-
-
-    
-}
-
 
 //Si algo existe lo eliminamos
 export function eliminarExistente(idNodo) {
