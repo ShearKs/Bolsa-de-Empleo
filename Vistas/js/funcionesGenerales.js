@@ -97,7 +97,7 @@ export function mensajeDialogo(respuesta) {
     }
 
     let btnAceptar = crearNodo("button", "Aceptar", "botonMenDialogo", "botonMenDialogo", dialog)
-    if (!false) { btnAceptar.style.backgroundColor = "#e60000"; }
+    if (!exito) { btnAceptar.style.backgroundColor = "#e60000"; }
 
     btnAceptar.addEventListener('click', () => {
 

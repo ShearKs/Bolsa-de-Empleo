@@ -1,5 +1,5 @@
 import *  as nodos from './utilsDom.js';
-import { cambioRuta,mensajeDialogo } from './funcionesGenerales.js';
+import { cambioRuta, mensajeDialogo } from './funcionesGenerales.js';
 
 //Función Fetch que se encarga de realizar el autenticado
 export function inicioSesion(usuario, parrafoError) {
@@ -143,34 +143,6 @@ export function cambioContrasena(solicitud) {
     });
 }
 
-export function devuelveAlumnosOferta(cifEmpresa, idSol) {
-
-    let solicitud = { cif: cifEmpresa, id: idSol }
-
-    return new Promise((resolve, reject) => {
-
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(solicitud)
-        }
-
-        fetch('../Controladores/devuelveAlumSol.php', requestOptions)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('La solicitud no fue exitosa');
-                }
-                return response.json();
-            })
-            .then(respuesta => {
-                console.log(respuesta);
-                resolve(respuesta)
-            })
-            .catch(error => {
-                reject("Error en la solicitud: " + error);
-            });
-    });
-}
 
 
 export function cambioContraseñaProcesa(solicitud) {
@@ -225,9 +197,9 @@ export function editarUsuarioBolsa(usuario, rol) {
             .then(respuesta => {
                 console.log(respuesta)
 
-                if(mensajeDialogo(respuesta)){
+                if (mensajeDialogo(respuesta)) {
                     resolve(respuesta)
-                }else{
+                } else {
                     reject(respuesta)
                 }
 
@@ -240,7 +212,7 @@ export function editarUsuarioBolsa(usuario, rol) {
 }
 
 
-export function solicitudes(cifEmpresa) {
+export function solicitudes(cifEmpresa,contenedor) {
 
     return new Promise((resolve, reject) => {
 
@@ -259,16 +231,63 @@ export function solicitudes(cifEmpresa) {
                 return response.json()
             })
             .then(solicitudes => {
+                if(solicitudes.hasOwnProperty('Error')){
+                    nodos.crearNodo("p","No hay ninguna solicitud aún..","","",contenedor)
+                    return
+                }
                 resolve(solicitudes)
-                console.log(solicitudes)
             })
             .catch(error => {
                 //console.error("Error en la solicitud: " + error)
                 reject(error)
             })
     })
-
 }
+
+export function devuelveAlumnosOferta(cifEmpresa, idSol) {
+
+    let solicitud = { cif: cifEmpresa, id: idSol }
+
+    return new Promise((resolve, reject) => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(solicitud)
+        }
+
+        fetch('../Controladores/devuelveAlumSol.php', requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La solicitud no fue exitosa');
+                }
+                return response.json();
+            })
+            .then(respuesta => {
+                console.log("alumnos que cumplen la premisa")
+                console.log(respuesta);
+                resolve(respuesta)
+            })
+            .catch(error => {
+                reject("Error en la solicitud: " + error);
+            });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Función que se encarga de ver todos los cursos que hay en la base de datos y mostrarlo con Dom
 export async function crearCursos(curso, div, esIndex, modo) {

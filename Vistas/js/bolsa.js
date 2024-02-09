@@ -68,7 +68,7 @@ function menuGeneral() {
          break;
       case 2:
          cadena = "Área de usuario";
-         break;    
+         break;
    }
 
 
@@ -120,105 +120,94 @@ function crearMenuEmpresa() {
    crearNodo("a", "Formalizar Contratos", "", "", contratos)
    contratos.addEventListener('click', () => {
       limpiarContenido(contenedor);
-      realizarContrato()
+      visualizarSolicitudes()
    })
 
 }
 
-async function visualizarSolicitudes(divMostrado) {
-   let elementoSeleccionado = null; 
-   let alumnoSolicitado = {}; 
+async function visualizarSolicitudes() {
 
-   await solicitudes(usuario.cif)
-      .then((solicitud => {
-         let divSoli = crearNodo("div", "", "divSolicitud", "", divMostrado);
+   let alumSeleccionado = {}
 
-         for (let soli of solicitud) {
-            let divInfo = crearNodo("div", "", "divInfo", "", divSoli);
-            let divSolci = crearNodo("div", "", "divSoli", "", divInfo);
-            crearNodo("p", soli.id, "numeroSolicitud", "", divSolci);
-            crearNodo("p", soli.cif_empresa, "", "", divSolci);
-            crearNodo("p", soli.cursos, "", "", divSolci);
-            // Me creo un div con los alumnos
-            let divAlums = crearNodo("div", "", "divAlumSol", "", divInfo);
-            devuelveAlumnosOferta(soli.cif_empresa, soli.id)
-               .then((alumnos) => {
-                  console.log(alumnos);
-                  for (let alum of alumnos) {
-                     let divAlum = crearNodo("div", "", "divAlumno", "", divAlums);
-                     crearNodo("p", alum.nombre, "", "nombre", divAlum);
-                     crearNodo("p", alum.apellidos, "", "apellido", divAlum);
-                     let pDni = crearNodo("p", alum.dni, "", "dni", divAlum);
-                     pDni.style.display = "none";
+   let divSolicitudes = crearNodo("div", "", "divSolicitudes", "divSolicitudes", contenedor);
 
-                     // Agregar evento de clic al elemento divAlum
-                     divAlum.addEventListener('click', (event) => {
-                        // Si el elemento clicado es igual al elemento seleccionado
-                        if (elementoSeleccionado === divAlum) {
-                           // Limpiar el elemento seleccionado
-                           divAlum.style.backgroundColor = '';
-                           // Vaciar el objeto alumnoSolicitado
-                           alumnoSolicitado = {};
-                           elementoSeleccionado = null; // Actualizar el elemento seleccionado a null
-                           console.log("Elemento deseleccionado");
-                           return; 
-                        }
+   crearNodo("h1", "Solicitudes de " + usuario.nombre, "", "", divSolicitudes)
 
-                        // Si hay un elemento seleccionado previamente, revertir su estilo
-                        if (elementoSeleccionado !== null) {
-                           elementoSeleccionado.style.backgroundColor = '';
-                        }
+   await solicitudes(usuario.cif,divSolicitudes)
+      .then((solicitudes => {
+         console.log(solicitudes.length)
 
-                        // Cambiar el estilo del elemento actualmente seleccionado
-                        divAlum.style.backgroundColor = '#0040ff';
-
-                        // Actualizar el elemento seleccionado
-                        elementoSeleccionado = divAlum;
-
-                        // Obtener datos del alumno seleccionado
-                        const nombre = alum.nombre;
-                        const apellido = alum.apellidos;
-                        const dni = alum.dni;
-                        const numSolicitud = soli.id;
-
-                        // Guardar datos del alumno en el objeto alumnoSolicitado
-                        alumnoSolicitado = {
-                           nombre: nombre,
-                           apellidos: apellido,
-                           dni: dni,
-                           numSolicitud: numSolicitud
-                        };
-
-                        console.log("Datos del alumno:", alumnoSolicitado);
-                     });
-                  }
-               });
+         if(solicitudes.length == 0){  
+            console.log("no hay ninguna solicitud")
+            
          }
+         solicitudes.forEach(solicitud => {
+            let tablaSolicitud = crearNodo("table", "", "tablaSolicitud", "", divSolicitudes);
+            let encabezado = crearNodo("thead", "", "theadTablaSoli", "", tablaSolicitud);
+            let cuerpoTabla = crearNodo("tbody", "", "tbodyTablaSoli", "", tablaSolicitud);
+
+            // Crea la fila de encabezado con las columnas
+            let encabezadoFila = crearNodo("tr", "", "trEncabezado", "", encabezado);
+            for (let clave in solicitud) {
+               let th = crearNodo("th", clave, "", "", encabezadoFila);
+            }
+
+            // Crea una fila de datos para cada solicitud
+            let datosFila = crearNodo("tr", "", "trDatos", "", cuerpoTabla);
+            for (let clave in solicitud) {
+               let td = crearNodo("td", solicitud[clave], "", "", datosFila);
+            }
+
+            // Crear una fila para la tabla anidada de alumnos
+            let filaAlumnos = crearNodo("tr", "", "filaAlumnos", "", cuerpoTabla);
+            let celdaAlumnos = crearNodo("td", "", "", "", filaAlumnos);
+            celdaAlumnos.colSpan = Object.keys(solicitud).length; // Hacer que la celda ocupe todas las columnas
+            let tablaAlumnos = crearNodo("table", "", "tablaAlumnos", "", celdaAlumnos);
+
+            // Obtener los alumnos de esta solicitud y construir la tabla anidada
+            devuelveAlumnosOferta(solicitud.cif_empresa, solicitud.id)
+               .then(alumnos => {
+                  alumnos.forEach(alumno => {
+                     let filaAlumno = crearNodo("tr", "", "filaAlumno", "", tablaAlumnos);
+                     for (let clave in alumno) {
+                        let td = crearNodo("td", alumno[clave], clave, "", filaAlumno);
+                        if(clave == 'dni') td.style.display = 'none'
+                     }
+                     filaAlumno.addEventListener('click', () => {
+                        console.log(filaAlumno)
+
+                        //recogemos las celdas (td) que contiene cada tr(fila) que clico
+                        let celdas = filaAlumno.querySelectorAll("td");
+
+                        for (let i = 0; i < celdas.length; i++) {
+                           let atributo = celdas[i].className;
+                           let contenido = celdas[i].textContent
+                           // console.log(atributo)
+                           // console.log(contenido)
+                           alumSeleccionado[atributo] = contenido
+                        }
+                        console.log("=========Alumno Seleccionado=======")
+                        console.log(alumSeleccionado)
+                     })
+                  });
+               });
+         });
+
+
+
+
+
+
       }));
-}
 
-async function realizarContrato() {
 
-   let alumno = {}
 
-   let divMostrado = crearNodo("div", "", "soliAlumno", "soliAlumno", contenedor)
 
-   crearNodo("h2", "Solicitudes", "", "", divMostrado)
-
-   await visualizarSolicitudes(divMostrado)
-
-   let btnContrato = crearNodo("button", "Contratar", "", "", divMostrado)
-   btnContrato.addEventListener('click', () => {
-      if (Object.keys(alumnoSolicitado).length === 0) {
-         alert("Tienes que seleccionar un alumno...")
-         return
-      }
-      let solicitud = {
-         cif: usuario.cif,
-         alumno: alumnoSolicitado
-      }
-      procesaContrato(solicitud)
+   let botonContrato = crearNodo("button", "Contratar", "btnContrato", "", divSolicitudes)
+   botonContrato.addEventListener("click", () => {
+      console.log(alumSeleccionado)
    })
+
 
 }
 

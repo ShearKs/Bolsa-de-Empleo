@@ -203,7 +203,7 @@ class DaoEmpresa
 
         $solicitud = array();
 
-        if ($estado & $resultado->num_rows > 1) {
+        if ($estado && $resultado->num_rows > 0) {
 
             while ($fila = $resultado->fetch_assoc()) {
 
@@ -233,7 +233,7 @@ class DaoEmpresa
 
         $alumnosSoli = array();
 
-        if ($estado & $resultado->num_rows > 1) {
+        if ($estado && $resultado->num_rows > 0) {
 
             while ($fila = $resultado->fetch_assoc()) {
 

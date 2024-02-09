@@ -12,18 +12,17 @@
 .dialog h1{
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 35px;
-    color:rgb(22, 231, 161);
+    color:rgb(11, 202, 139);
 }
 
 /*De forma predeterminada está de forma de exxito  */
 .dialog button{
     
-    position: absolute;
-    top: 50%;
+    position: relative;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
 
-
+    width: 130px;
     border-radius: 10px;
     padding: 5px;
     color:white;
