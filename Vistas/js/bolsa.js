@@ -129,18 +129,16 @@ async function visualizarSolicitudes() {
 
    let alumSeleccionado = {}
 
+   //booleano para saber si está seleccionado
+   let ultimoSelec = null
+
    let divSolicitudes = crearNodo("div", "", "divSolicitudes", "divSolicitudes", contenedor);
 
    crearNodo("h1", "Solicitudes de " + usuario.nombre, "", "", divSolicitudes)
 
-   await solicitudes(usuario.cif,divSolicitudes)
+   await solicitudes(usuario.cif, divSolicitudes)
       .then((solicitudes => {
-         console.log(solicitudes.length)
 
-         if(solicitudes.length == 0){  
-            console.log("no hay ninguna solicitud")
-            
-         }
          solicitudes.forEach(solicitud => {
             let tablaSolicitud = crearNodo("table", "", "tablaSolicitud", "", divSolicitudes);
             let encabezado = crearNodo("thead", "", "theadTablaSoli", "", tablaSolicitud);
@@ -171,43 +169,51 @@ async function visualizarSolicitudes() {
                      let filaAlumno = crearNodo("tr", "", "filaAlumno", "", tablaAlumnos);
                      for (let clave in alumno) {
                         let td = crearNodo("td", alumno[clave], clave, "", filaAlumno);
-                        if(clave == 'dni') td.style.display = 'none'
+                        if (clave == 'dni') td.style.display = 'none'
                      }
-                     filaAlumno.addEventListener('click', () => {
-                        console.log(filaAlumno)
+                     filaAlumno.addEventListener('click', (event) => {
 
-                        //recogemos las celdas (td) que contiene cada tr(fila) que clico
-                        let celdas = filaAlumno.querySelectorAll("td");
+                        // Cambiar de color y gestionar la selección
+                        if (ultimoSelec === filaAlumno) {
+                           // Deseleccionar el alumno si ya estaba seleccionado
+                           filaAlumno.style.backgroundColor = '';
+                           alumSeleccionado = {};
+                           ultimoSelec = null;
+                        } else {
+                           // Seleccionar el alumno y guardar sus datos
+                           if (ultimoSelec !== null) {
+                              // Si había otro alumno seleccionado, deseleccionarlo
+                              ultimoSelec.style.backgroundColor = '';
+                           }
+                           filaAlumno.style.backgroundColor = "#6f5ed0";
+                           //recogemos las celdas (td) que contiene cada tr(fila) que clico
+                           //recoge los datos sobre el que hemos pinchado
+                           let celdas = filaAlumno.querySelectorAll("td");
+                           //Cargamos en el objeto el ultimo seleccionado
+                           alumSeleccionado["id"] = solicitud.id
+                           for (let i = 0; i < celdas.length; i++) {
+                              let atributo = celdas[i].className;
+                              let contenido = celdas[i].textContent;
 
-                        for (let i = 0; i < celdas.length; i++) {
-                           let atributo = celdas[i].className;
-                           let contenido = celdas[i].textContent
-                           // console.log(atributo)
-                           // console.log(contenido)
-                           alumSeleccionado[atributo] = contenido
+                              alumSeleccionado[atributo] = contenido;
+                           }
+                           ultimoSelec = filaAlumno;
                         }
-                        console.log("=========Alumno Seleccionado=======")
-                        console.log(alumSeleccionado)
+
+                        // console.log("=========Alumno Seleccionado=======")
+                        // console.log(alumSeleccionado)
                      })
                   });
                });
          });
 
-
-
-
-
-
       }));
-
-
 
 
    let botonContrato = crearNodo("button", "Contratar", "btnContrato", "", divSolicitudes)
    botonContrato.addEventListener("click", () => {
       console.log(alumSeleccionado)
    })
-
 
 }
 
