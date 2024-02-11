@@ -32,19 +32,6 @@ export function promesaGeneral(solicitud, ruta) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Función Fetch que se encarga de realizar el autenticado
 export function inicioSesion(usuario, parrafoError) {
 
@@ -313,19 +300,6 @@ export function devuelveAlumnosOferta(solicitud) {
             });
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

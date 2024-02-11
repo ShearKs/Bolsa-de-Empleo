@@ -93,7 +93,6 @@ export function mensajeDialogo(respuesta) {
         dialog.style.border = "5px solid #e60000";
         //Lo he tenido que hacer así porque con el tituloDia.style ...  no me funcionaba...
         document.getElementById("dialogoTitulo").style.color = "#e60000"
-
     }
 
     let btnAceptar = crearNodo("button", "Aceptar", "botonMenDialogo", "botonMenDialogo", dialog)
@@ -170,6 +169,12 @@ export function dialogoSimple(mensaje) {
 }
 
 
+
+
+
+
+
+/* Funciones para los dialogos    */
 function activarBlur() {
     //Activamos el blur a toda la página menos al diálogo 
     //buscamos todos los que no son diálogos y les añadimos el blur

@@ -249,7 +249,7 @@ class DaoEmpresa
     {
 
         //Obtenemos los campos que necesitamos
-        $idSolicitud = $contratoAlumno['numSolicitud'];
+        $idSolicitud = $contratoAlumno['id'];
         $dniAlum = $contratoAlumno['dni'];
 
         //Desactivamso el autocommit
@@ -276,9 +276,8 @@ class DaoEmpresa
             $estado = $senteciaElim->execute();
             if ($estado) {
 
-
                 $this->conexion->commit();
-                return json_encode($dniAlum);
+                return json_encode(array("Exito" => "Se ha realizado la contratación del alumno!"));
             } else {
                 return json_encode(array("Error" => "No se pudo realizar la el borrado de solicitud"));
             }

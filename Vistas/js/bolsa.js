@@ -1,7 +1,7 @@
 import {
    obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal,
    alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo,
-   enviarSolicitudes, solicitudes, devuelveAlumnosOferta
+   enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral
 } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
@@ -131,6 +131,8 @@ async function visualizarSolicitudes() {
 
    //booleano para saber si está seleccionado
    let ultimoSelec = null
+   //Solicitud en la que está el usuario estará representada en una tabla
+   let tablaSeleccionada;
 
    let divSolicitudes = crearNodo("div", "", "divSolicitudes", "divSolicitudes", contenedor);
 
@@ -139,8 +141,8 @@ async function visualizarSolicitudes() {
    let solicitud = { cif: usuario.cif, modo: 1 }
 
    await solicitudes(solicitud, divSolicitudes)
-      .then((solicitudes => {
 
+      .then((solicitudes => {
          solicitudes.forEach(solicitud => {
             let tablaSolicitud = crearNodo("table", "", "tablaSolicitud", "", divSolicitudes);
             let encabezado = crearNodo("thead", "", "theadTablaSoli", "", tablaSolicitud);
@@ -175,6 +177,8 @@ async function visualizarSolicitudes() {
                         if (clave == 'dni') td.style.display = 'none'
                      }
                      filaAlumno.addEventListener('click', (event) => {
+                        // Guardar la tabla seleccionada
+                        tablaSeleccionada = tablaAlumnos.parentNode.parentNode.parentNode.parentNode;
 
                         // Cambiar de color y gestionar la selección
                         if (ultimoSelec === filaAlumno) {
@@ -203,8 +207,6 @@ async function visualizarSolicitudes() {
                            ultimoSelec = filaAlumno;
                         }
 
-                        // console.log("=========Alumno Seleccionado=======")
-                        // console.log(alumSeleccionado)
                      })
                   });
                });
@@ -221,6 +223,23 @@ async function visualizarSolicitudes() {
          const confirmado = await dialogoInformacion("Realizar Contrato", "¿Quieres contratar a " + alumSeleccionado.nombre + " ?");
          if (confirmado) {
             console.log(alumSeleccionado)
+            console.log(tablaSeleccionada)
+
+            let alumno = { alumno: alumSeleccionado, cif: usuario.cif, modo: 3 }
+
+            promesaGeneral(alumno, '../Controladores/contratacion.php')
+               .then(respuesta => {
+                  mensajeDialogo(respuesta)
+                  tablaSeleccionada.remove()
+                  console.log(divSolicitudes.children.length)
+                  //Significa que solo queda el titulo y el boton y no hay ninguna solicitud por lo que procedemos a quitar
+                  //el boton y a decirle al usuario que no tiene ninguna solicitud...
+                  if (divSolicitudes.children.length == 2){
+                     botonContrato.remove()
+                     crearNodo("p", "No hay ninguna solicitud aún..", "", "", divSolicitudes)
+                  }
+               })
+
          }
       } else {
          dialogoSimple("Tienes que seleccionar algún alumno...")
@@ -296,6 +315,7 @@ function visualizarAlumnosOferta(alumnosOfertados, divMostrado, criterios) {
 
    let btnProcesarSoli = crearNodo("button", "Confirma las solicitudes", "", "", divMostrado);
    btnProcesarSoli.addEventListener('click', () => {
+
       enviarSolicitudes(alumnosOfertados, usuario, criterios)
    })
 }
