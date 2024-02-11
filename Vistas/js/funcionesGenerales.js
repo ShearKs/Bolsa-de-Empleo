@@ -118,7 +118,7 @@ export function mensajeDialogo(respuesta) {
 }
 
 //He tenido que hacer dialogo Información como promesa para que clique es en el boton me devuelva una cosa u otra
-export  function dialogoInformacion(titulo, mensaje) {
+export function dialogoInformacion(titulo, mensaje) {
     return new Promise((resolve, reject) => {
         let dialogo = crearNodo("dialog", "", "dialogInfo", "dialog", document.body);
         let tituloDia = crearNodo("h1", titulo, "", "", dialogo);
@@ -130,7 +130,7 @@ export  function dialogoInformacion(titulo, mensaje) {
             dialogo.close();
             dialogo.remove();
             quitarBlur();
-            resolve(true); 
+            resolve(true);
         });
 
         let botonCancelar = crearNodo("button", "Cancelar", "", "", conteBotones);
@@ -138,14 +138,35 @@ export  function dialogoInformacion(titulo, mensaje) {
             dialogo.close();
             dialogo.remove();
             quitarBlur();
-            resolve(false); 
+            resolve(false);
         });
 
-        dialogo.show();
+
         quitarBlurEscape();
         activarBlur();
         quitarBlurClicar(dialogo)
+        dialogo.show();
     });
+}
+//Dialogo siemple que unicamente comunica un mensaje
+export function dialogoSimple(mensaje) {
+
+    let dialogo = crearNodo("dialog", "", "dialogoInformarcion", "", document.body)
+    dialogo.innerHTML = "<h1>Información</h1>";
+    dialogo.innerHTML += "<p>" + mensaje + "</p>"
+
+    let botonOk = crearNodo("button", "OK", "btnOk", "", dialogo)
+    botonOk.addEventListener('click', () => {
+        dialogo.close();
+        dialogo.remove();
+        quitarBlur();
+    })
+
+    activarBlur();
+    quitarBlurEscape();
+    quitarBlurClicar(dialogo)
+    dialogo.show();
+
 }
 
 
@@ -188,7 +209,7 @@ function quitarBlurClicar(dialog) {
         //Hacemos que cuando 
         if (!dialog.contains(event.target)) {
             dialog.close();
-            //dialog.remove();
+            dialog.remove();
             // Quitamos la clase de desenfoque a todos los elementos que no son el diálogo
             document.querySelectorAll("body > *:not(dialog)").forEach(element => {
                 element.classList.remove("blur");
