@@ -4,7 +4,7 @@ import {
    enviarSolicitudes, solicitudes, devuelveAlumnosOferta
 } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
-import { cadenaFormateada, eliminarDatosObjecto } from './funcionesGenerales.js';
+import { cadenaFormateada, eliminarDatosObjecto,dialogoInformacion,mensajeDialogo } from './funcionesGenerales.js';
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
 const listaMenu = document.getElementById('lista');
@@ -211,8 +211,19 @@ async function visualizarSolicitudes() {
 
 
    let botonContrato = crearNodo("button", "Contratar", "btnContrato", "", divSolicitudes)
-   botonContrato.addEventListener("click", () => {
-      console.log(alumSeleccionado)
+   botonContrato.addEventListener("click",async (event) => {
+      event.stopPropagation()
+      if(Object.keys(alumSeleccionado).length !== 0){
+         
+         const confirmado = await dialogoInformacion("Realizar Contrato", "¿Quieres dar de alta a " + alumSeleccionado.nombre + " ?");
+         if (confirmado) {
+            console.log("dando de alta...");
+            
+         }
+      }else{
+         alert("Tienes que seleccionar algún alumno...")
+         
+      }
    })
 
 }

@@ -77,8 +77,8 @@ export function mensajeDialogo(respuesta) {
 
     let exito = false
 
-    let dialog = crearNodo("dialog", "", "dialog", "dialog", document.body)
-    let tituloDia = crearNodo("h1","","","dialogoTitulo",dialog)
+    let dialog = crearNodo("dialog", "", "dialogMensaje", "dialog", document.body)
+    let tituloDia = crearNodo("h1", "", "", "dialogoTitulo", dialog)
 
     if (respuesta.hasOwnProperty('Exito')) {
         tituloDia.textContent = "Acción Realizada"
@@ -110,37 +110,93 @@ export function mensajeDialogo(respuesta) {
 
     })
     dialog.show()
+    quitarBlurClicar(dialog);
+    quitarBlurEscape();
+    activarBlur();
 
-    // Cerrar el diálogo cuando fuera del dialogo lo quitamos y le quitamos el blur que contenga
+    return exito
+}
+
+//He tenido que hacer dialogo Información como promesa para que clique es en el boton me devuelva una cosa u otra
+export  function dialogoInformacion(titulo, mensaje) {
+    return new Promise((resolve, reject) => {
+        let dialogo = crearNodo("dialog", "", "dialogInfo", "dialog", document.body);
+        let tituloDia = crearNodo("h1", titulo, "", "", dialogo);
+        let p = crearNodo("p", mensaje, "", "", dialogo);
+        let conteBotones = crearNodo("div", "", "botonesDia", "", dialogo);
+
+        let botonOk = crearNodo("button", "Ok", "", "", conteBotones);
+        botonOk.addEventListener('click', () => {
+            dialogo.close();
+            dialogo.remove();
+            quitarBlur();
+            resolve(true); 
+        });
+
+        let botonCancelar = crearNodo("button", "Cancelar", "", "", conteBotones);
+        botonCancelar.addEventListener('click', () => {
+            dialogo.close();
+            dialogo.remove();
+            quitarBlur();
+            resolve(false); 
+        });
+
+        dialogo.show();
+        quitarBlurEscape();
+        activarBlur();
+        quitarBlurClicar(dialogo)
+    });
+}
+
+
+function activarBlur() {
+    //Activamos el blur a toda la página menos al diálogo 
+    //buscamos todos los que no son diálogos y les añadimos el blur
+    document.querySelectorAll("body > *:not(dialog)").forEach(element => {
+        //El blur está establecido en nuestro CSS
+        element.classList.add("blur");
+    });
+}
+
+function quitarBlur() {
+
+    document.querySelectorAll("body > *").forEach(element => {
+        element.classList.remove("blur");
+    });
+}
+
+function quitarBlurEscape() {
+    // Cerrar el diálogo cuando se presiona una tecla de escape (con keydown nos referimos a clicamos en cualquier tecla)
+    window.addEventListener('keydown', (event) => {
+        //Si hacemos escape cerramos el diálogo y eliminamos el blur
+        if (event.key === 'Escape') {
+            dialog.close();
+            dialog.remove();
+            // Quitamos la clase de desenfoque a todos los elementos que no son el diálogo
+            document.querySelectorAll("body > *:not(dialog)").forEach(element => {
+                element.classList.remove("blur");
+            });
+        }
+    });
+}
+
+//Quitamos el blur cuando pulsemos en algun otro sitio
+function quitarBlurClicar(dialog) {
+
     //Evento click a todo el documento
     document.addEventListener('click', (event) => {
         //Hacemos que cuando 
         if (!dialog.contains(event.target)) {
             dialog.close();
-            dialog.remove();
-            document.querySelectorAll("body > *").forEach(element => {
+            //dialog.remove();
+            // Quitamos la clase de desenfoque a todos los elementos que no son el diálogo
+            document.querySelectorAll("body > *:not(dialog)").forEach(element => {
                 element.classList.remove("blur");
             });
         }
     });
-    // Cerrar el diálogo cuando se presiona una tecla de escape (con keydown nos referimos a clicamos en cualquier tecla)
-    window.addEventListener('keydown', (event) => {
-        //Si hacemos escape cerramos el dialogo y eliminamos el blur
-        if (event.key === 'Escape') {
-            dialog.close();
-            dialog.remove();
-            element.classList.remove("blur");
-        }
-    });
-
-    //Activamos el blur a toda la página menos al dialogo 
-                             //buscamos todos los que no son dialogos y le añadimos el blur
-    document.querySelectorAll("body > *:not(.dialog)").forEach(element => {
-        //El blur está está establecido en nuestro css
-        element.classList.add("blur");
-    });
-
-    return exito
 }
+
+
 
 

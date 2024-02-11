@@ -1,23 +1,64 @@
-.dialog {
+dialog {
     position: fixed;
     top: 50%;
     left: 50%;
-    background-color: rgb(229, 246, 228);;
     transform: translate(-50%, -50%);
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     border-radius: 15px;
+}
+
+.dialogMensaje {
+
+    background-color: rgb(229, 246, 228);
     border: 5px solid rgb(17, 240, 25);
 }
 
-.dialog h1{
+dialog h1 {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 35px;
-    color:rgb(11, 202, 139);
+}
+
+.dialogInfo h1 {
+    color: #0755ee;
+}
+
+.dialogInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #b8dfff;
+    border: 5px solid #123f9a;
+}
+
+.dialogInfo button{
+    cursor: pointer;
+    margin:5px;
+    background-color: #0755ee;
+    color:aliceblue;
+    padding: 5px;
+    border-radius: 10px;
+    width: 100px;
+}
+
+.botonesDia {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5rem;
+    padding: 0.75rem;
+}
+
+
+.dialogMensaje h1 {
+    color: rgb(11, 202, 139);
 }
 
 /*De forma predeterminada está de forma de exxito  */
-.dialog button{
-    
+.dialogMensaje button {
+
     position: relative;
     left: 50%;
     transform: translateX(-50%);
@@ -25,7 +66,7 @@
     width: 130px;
     border-radius: 10px;
     padding: 5px;
-    color:white;
+    color: white;
     background-color: rgb(115, 215, 95);
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 15px;
@@ -33,14 +74,8 @@
 }
 
 
-.blur{
+.blur {
 
-    filter: blur(2px); 
+    filter: blur(2px);
     pointer-events: none;
 }
-
-
-
-
-
-
