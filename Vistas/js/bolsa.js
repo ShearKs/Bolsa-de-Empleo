@@ -4,7 +4,7 @@ import {
    enviarSolicitudes, solicitudes, devuelveAlumnosOferta
 } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
-import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo,dialogoSimple } from './funcionesGenerales.js';
+import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
 const listaMenu = document.getElementById('lista');
@@ -136,7 +136,9 @@ async function visualizarSolicitudes() {
 
    crearNodo("h1", "Solicitudes de " + usuario.nombre, "", "", divSolicitudes)
 
-   await solicitudes(usuario.cif, divSolicitudes)
+   let solicitud = { cif: usuario.cif, modo: 1 }
+
+   await solicitudes(solicitud, divSolicitudes)
       .then((solicitudes => {
 
          solicitudes.forEach(solicitud => {
@@ -162,8 +164,9 @@ async function visualizarSolicitudes() {
             celdaAlumnos.colSpan = Object.keys(solicitud).length; // Hacer que la celda ocupe todas las columnas
             let tablaAlumnos = crearNodo("table", "", "tablaAlumnos", "", celdaAlumnos);
 
+            let objeto = { cif: solicitud.cif_empresa, id: solicitud.id, modo: 2 }
             // Obtener los alumnos de esta solicitud y construir la tabla anidada
-            devuelveAlumnosOferta(solicitud.cif_empresa, solicitud.id)
+            devuelveAlumnosOferta(objeto)
                .then(alumnos => {
                   alumnos.forEach(alumno => {
                      let filaAlumno = crearNodo("tr", "", "filaAlumno", "", tablaAlumnos);
@@ -215,10 +218,9 @@ async function visualizarSolicitudes() {
       event.stopPropagation()
       if (Object.keys(alumSeleccionado).length !== 0) {
 
-         const confirmado = await dialogoInformacion("Realizar Contrato", "¿Quieres dar de alta a " + alumSeleccionado.nombre + " ?");
+         const confirmado = await dialogoInformacion("Realizar Contrato", "¿Quieres contratar a " + alumSeleccionado.nombre + " ?");
          if (confirmado) {
-            console.log("dando de alta...");
-
+            console.log(alumSeleccionado)
          }
       } else {
          dialogoSimple("Tienes que seleccionar algún alumno...")

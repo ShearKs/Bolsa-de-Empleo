@@ -1,6 +1,50 @@
 import *  as nodos from './utilsDom.js';
 import { cambioRuta, mensajeDialogo } from './funcionesGenerales.js';
 
+//Promesa General usada para quitar código
+export function promesaGeneral(solicitud, ruta) {
+
+    return new Promise((resolve, reject) => {
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(solicitud)
+        }
+
+        fetch(ruta, requestOptions)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('La solicitud no fue exitosa');
+                }
+                return response.json();
+            })
+            .then(respuesta => {
+                console.log(respuesta);
+                resolve(respuesta)
+            })
+            .catch(error => {
+                reject("Error en la solicitud: " + error);
+            });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Función Fetch que se encarga de realizar el autenticado
 export function inicioSesion(usuario, parrafoError) {
 
@@ -143,8 +187,6 @@ export function cambioContrasena(solicitud) {
     });
 }
 
-
-
 export function cambioContraseñaProcesa(solicitud) {
 
     // Creamos un objeto con la solictud del usuario
@@ -212,17 +254,17 @@ export function editarUsuarioBolsa(usuario, rol) {
 }
 
 
-export function solicitudes(cifEmpresa,contenedor) {
+export function solicitudes(solicitud, contenedor) {
 
     return new Promise((resolve, reject) => {
 
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cif: cifEmpresa })
+            body: JSON.stringify(solicitud)
         }
 
-        fetch('../Controladores/devuelveSolicitud.php', requestOptions)
+        fetch('../Controladores/contratacion.php', requestOptions)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('La solicitud no ha sido correcta')
@@ -231,8 +273,8 @@ export function solicitudes(cifEmpresa,contenedor) {
                 return response.json()
             })
             .then(solicitudes => {
-                if(solicitudes.hasOwnProperty('Error')){
-                    nodos.crearNodo("p","No hay ninguna solicitud aún..","","",contenedor)
+                if (solicitudes.hasOwnProperty('Error')) {
+                    nodos.crearNodo("p", "No hay ninguna solicitud aún..", "", "", contenedor)
                     return
                 }
                 resolve(solicitudes)
@@ -244,9 +286,7 @@ export function solicitudes(cifEmpresa,contenedor) {
     })
 }
 
-export function devuelveAlumnosOferta(cifEmpresa, idSol) {
-
-    let solicitud = { cif: cifEmpresa, id: idSol }
+export function devuelveAlumnosOferta(solicitud) {
 
     return new Promise((resolve, reject) => {
 
@@ -256,7 +296,7 @@ export function devuelveAlumnosOferta(cifEmpresa, idSol) {
             body: JSON.stringify(solicitud)
         }
 
-        fetch('../Controladores/devuelveAlumSol.php', requestOptions)
+        fetch('../Controladores/contratacion.php', requestOptions)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('La solicitud no fue exitosa');
