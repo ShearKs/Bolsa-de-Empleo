@@ -1,7 +1,7 @@
 import {
    obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal,
    alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo,
-   enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral,modalidadFct
+   enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral, modalidadFct
 } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
@@ -137,20 +137,23 @@ async function alumnFCTS() {
 
    let titulo = crearNodo("h1", "Escoge alumnos para las FCTS", "", "", divFCT)
 
-   let select = await modalidadFct(titulo)
+   let select = await modalidadFct({modo:1},titulo)
 
-   let botonFCT = crearNodo("button", "Seleccionar Alumno para la FCT", "", "", divFCT)
+   let botonFCT = crearNodo("button", "Seleccionar Modalidad", "", "", divFCT)
 
    botonFCT.addEventListener('click', () => {
-      
-      console.log(select.value)
+
+      //div donde mostraremos todos los alumnos que esten realizando esa fct
+      let divAlumnos = crearNodo("div", "", "divAlumFct", "", divFCT)
+      let tipoFct = select.value
+      promesaGeneral({ modo: 2 ,tipo : tipoFct}, '../Controladores/realizacionFCT.php')
+         .then((respuesta =>{
+            console.log(respuesta)
+         }))
 
    })
 
 }
-
-
-
 
 
 async function visualizarSolicitudes() {

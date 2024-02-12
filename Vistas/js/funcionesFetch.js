@@ -333,9 +333,14 @@ export async function crearCursos(curso, div, esIndex, modo) {
     }
 }
 
-export async function modalidadFct(titulo) {
+export async function modalidadFct(modo, titulo) {
     try {
-        const response = await fetch('../Controladores/devuelveModalidadFCT.php');
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(modo)
+        }
+        const response = await fetch('../Controladores/realizacionFCT.php', requestOptions);
         if (!response.ok) {
             throw new Error('La solicitud no ha sido correcta');
         }
@@ -343,14 +348,14 @@ export async function modalidadFct(titulo) {
         const modalidades = await response.json();
         console.log(modalidades)
         // Crear el elemento select
-        let select = nodos.crearNodoDebajo("select", "", "selectoption", "selectCursos", titulo);
+        let select = nodos.crearNodoDebajo("select", "", "selectModalidades", "select", titulo);
 
         // Iterar sobre los cursos y agregar opciones al select
         for (let moda in modalidades) {
             let nombreModalidad = modalidades[moda].tipo;
             let option = nodos.crearNodo("option", nombreModalidad, "", "", select);
             option.value = modalidades[moda].id;
-           
+
         }
         return select;
     } catch (error) {

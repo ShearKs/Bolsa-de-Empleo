@@ -309,6 +309,32 @@ class DaoEmpresa
         }
     }
 
+    public function alumnosModalidadFct($modalidad)
+    {
+
+        $sql = "SELECT fct.dni,al.nombre,al.apellidos,al.email,mo.tipo FROM alumnofct fct
+                    INNER JOIN alumnoies al ON al.dni = fct.dni 
+                    INNER JOIN modalidad_fct mo ON mo.id = fct.modalidad WHERE mo.id = ? ";
+
+        $sentecia = $this->conexion->prepare($sql);
+        $sentecia->bind_param("i", $modalidad);
+        $estado = $sentecia->execute();
+        $resultado = $sentecia->get_result();
+        $alumnosFct = array();
+
+        if ($estado != null &&  $resultado->num_rows) {
+
+            while ($fila = $resultado->fetch_assoc()) {
+
+                $alumnosFct[] = $fila;
+            }
+            return json_encode($alumnosFct);
+        } else {
+
+            return json_encode(array('Error' => "No se han encontrado alumnos para esa modalidad de Fct"));
+        }
+    }
+
 
 
     public function existeCifEmpresa($cifEmpresa)
