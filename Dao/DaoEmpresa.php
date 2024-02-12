@@ -218,7 +218,6 @@ class DaoEmpresa
     public function obtenerAlumnosSolici($cifEmpresa, $idSoli)
     {
 
-
         $sql = "SELECT distinct al.nombre,al.apellidos,al.dni
                     FROM alumno_bolsa a
                     JOIN alumnoies al ON al.dni = a.dni
@@ -335,6 +334,41 @@ class DaoEmpresa
         }
     }
 
+    public function realizarPeticion($alumnos, $tipo)
+    {
+
+        //Ponemos el autocommit en falso ya que no vamos a crear la peticion sin asignar los alumnos a la petición de fcts
+        $this->conexion->autocommit(false);
+
+        $sql = "INSERT INTO peticionfcts (modalidad) VALUES(?)";
+        $sentecia = $this->conexion->prepare($sql);
+        $sentecia->bind_param("s", $tipo);
+        $estado = $sentecia->execute();
+
+        if ($estado) {
+            $idPeticion = $sentecia->insert_id;
+            $sentecia->close();
+
+            foreach ($alumnos as $alum) {
+
+                $dni = $alum['dni'];
+
+                $sqlAsig = "INSERT INTO peticion_alumnos(idPeticion,dniAlumno) VALUES (?,?) ";
+                $sentenciaAsig = $this->conexion->prepare($sqlAsig);
+                $sentenciaAsig->bind_param("is", $idPeticion, $dni);
+                $estado = $sentenciaAsig->execute();
+
+                if (!$estado) {
+                    $this->conexion->rollback();
+                    return json_encode(array('Error' => 'No se ha podido asignar la petición al alumno'));
+                }
+            }
+            $this->conexion->autocommit(true);
+            return json_encode(array('Exito' => 'Se ha creado la petición correctamte'));
+        } else {
+            return json_encode(array('Error' => 'No se ha podido crear la petición'));
+        }
+    }
 
 
     public function existeCifEmpresa($cifEmpresa)

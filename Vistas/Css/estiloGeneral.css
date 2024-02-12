@@ -1,3 +1,7 @@
+.mensajeError {
+    color: #ff1a1a;
+}
+
 dialog {
     position: fixed;
     top: 50%;
@@ -32,11 +36,11 @@ dialog h1 {
     border: 5px solid #123f9a;
 }
 
-.dialogInfo button{
+.dialogInfo button {
     cursor: pointer;
-    margin:5px;
+    margin: 5px;
     background-color: #0755ee;
-    color:aliceblue;
+    color: aliceblue;
     padding: 5px;
     border-radius: 10px;
     width: 100px;

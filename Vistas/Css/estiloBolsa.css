@@ -345,7 +345,8 @@ td {
     font-size: 14px;
 }
 
-.divFCT button {
+.divFCT button,
+.divAlumFct button {
     cursor: pointer;
     color: white;
     font-weight: bolder;
@@ -354,4 +355,56 @@ td {
     padding: 0.8rem;
     border-radius: 15px;
     margin-top: 15px;
+}
+
+/* Muestra de los alumnos   */
+
+.divAlumFct {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+
+    background-color: #76ffb9;
+    margin: 15px;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+
+/* Estilo de la tabla alumnos FCTS   */
+.tAlumFcts {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    border-radius: 15px;
+}
+
+.tAlumFcts th,
+.tAlumFcts td {
+    border: 1px solid #ddd;
+    /* Borde de celdas */
+    padding: 8px;
+    /* Espaciado interno de celdas */
+    text-align: left;
+    /* Alineación de texto */
+}
+
+.tAlumFcts th {
+    background-color: #f2f2f2;
+}
+
+.tAlumFcts tr:nth-child(even) {
+    background-color: #f2f2f2;
+    cursor: pointer;
+ 
+}
+.tAlumFcts tr:nth-child(odd) {
+    background-color: #cdecd5;
+    cursor: pointer;
+}
+.tAlumFcts tr:hover{
+    background-color: #74bf87;
 }

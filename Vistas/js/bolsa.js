@@ -3,7 +3,7 @@ import {
    alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo,
    enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral, modalidadFct
 } from './funcionesFetch.js';
-import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
+import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect, eliminarExistente } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
@@ -137,22 +137,60 @@ async function alumnFCTS() {
 
    let titulo = crearNodo("h1", "Escoge alumnos para las FCTS", "", "", divFCT)
 
-   let select = await modalidadFct({modo:1},titulo)
+   let select = await modalidadFct({ modo: 1 }, titulo)
+
+   //Mensaje del error por si surge
+   let mensajeError = crearNodo("p", "", "mensajeError", "", divFCT)
 
    let botonFCT = crearNodo("button", "Seleccionar Modalidad", "", "", divFCT)
 
    botonFCT.addEventListener('click', () => {
 
-      //div donde mostraremos todos los alumnos que esten realizando esa fct
-      let divAlumnos = crearNodo("div", "", "divAlumFct", "", divFCT)
       let tipoFct = select.value
-      promesaGeneral({ modo: 2 ,tipo : tipoFct}, '../Controladores/realizacionFCT.php')
-         .then((respuesta =>{
-            console.log(respuesta)
+      promesaGeneral({ modo: 2, tipo: tipoFct }, '../Controladores/realizacionFCT.php')
+         .then((alumnosFcts => {
+
+            //Para recoger lo que hay dentro del option
+            let tipo = select.options[select.value - 1].textContent;
+            eliminarExistente("divAlumFct")
+
+            if (alumnosFcts.hasOwnProperty('Error')) {
+               mensajeError.textContent = alumnosFcts.Error
+               return
+            }
+            mensajeError.textContent = ""
+            visualizarAlumnosFct(alumnosFcts, tipo)
          }))
-
    })
+}
 
+function visualizarAlumnosFct(alumnos, tipo) {
+
+   let divMuestraFct = crearNodo("div", "", "divAlumFct", "divAlumFct", contenedor)
+
+   crearNodo("h2", "Cantidad de alumnos recogidos en " + tipo + "  :" + alumnos.length, "", "", divMuestraFct)
+
+   let tabla = crearNodo("table", "", "tAlumFcts", "", divMuestraFct)
+
+   for (let alum of alumnos) {
+      let tr = crearNodo("tr", "", "", "", tabla)
+      for (let propiedad in alum) {
+         crearNodo("td", alum[propiedad], "", "", tr)
+      }
+   }
+
+   let btnPeticion = crearNodo("button", "Realizar Petición", "", "", divMuestraFct)
+   btnPeticion.addEventListener('click', async (event) => {
+      event.stopPropagation();
+      const confirmado = await dialogoInformacion("Peticiones FCTS", "¿Quieres seleccionar a estos alumno/s para fcts? ");
+      if (confirmado) {
+         //Realizamos una petición de los alumnos seleccionados
+         promesaGeneral({ modo: 3, tipo: tipo, alumnos: alumnos }, '../Controladores/realizacionFCT.php')
+            .then((respuesta => {
+               mensajeDialogo(respuesta)
+            }))
+      }
+   })
 }
 
 

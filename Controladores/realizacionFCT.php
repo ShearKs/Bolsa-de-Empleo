@@ -15,14 +15,17 @@ switch ($modo) {
         echo $modalidades;
         break;
     case 2:
-
-        //Vemos que alumnos cumplen con
+        //En este modo nos encargamos de obtener los alumnos de la modalidad seleccionada
         $tipoFct = $solicitud['tipo'];
         $alumnosFct = $daoEmpresa->alumnosModalidadFct($tipoFct);
         echo $alumnosFct;
-    case 3:
         break;
-
+    case 3:
+        $alumnos = $solicitud['alumnos'];   
+        $tipoPeticion = $solicitud['tipo']; 
+        $mensaje = $daoEmpresa->realizarPeticion($alumnos,$tipoPeticion);
+        echo $mensaje;
+        break;
     default:
         echo json_encode(array('Error' => "No se ha asignado ningun modo para la funcionalidad de Fcts"));
         break;
