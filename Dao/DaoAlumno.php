@@ -42,18 +42,14 @@ class DaoAlumno
 
 
 
-    public function devuelveAlumno($dni, $esbolsa)
+    public function devuelveAlumno($dni)
     {
-        $sql = "SELECT alu.dni, alu.nombre, apellidos, email, telefono, cur.nombre as 'curso'";
-        $sql .= $esbolsa ? ", idCurso, expLaboral as 'Experiencia Laboral', telefono as 'Teléfono', usu.nombre as 'usuario'" : "";
-        $sql .= " FROM alumnoies alu";
-        $sql .= " JOIN cursa_alumn c ON alu.dni = c.dniAlum";
-        $sql .= " JOIN curso cur ON c.idCurso = cur.id";
-        $sql .= $esbolsa ? " LEFT JOIN alumno_bolsa b ON alu.dni = b.dni" : "";
-        $sql .= $esbolsa ? " LEFT JOIN usuario usu ON b.idUsuario = usu.id" : "";
-        $sql .= " WHERE alu.dni = ?";
-        $sql .= " GROUP BY alu.dni";
-
+        
+        $sql = "SELECT alu.dni, alu.nombre, apellidos, email, telefono,titulado,cur.nombre as 'curso',titulado ".
+                    "FROM alumnoies alu ".
+                    "INNER JOIN cursa_alumn c ON alu.dni = c.dniAlum ".
+                    "INNER JOIN curso cur ON c.idCurso = cur.id ".
+                    "WHERE titulado = 1 and alu.dni = ?";
 
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s", $dni);
@@ -62,9 +58,10 @@ class DaoAlumno
 
         if ($resultado->num_rows == 1 && $estado != null) {
             $alumno = $resultado->fetch_assoc();
+
             return json_encode($alumno);
         } else {
-            return json_encode(array("Error" => "No se encuentra ese alumno en la base de datos"));
+            return json_encode(array("Error" => "No se encuentra ese alumno en la base de datos de alumnos titulados"));
         }
     }
 

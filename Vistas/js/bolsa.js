@@ -1,7 +1,7 @@
 import {
    obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal,
    alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo,
-   enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral
+   enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral,modalidadFct
 } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
@@ -108,6 +108,12 @@ function crearMenuAlumnos() {
 
 function crearMenuEmpresa() {
 
+   let practicasFCTS = crearNodo("li", "", "liEmpresa", "practicasFCTs", listaMenu)
+   crearNodo("a", "Seleccionar Alumnos para FCTS", "", "", practicasFCTS)
+   practicasFCTS.addEventListener('click', () => {
+      limpiarContenido(contenedor)
+      alumnFCTS();
+   })
 
    let mandarOferta = crearNodo("li", "", "liEmpresa", "solicitudOferta", listaMenu)
    crearNodo("a", "Mandar Oferta", "", "", mandarOferta)
@@ -124,6 +130,28 @@ function crearMenuEmpresa() {
    })
 
 }
+
+async function alumnFCTS() {
+
+   let divFCT = crearNodo("div", "", "divFCT", "", contenedor);
+
+   let titulo = crearNodo("h1", "Escoge alumnos para las FCTS", "", "", divFCT)
+
+   let select = await modalidadFct(titulo)
+
+   let botonFCT = crearNodo("button", "Seleccionar Alumno para la FCT", "", "", divFCT)
+
+   botonFCT.addEventListener('click', () => {
+      
+      console.log(select.value)
+
+   })
+
+}
+
+
+
+
 
 async function visualizarSolicitudes() {
 
@@ -234,7 +262,7 @@ async function visualizarSolicitudes() {
                   console.log(divSolicitudes.children.length)
                   //Significa que solo queda el titulo y el boton y no hay ninguna solicitud por lo que procedemos a quitar
                   //el boton y a decirle al usuario que no tiene ninguna solicitud...
-                  if (divSolicitudes.children.length == 2){
+                  if (divSolicitudes.children.length == 2) {
                      botonContrato.remove()
                      crearNodo("p", "No hay ninguna solicitud aún..", "", "", divSolicitudes)
                   }

@@ -310,3 +310,16 @@ td {
     font-weight: bolder;
     cursor: pointer;
 }
+
+/*  FCTS  */
+
+.divFCT{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #daa9d7;
+    border-radius: 15px;
+    height: 500px;
+    width: 500px;
+}

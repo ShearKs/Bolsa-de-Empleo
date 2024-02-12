@@ -288,6 +288,27 @@ class DaoEmpresa
         }
     }
 
+    public function devuleveModalidadFCT()
+    {
+
+        $sql = "SELECT * FROM modalidad_fct";
+
+        $query = $this->conexion->query($sql);
+
+        $modalidades = array();
+
+        if ($query->num_rows > 0) {
+
+            while ($fila = $query->fetch_assoc()) {
+
+                $modalidades[] = $fila;
+            }
+            return json_encode($modalidades);
+        } else {
+            return json_encode(array("Error" => "Ha habido un problema no se ha podido obtener nada de la consulta"));
+        }
+    }
+
 
 
     public function existeCifEmpresa($cifEmpresa)

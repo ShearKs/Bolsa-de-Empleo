@@ -30,8 +30,6 @@ export function promesaGeneral(solicitud, ruta) {
 }
 
 
-
-
 //Función Fetch que se encarga de realizar el autenticado
 export function inicioSesion(usuario, parrafoError) {
 
@@ -329,8 +327,32 @@ export async function crearCursos(curso, div, esIndex, modo) {
                 option.selected = true;
             }
         }
-
         return selectOption;
+    } catch (error) {
+        console.error("Error en la solicitud:" + error);
+    }
+}
+
+export async function modalidadFct(titulo) {
+    try {
+        const response = await fetch('../Controladores/devuelveModalidadFCT.php');
+        if (!response.ok) {
+            throw new Error('La solicitud no ha sido correcta');
+        }
+
+        const modalidades = await response.json();
+        console.log(modalidades)
+        // Crear el elemento select
+        let select = nodos.crearNodoDebajo("select", "", "selectoption", "selectCursos", titulo);
+
+        // Iterar sobre los cursos y agregar opciones al select
+        for (let moda in modalidades) {
+            let nombreModalidad = modalidades[moda].tipo;
+            let option = nodos.crearNodo("option", nombreModalidad, "", "", select);
+            option.value = modalidades[moda].id;
+           
+        }
+        return select;
     } catch (error) {
         console.error("Error en la solicitud:" + error);
     }
@@ -467,7 +489,6 @@ export function devuelveCamposEmpresa(creaFormularioEmpresa, cif) {
             return response.json()
         })
         .then(data => {
-
 
             if (data.hasOwnProperty('Error')) {
                 parrafoError.textContent = "Error: " + data.Error
