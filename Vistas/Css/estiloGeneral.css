@@ -3,14 +3,22 @@
 }
 
 dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     border-radius: 15px;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    /* position: fixed; Cambiado a fixed */
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex; 
+    flex-direction: column;
+    align-items: center; 
+    justify-content: center; 
 }
-
+ 
 .dialogMensaje {
 
     background-color: rgb(229, 246, 228);
@@ -27,10 +35,7 @@ dialog h1 {
 }
 
 .dialogInfo {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 
     background-color: #b8dfff;
     border: 5px solid #123f9a;

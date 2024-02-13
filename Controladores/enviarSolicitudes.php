@@ -15,7 +15,7 @@ $daoEmpresa = new DaoEmpresa();
 $mensaje = $daoEmpresa->realizarSolicitud($alumnos,$empresa,$criterios);
 
 
-echo json_encode($mensaje);
+echo $mensaje;
 
 
 

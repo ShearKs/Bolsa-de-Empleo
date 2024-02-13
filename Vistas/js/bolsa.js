@@ -1,8 +1,4 @@
-import {
-   obtenerUsuario, editarUsuarioBolsa, crearCursos, generarCodigoTemporal,
-   alumnosOferta, cambioContrasena, cambioContraseñaProcesa, insertarTitulo,
-   enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral, modalidadFct
-} from './funcionesFetch.js';
+import { obtenerUsuario, editarUsuarioBolsa, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect, eliminarExistente } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
 import { anadirTitulacion } from './alumnos.js';
@@ -103,7 +99,7 @@ function crearMenuAlumnos() {
 
    botonTitulacion.addEventListener('click', () => {
       limpiarContenido(contenedor);
-      anadirTitulacion(contenedor,usuario);
+      anadirTitulacion(contenedor, usuario);
    })
 }
 
@@ -132,9 +128,10 @@ function crearMenuEmpresa() {
 
 }
 
-let propEliminarAlum = ["idCurso", "disponibilidad", "posiViajar"]
+
 
 async function crearFormularioDatos() {
+   let propEliminarAlum = ["idCurso", "disponibilidad", "posiViajar"]
 
    let usuarioChanged = usuario
    if (rolUser == 1) {

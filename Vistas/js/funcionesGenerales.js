@@ -72,12 +72,60 @@ export function eventoCheckBox(checkbox, elementoCreado, idNodo, nodo, nodoAnter
     })
 }
 
+export function devolverObjetaTabla(filasTabla,arrayObjetos){
+    for (let i = 0; i < filasTabla.length; i++) {
+        filasTabla[i].addEventListener('click', () => {
+          
+            //Recogemos de esa fila su td correspondiente para obtener los datos del alumno
+            let objetoT = {}
+            let tdFila = filasTabla[i].children
+
+            for (let j = 0; j < tdFila.length; j++) {
+                //Accedemos al classname de la celda
+                let nombreClase = tdFila[j].className
+                //Contenido que hay en ese td
+                let contenido = tdFila[j].textContent
+                //Creamos el objeto alumno que le añadimos al array de objetos
+                objetoT[nombreClase] = contenido
+            }
+            //Nos devuelve el index si un alumno está contenido en el array de objetos
+            let index = arrayObjetos.findIndex(item => {
+
+                //Buscamos por todos los objetos si está el objeto alumno..
+                return Object.keys(item).every(key => {
+                    return item[key] === objetoT[key];
+                })
+            });
+
+            if (index !== -1) {
+                console.log("El objeto es igual al que contienes en el array")
+                arrayObjetos.splice(index, 1)
+                //Al estar deseleccionado le quitamos el color
+                filasTabla[i].style.backgroundColor = ''
+
+            } else {
+                arrayObjetos.push(objetoT)
+                filasTabla[i].style.backgroundColor = "#74bf87";
+            }
+
+            return arrayObjetos
+
+        })
+    }
+}
+
+
+
+/* ---------------   Dialogos para la aplicación    ----------------------   */
+
 
 export function mensajeDialogo(respuesta) {
 
     let exito = false
 
-    let dialog = crearNodo("dialog", "", "dialogMensaje", "dialog", document.body)
+    //let dialog = crearNodo("dialog", "", "dialogMensaje", "dialog", document.body)
+    let dialog = crearNodoDebajo("dialog","","dialogMensaje","dialog",document.body)
+
     let tituloDia = crearNodo("h1", "", "", "dialogoTitulo", dialog)
 
     if (respuesta.hasOwnProperty('Exito')) {
@@ -119,7 +167,8 @@ export function mensajeDialogo(respuesta) {
 //He tenido que hacer dialogo Información como promesa para que clique es en el boton me devuelva una cosa u otra
 export function dialogoInformacion(titulo, mensaje) {
     return new Promise((resolve, reject) => {
-        let dialogo = crearNodo("dialog", "", "dialogInfo", "dialog", document.body);
+        let dialogo = crearNodoDebajo("dialog", "", "dialogInfo", "dialog", document.body);
+
         let tituloDia = crearNodo("h1", titulo, "", "", dialogo);
         let p = crearNodo("p", mensaje, "", "", dialogo);
         let conteBotones = crearNodo("div", "", "botonesDia", "", dialogo);
@@ -150,7 +199,7 @@ export function dialogoInformacion(titulo, mensaje) {
 //Dialogo siemple que unicamente comunica un mensaje
 export function dialogoSimple(mensaje) {
 
-    let dialogo = crearNodo("dialog", "", "dialogoInformarcion", "", document.body)
+    let dialogo = crearNodoDebajo("dialog", "", "dialogoInformarcion", "", document.body)
     dialogo.innerHTML = "<h1>Información</h1>";
     dialogo.innerHTML += "<p>" + mensaje + "</p>"
 
@@ -168,13 +217,7 @@ export function dialogoSimple(mensaje) {
 
 }
 
-
-
-
-
-
-
-/* Funciones para los dialogos    */
+/* -----------    Funciones para los dialogos  ------------------  */
 function activarBlur() {
     //Activamos el blur a toda la página menos al diálogo 
     //buscamos todos los que no son diálogos y les añadimos el blur

@@ -17,7 +17,6 @@ $daoAlumno = new DaoAlumno();
 $daoEmpresa = new DaoEmpresa();
 
 
-
 //Construimos el objeto Empresa con los datos recibidos
 //$empresa = new Empresa($empresa['cif'],$empresa['nombre'],$empresa,['telefono'],$empresa['direccion'],$empresa['email']);
 

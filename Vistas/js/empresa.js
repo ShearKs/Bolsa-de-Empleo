@@ -1,7 +1,8 @@
 
-import {crearCursos,alumnosOferta,enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral, modalidadFct
+import {
+    crearCursos, enviarSolicitudes, solicitudes, devuelveAlumnosOferta, promesaGeneral, modalidadFct
 } from './funcionesFetch.js';
-import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
+import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple, devolverObjetaTabla } from './funcionesGenerales.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect, eliminarExistente } from './utilsDom.js';
 
 export async function alumnFCTS(contenedor) {
@@ -38,7 +39,7 @@ export async function alumnFCTS(contenedor) {
 }
 
 
-export function visualizarAlumnosFct(alumnos, tipo, contenedor) {
+function visualizarAlumnosFct(alumnos, tipo, contenedor) {
 
     //Array de objetos donde guardaremos todos los alumnos que envie el cliente
     let alumnosPeti = []
@@ -49,11 +50,20 @@ export function visualizarAlumnosFct(alumnos, tipo, contenedor) {
 
     //Creamos la tabla donde visualizaremos a alos alumnos
     let tabla = crearNodo("table", "", "tAlumFcts", "", divMuestraFct)
+    let tr = crearNodo("tr", "", "filaAlumno", "filaAlumno", tabla)
+    for (let propiedad in alumnos[0]) {
+        if (propiedad !== 'dni') { // Excluir la columna 'dni'
+            crearNodo("th", cadenaFormateada(propiedad), "", "", tr);
+        }
+    }
 
     for (let alum of alumnos) {
         let tr = crearNodo("tr", "", "filaAlumno", "filaAlumno", tabla)
         for (let propiedad in alum) {
             let td = crearNodo("td", alum[propiedad], propiedad, "", tr)
+            if (propiedad=== 'dni'){
+                td.style.display = 'none'
+            }
         }
     }
 
@@ -112,7 +122,7 @@ export function visualizarAlumnosFct(alumnos, tipo, contenedor) {
         if (confirmado) {
 
             //Realizamos una petición de los alumnos seleccionados
-            promesaGeneral({ modo: 3, tipo: tipo, alumnos: alumnos }, '../Controladores/realizacionFCT.php')
+            promesaGeneral({ modo: 3, tipo: tipo, alumnos: alumnosPeti }, '../Controladores/realizacionFCT.php')
                 .then((respuesta => {
                     mensajeDialogo(respuesta)
                 }))
@@ -125,8 +135,6 @@ export async function enviarOferta(contenedor, empresa) {
 
     let formularioOfertas = crearNodo("form", "", "", "", contenedor)
     formularioOfertas.method = "POST"
-
-    let divMostrado = crearNodo("div", "", "", "mostrarAlumnos", contenedor)
 
     let divOferta = crearNodo("div", "", "divOferta", "", formularioOfertas)
     let p = crearNodo("p", "Elige intervención profesional", "", "", divOferta)
@@ -149,9 +157,13 @@ export async function enviarOferta(contenedor, empresa) {
     crearCaja("residencia", "Otra residencia", divOferta);
     crearSelect("selectOferta", "residencia", ["Sí", "No"], divOferta);
 
-    let botonSoliOferta = crearNodo("button", "Enviar solicitud", "btnOferta", "", divOferta)
-    botonSoliOferta.addEventListener("click", (event) => {
+    let parrafoError = crearNodo("p", "", "mensajeError", "", divOferta)
+
+    let btnAlumOf = crearNodo("button", "Obtener Alumnos", "btnOferta", "", divOferta)
+    btnAlumOf.addEventListener("click", (event) => {
         event.preventDefault();
+        //Borro el que haya ya que siempre que le de al botón se va a crear uno nuevo
+        eliminarExistente('mostrarAlumnos')
 
         let solicitud = {}
         let formData = new FormData(formularioOfertas);
@@ -168,31 +180,118 @@ export async function enviarOferta(contenedor, empresa) {
                 solicitud[clave] = valor;
             }
         }
-
-        alumnosOferta(solicitud, empresa, visualizarAlumnosOferta, divMostrado);
+        promesaGeneral({ criterios: solicitud, empresa: empresa }, '../Controladores/devuelveAlumnoOferta.php')
+            .then((alumnos => {
+                if (alumnos.length === 0) {
+                    parrafoError.textContent = "No hay ningun alumno que cumpla esos requisitos.."
+                    return
+                }
+                parrafoError.textContent = ""
+                visualizarAlumnosOferta(alumnos, empresa, solicitud, contenedor)
+            }))
+        //alumnosOferta(solicitud, empresa, visualizarAlumnosOferta,contenedor);
     })
 
 }
 
-export function visualizarAlumnosOferta(alumnosOfertados, divMostrado, empresa, criterios) {
+function visualizarAlumnosOferta(alumnosOfertados, empresa, criterios, contenedor) {
+
+    let alumnosOferta = []
+
+    let divMostrado = crearNodo("div", "", "mostrarAlumnos", "mostrarAlumnos", contenedor)
+
+    crearNodo("h2", "Alumnos obtenidos de los cursos indicados: " + alumnosOfertados.length, "", "", divMostrado)
 
     let tabla = crearNodo("table", "", "", "", divMostrado)
+
+    let trh = crearNodo("tr", "", "filaAlumno", "", tabla);
+
+    // Crear los encabezados de las columnas
+    for (let propiedad in alumnosOfertados[0]) {
+        if (propiedad !== 'dni') { // Excluir la columna 'dni'
+            let th = crearNodo("th", cadenaFormateada(propiedad), "", "", trh);
+        }
+    }
     for (let alumno of alumnosOfertados) {
-        let tr = crearNodo("tr", "", "", "", tabla)
+
+
+        let tr = crearNodo("tr", "", "filaAlumno", "", tabla)
         for (let propiedad in alumno) {
-            crearNodo("td", alumno[propiedad], "", "", tr)
+
+            let td = crearNodo("td", alumno[propiedad], propiedad, "", tr)
+            if (propiedad === 'dni'){
+                td.style.display = 'none'
+            }
+
         }
     }
 
-    let btnProcesarSoli = crearNodo("button", "Confirma las solicitudes", "", "", divMostrado);
-    btnProcesarSoli.addEventListener('click', () => {
+    let filasAlumno = document.getElementsByClassName("filaAlumno");
 
-        enviarSolicitudes(alumnosOfertados, empresa, criterios)
+    for (let i = 0; i < filasAlumno.length; i++) {
+        filasAlumno[i].addEventListener('click', () => {
+
+            //Recogemos de esa fila su td correspondiente para obtener los datos del alumno
+            let alumno = {}
+            let tdFila = filasAlumno[i].children
+            console.log(tdFila)
+            for (let j = 0; j < tdFila.length; j++) {
+                //Accedemos al classname de la celda
+                let nombreClase = tdFila[j].className
+                //Contenido que hay en ese td
+                let contenido = tdFila[j].textContent
+
+                //Creamos el objeto alumno que le añadimos al array de objetos
+                alumno[nombreClase] = contenido
+            }
+            //Nos devuelve el index si un alumno está contenido en el array de objetos
+            let index = alumnosOferta.findIndex(item => {
+
+                //Buscamos por todos los objetos si está el objeto alumno..
+                return Object.keys(item).every(key => {
+                    return item[key] === alumno[key];
+                })
+            });
+
+            if (index !== -1) {
+                alumnosOferta.splice(index, 1)
+                //Al estar deseleccionado le quitamos el color
+                filasAlumno[i].style.backgroundColor = ''
+
+            } else {
+                alumnosOferta.push(alumno)
+                filasAlumno[i].style.backgroundColor = "#268da6";
+            }
+        })
+    }
+
+
+
+    let btnProcesarSoli = crearNodo("button", "Confirma las solicitudes", "btnOferta", "", divMostrado);
+    btnProcesarSoli.addEventListener('click', async (event) => {
+        event.stopPropagation();
+        console.log(alumnosOferta)
+        if (alumnosOferta.length === 0) {
+            dialogoSimple("No has seleccionado ningún alumno..")
+            return
+        }
+        let confirmacion = await dialogoInformacion("Enviar Oferta", "¿Quieres enviar esta oferta a estos alumno/s?")
+        console.log(alumnosOferta)
+        if (confirmacion) {
+            promesaGeneral({ alumnos: alumnosOferta, empresa: empresa, criterios: criterios }, '../Controladores/enviarSolicitudes.php')
+                .then((respuesta => {
+                    mensajeDialogo(respuesta)
+                }))
+            //enviarSolicitudes(alumnosOferta, empresa, criterios)
+        }
+
     })
 }
 
 
-export async function visualizarSolicitudes(contenedor,empresa) {
+
+//Contratos
+export async function visualizarSolicitudes(contenedor, empresa) {
 
     let alumSeleccionado = {}
 

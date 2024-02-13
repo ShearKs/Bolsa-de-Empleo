@@ -44,12 +44,12 @@ class DaoAlumno
 
     public function devuelveAlumno($dni)
     {
-        
-        $sql = "SELECT alu.dni, alu.nombre, apellidos, email, telefono,titulado,cur.nombre as 'curso',titulado ".
-                    "FROM alumnoies alu ".
-                    "INNER JOIN cursa_alumn c ON alu.dni = c.dniAlum ".
-                    "INNER JOIN curso cur ON c.idCurso = cur.id ".
-                    "WHERE titulado = 1 and alu.dni = ?";
+
+        $sql = "SELECT alu.dni, alu.nombre, apellidos, email, telefono,titulado,cur.nombre as 'curso',titulado " .
+            "FROM alumnoies alu " .
+            "INNER JOIN cursa_alumn c ON alu.dni = c.dniAlum " .
+            "INNER JOIN curso cur ON c.idCurso = cur.id " .
+            "WHERE titulado = 1 and alu.dni = ?";
 
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s", $dni);
@@ -285,7 +285,7 @@ class DaoAlumno
 
         $cadenaCursos = implode(',', $cursos);
 
-        $sql = "SELECT a.*, al.*, c.nombre as 'nombreCurso' ,c.id as 'idCurso' " .
+        $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email,a.telefono, c.nombre as 'Curso'" .
             "FROM alumno_bolsa al " .
             "INNER JOIN alumnoies a ON al.dni = a.dni " .
             "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .

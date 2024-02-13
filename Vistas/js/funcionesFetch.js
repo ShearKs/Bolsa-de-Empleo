@@ -389,36 +389,6 @@ export function insertarTitulo(solicitudCurso) {
         })
 }
 
-export function alumnosOferta(criterios, empresa, visualizarAlumnosOferta,divMostrado) {
-    let solicitud = {
-        criterios: criterios,
-        empresa: empresa
-    }
-
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(solicitud)
-    }
-
-    fetch('../Controladores/devuelveAlumnoOferta.php', requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('La solicitud no ha sido correcta')
-            }
-
-            return response.json()
-        })
-        .then(data => {
-            console.log(data)
-            nodos.limpiarContenido(divMostrado)
-            visualizarAlumnosOferta(data, divMostrado,empresa,criterios)
-
-        })
-        .catch(error => {
-            console.error("Error en la solicitud: " + error)
-        })
-}
 
 export function enviarSolicitudes(alumnos, empresa,criterios) {
 

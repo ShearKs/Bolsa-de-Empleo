@@ -8,6 +8,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    
+    
 }
 
 /* Resto de tus estilos para el header */
@@ -21,7 +23,7 @@ header {
     border: 2px;
     padding: 8px;
     border-radius: 15px;
-    margin-top: 3%;
+    margin-top: 2%;
 }
 
 header ul {
@@ -190,8 +192,7 @@ input[type="checkbox"] {
     color: #0b5017;
 }
 
-.contenedorContra button,
-.btnOferta {
+.contenedorContra button {
     padding: 10px;
     margin: 25px;
     padding: 15px;
@@ -232,15 +233,94 @@ input[type="checkbox"] {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
-    padding: 5%;
-    background-color: #daa9d7;
+    margin: 3%;
+    width: 400px;
+    padding: 4%;
+    background-color: #75caff;
     border-radius: 15px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* Contratos  */
+.divOferta .selectoption {
+    padding: 8px 10px;
+    font-size: 16px;
+    border: 1px solid #3137d7;
+    border-radius: 4px;
+    background-color: #9edee6;
+    appearance: none;
+    cursor: pointer;
+}
+
+/* Estilo para las opciones del select */
+option {
+    padding: 8px 10px;
+    font-size: 16px;
+    background-color: #ffffff;
+}
+
+/* Estilo para las opciones cuando están seleccionadas */
+option:checked {
+    background-color: #e0e0e0;
+}
+
+.btnOferta {
+    background-color: #005dab;
+    color: white;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    padding: 1rem;
+    margin: 1.25rem;
+    border-radius: 15px;
+    cursor: pointer;
+}
+
+.mostrarAlumnos {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin: 3%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #75caff;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 1.25rem;
+}
+
+/* tabla de alumnos ofertados  */
+.mostrarAlumnos td {
+    border: 1px solid #ddd;
+    /* Borde de celdas */
+    padding: 8px;
+    /* Espaciado interno de celdas */
+    text-align: left;
+    /* Alineación de texto */
+}
+
+
+
+.mostrarAlumnos tr:nth-child(even) {
+    background-color: #e0eef5;
+    cursor: pointer;
+
+}
+
+.mostrarAlumnos tr:nth-child(odd) {
+    background-color: #c8f2f7;
+    cursor: pointer;
+}
+
+.mostrarAlumnos tr:hover {
+    background-color: #40b6d3;
+}
+
+
+
+
+
+/* -----------  Contratos --------------  */
 .divSolicitudes {
     margin-top: 0;
     ;
@@ -318,7 +398,7 @@ td {
     flex-direction: column;
     align-items: center;
     margin: 0;
-    padding: 5%;
+    padding: 1.75rem;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     justify-content: center;
     background-color: #76ffb9;
@@ -357,6 +437,12 @@ td {
     margin-top: 15px;
 }
 
+.divFCT button:hover,
+.divAlumFct button:hover {
+    background-color: #0a713f;
+
+}
+
 /* Muestra de los alumnos   */
 
 .divAlumFct {
@@ -365,10 +451,11 @@ td {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
-
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    width: 100%;
     background-color: #76ffb9;
-    margin: 15px;
+    margin:3%;
+    width: 80%;
     padding: 15px;
     border-radius: 15px;
 }
