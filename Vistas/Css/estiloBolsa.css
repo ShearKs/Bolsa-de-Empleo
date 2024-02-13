@@ -21,7 +21,7 @@ header {
     border: 2px;
     padding: 8px;
     border-radius: 15px;
-    margin-top: 2%;
+    margin-top: 3%;
 }
 
 header ul {
@@ -57,13 +57,13 @@ header ul li:hover a {
     color: white;
 }
 
-/*   */
+/* Estilo de la bolsa  */
 
 #principal {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 5%;
+    margin-top: 2%;
     width: 75%;
     padding: 0;
 
@@ -399,12 +399,14 @@ td {
 .tAlumFcts tr:nth-child(even) {
     background-color: #f2f2f2;
     cursor: pointer;
- 
+
 }
+
 .tAlumFcts tr:nth-child(odd) {
     background-color: #cdecd5;
     cursor: pointer;
 }
-.tAlumFcts tr:hover{
+
+.tAlumFcts tr:hover {
     background-color: #74bf87;
 }
