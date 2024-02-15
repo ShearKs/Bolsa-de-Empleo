@@ -1,4 +1,4 @@
-import { obtenerUsuario, editarUsuarioBolsa, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa, promesaGeneral } from './funcionesFetch.js';
+import { obtenerUsuario, editarUsuarioBolsa, generarCodigoTemporal, cambioContrasena, promesaGeneral } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect, eliminarExistente } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
 

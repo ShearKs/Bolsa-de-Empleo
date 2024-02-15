@@ -14,7 +14,6 @@ $daoEmpresa = new DaoEmpresa();
 
 $mensaje = $daoEmpresa->realizarSolicitud($alumnos,$empresa,$criterios);
 
-
 echo $mensaje;
 
 

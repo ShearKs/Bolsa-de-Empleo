@@ -210,7 +210,7 @@ input[type="checkbox"] {
     border-radius: 5px;
 }
 
-/*Titulaciones   */
+/*-------------------------------------  Titulaciones  ------------------------------------------------ */
 
 .divTitulacion {
 
@@ -231,11 +231,10 @@ input[type="checkbox"] {
 .divOferta {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
     margin: 3%;
     width: 400px;
-    padding: 4%;
+    padding: 8%;
     background-color: #75caff;
     border-radius: 15px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -245,11 +244,18 @@ input[type="checkbox"] {
 .divOferta .selectoption {
     padding: 8px 10px;
     font-size: 16px;
+    margin-bottom: .75rem;
     border: 1px solid #3137d7;
     border-radius: 4px;
     background-color: #9edee6;
     appearance: none;
     cursor: pointer;
+}
+.lbOferta{
+    margin-bottom: 0.85rem;
+}
+.selectOferta{
+    margin-bottom: 0.85rem;
 }
 
 /* Estilo para las opciones del select */
@@ -299,6 +305,9 @@ option:checked {
     /* Alineación de texto */
 }
 
+.mostrarAlumnos th{
+    background-color: #e0eef5;
+}
 
 
 .mostrarAlumnos tr:nth-child(even) {
@@ -316,14 +325,14 @@ option:checked {
     background-color: #40b6d3;
 }
 
-
+/* --------------------------------------------------------------------------------------------------------------------------------------------------------  */
 
 
 
 /* -----------  Contratos --------------  */
 .divSolicitudes {
     margin-top: 0;
-    ;
+  
 
     display: flex;
     flex-direction: column;
@@ -335,7 +344,7 @@ option:checked {
     background-color: #b6abf2;
     padding: 20px;
     margin: 30px;
-    ;
+  
 
 }
 
@@ -391,7 +400,7 @@ td {
     cursor: pointer;
 }
 
-/*  FCTS  */
+/*  -------------------------------------------FCTS  ------------------------------------------------------------*/
 
 .divFCT {
     display: flex;

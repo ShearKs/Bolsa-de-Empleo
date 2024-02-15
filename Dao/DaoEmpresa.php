@@ -110,6 +110,9 @@ class DaoEmpresa
         // Deshabilitar autocommit para iniciar una transacción
         $this->conexion->autocommit(false);
 
+        //nombre del oferta de trabajo
+        $nombre = $criterios['nombreOferta'];
+
         //Obtenemos el cif de la empresa
         $cifEmpresa = $empresa['cif'];
         $nombreEmpresa = $empresa['nombre'];
@@ -121,9 +124,9 @@ class DaoEmpresa
         $posViajar = $criterios['posViajar'] === "Si" ? 1 : 0;
         $residencia = $criterios['residencia'] === "Sí" ? 1 : 0;
 
-        $sql = "INSERT INTO solicitud(cif_empresa,expLaboral,dispuestoViajar,otraResidencia) VALUES (?,?,?,?)";
+        $sql = "INSERT INTO solicitud(nombre,cif_empresa,expLaboral,dispuestoViajar,otraResidencia) VALUES (?,?,?,?,?)";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("siii", $cifEmpresa, $expLaboral, $posViajar, $residencia);
+        $sentencia->bind_param("ssiii", $nombre, $cifEmpresa, $expLaboral, $posViajar, $residencia);
 
         $estado = $sentencia->execute();
         if ($estado) {
@@ -179,9 +182,7 @@ class DaoEmpresa
             $this->conexion->commit();
 
             return json_encode(array("Exito" => "Se enviaron las solicitudes"));
-            //return json_encode(array("Exito" => $dniAlumns . " para la solicitud: " . $idSoli));
         }
-
         return json_encode(array("Error" => "Ha habido un error al enviar las solicitudes"));
     }
 
@@ -189,7 +190,7 @@ class DaoEmpresa
     public function obtenerSolicitud($cifEmpresa)
     {
 
-        $sql = "SELECT s.id, s.cif_empresa,e.nombre, s.fecha_solicitud, GROUP_CONCAT(c.nombre SEPARATOR ', ') AS cursos " .
+        $sql = "SELECT s.id, s.cif_empresa,s.nombre as 'Nombre de la Oferta', s.fecha_solicitud, GROUP_CONCAT(c.nombre SEPARATOR ', ') AS cursos " .
             "FROM solicitud s " .
             "JOIN empresa e ON s.cif_empresa = e.cif " .
             "JOIN solicitud_curso sc ON s.id = sc.idSolicitud " .
@@ -218,7 +219,7 @@ class DaoEmpresa
     public function obtenerAlumnosSolici($cifEmpresa, $idSoli)
     {
 
-        $sql = "SELECT distinct al.nombre,al.apellidos,al.dni
+        $sql = "SELECT distinct al.nombre,al.apellidos,al.dni,al.telefono,al.email
                     FROM alumno_bolsa a
                     JOIN alumnoies al ON al.dni = a.dni
                     JOIN solicitud_alumno sa ON a.dni = sa.dniAlumno
@@ -274,10 +275,21 @@ class DaoEmpresa
             $senteciaElim->bind_param("i", $idSolicitud);
             $estado = $senteciaElim->execute();
             if ($estado) {
+                $senteciaElim->close();
+                //Nos ecargamos de poner la disponibilidad a 0 para el alumno ya que ha sido contratado
+                $sqlUpdate = "UPDATE alumno_bolsa SET disponibilidad = 0 where dni = ?";
+                $sentenciaNoDis = $this->conexion->prepare($sqlUpdate);
+                $sentenciaNoDis->bind_param("s", $dniAlum);
+                $resultadoUpdate = $sentenciaNoDis->execute();
 
-                $this->conexion->commit();
-                return json_encode(array("Exito" => "Se ha realizado la contratación del alumno!"));
+                if ($resultadoUpdate) {
+                    $this->conexion->commit();
+                    return json_encode(array("Exito" => "Se ha realizado la contratación del alumno!"));
+                }
+                $this->conexion->rollback();
+                return json_encode(array("Error" => "No se ha podido poner al alumno como no disponible"));
             } else {
+                $this->conexion->rollback();
                 return json_encode(array("Error" => "No se pudo realizar la el borrado de solicitud"));
             }
         } else {

@@ -50,7 +50,7 @@ function visualizarAlumnosFct(alumnos, tipo, contenedor) {
 
     //Creamos la tabla donde visualizaremos a alos alumnos
     let tabla = crearNodo("table", "", "tAlumFcts", "", divMuestraFct)
-    let tr = crearNodo("tr", "", "filaAlumno", "filaAlumno", tabla)
+    let tr = crearNodo("tr", "", "", "", tabla)
     for (let propiedad in alumnos[0]) {
         if (propiedad !== 'dni') { // Excluir la columna 'dni'
             crearNodo("th", cadenaFormateada(propiedad), "", "", tr);
@@ -61,7 +61,7 @@ function visualizarAlumnosFct(alumnos, tipo, contenedor) {
         let tr = crearNodo("tr", "", "filaAlumno", "filaAlumno", tabla)
         for (let propiedad in alum) {
             let td = crearNodo("td", alum[propiedad], propiedad, "", tr)
-            if (propiedad=== 'dni'){
+            if (propiedad === 'dni') {
                 td.style.display = 'none'
             }
         }
@@ -130,13 +130,17 @@ function visualizarAlumnosFct(alumnos, tipo, contenedor) {
     })
 }
 
-
+/*  ------------------------------------- OFERTAS -------------------------------------------------------                     */
 export async function enviarOferta(contenedor, empresa) {
 
     let formularioOfertas = crearNodo("form", "", "", "", contenedor)
     formularioOfertas.method = "POST"
 
     let divOferta = crearNodo("div", "", "divOferta", "", formularioOfertas)
+
+    let nombreOferta = crearLabel("nombreOferta", "Nombre de la Oferta ", "", divOferta)
+    let inputNomOferta = crearInput("nombreOferta", "", "text", divOferta)
+
     let p = crearNodo("p", "Elige intervención profesional", "", "", divOferta)
     let selectCursos = await crearCursos("DAW", p, true, 1);
     selectCursos.setAttribute("multiple", "true")
@@ -162,6 +166,12 @@ export async function enviarOferta(contenedor, empresa) {
     let btnAlumOf = crearNodo("button", "Obtener Alumnos", "btnOferta", "", divOferta)
     btnAlumOf.addEventListener("click", (event) => {
         event.preventDefault();
+
+        if (inputNomOferta.value === "") {
+            parrafoError.textContent = "Tienes que indicar un nombre a la oferta"
+            return
+        }
+
         //Borro el que haya ya que siempre que le de al botón se va a crear uno nuevo
         eliminarExistente('mostrarAlumnos')
 
@@ -189,7 +199,6 @@ export async function enviarOferta(contenedor, empresa) {
                 parrafoError.textContent = ""
                 visualizarAlumnosOferta(alumnos, empresa, solicitud, contenedor)
             }))
-        //alumnosOferta(solicitud, empresa, visualizarAlumnosOferta,contenedor);
     })
 
 }
@@ -204,7 +213,7 @@ function visualizarAlumnosOferta(alumnosOfertados, empresa, criterios, contenedo
 
     let tabla = crearNodo("table", "", "", "", divMostrado)
 
-    let trh = crearNodo("tr", "", "filaAlumno", "", tabla);
+    let trh = crearNodo("tr", "", "", "", tabla);
 
     // Crear los encabezados de las columnas
     for (let propiedad in alumnosOfertados[0]) {
@@ -219,10 +228,9 @@ function visualizarAlumnosOferta(alumnosOfertados, empresa, criterios, contenedo
         for (let propiedad in alumno) {
 
             let td = crearNodo("td", alumno[propiedad], propiedad, "", tr)
-            if (propiedad === 'dni'){
+            if (propiedad === 'dni') {
                 td.style.display = 'none'
             }
-
         }
     }
 
@@ -264,8 +272,6 @@ function visualizarAlumnosOferta(alumnosOfertados, empresa, criterios, contenedo
             }
         })
     }
-
-
 
     let btnProcesarSoli = crearNodo("button", "Confirma las solicitudes", "btnOferta", "", divMostrado);
     btnProcesarSoli.addEventListener('click', async (event) => {
@@ -336,7 +342,14 @@ export async function visualizarSolicitudes(contenedor, empresa) {
                 // Obtener los alumnos de esta solicitud y construir la tabla anidada
                 devuelveAlumnosOferta(objeto)
                     .then(alumnos => {
+                        for (let propiedad in alumnos[0]) {
+                            if (propiedad !== 'dni') {
+                                crearNodo("th", cadenaFormateada(propiedad), "", "", tablaAlumnos)
+                            }
+                        }
+
                         alumnos.forEach(alumno => {
+
                             let filaAlumno = crearNodo("tr", "", "filaAlumno", "", tablaAlumnos);
                             for (let clave in alumno) {
                                 let td = crearNodo("td", alumno[clave], clave, "", filaAlumno);
