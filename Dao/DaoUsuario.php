@@ -85,10 +85,12 @@ class DaoUsuario
                     CASE 
                         WHEN al.idUsuario IS NOT NULL THEN al.dni -- Si es un alumno
                         WHEN e.idUsuario IS NOT NULL THEN e.cif  -- Si es una empresa
+                        WHEN tu.idUsuario IS NOT NULL THEN tu.dni -- Si es un tutor
                     END AS cif
                 FROM usuario u
                 LEFT JOIN alumno_bolsa al ON u.id = al.idUsuario
                 LEFT JOIN empresa e ON u.id = e.idUsuario
+                LEFT JOIN tutor tu ON u.id = tu.idUsuario
                 WHERE u.id = ? ";
 
         $sentencia = $this->conexion->prepare($sql);
@@ -136,7 +138,6 @@ class DaoUsuario
             case 1:
                 //Para alumno en bolsa
                 $sql = "SELECT al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario',otraResidencia as 'residencia',posiViajar ,expLaboral as 'Experiencia Laboral',c.nombre as 'curso',idCurso ,disponibilidad from alumno_bolsa al " .
-
                     "INNER JOIN alumnoies a ON a.dni = al.dni " .
                     "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
                     "INNER JOIN curso c ON c.id = cur.idCurso " .
@@ -153,7 +154,9 @@ class DaoUsuario
 
             case 3:
                 //Para tutor
-
+                $sql = "SELECT dni,tu.nombre as 'nombre',apellidos,telefono,correo as 'email',idUsuario,u.nombre as 'usuario',c.nombre as 'curso' FROM TUTOR tu
+                        INNER JOIN curso c ON c.id = idCursoT
+                        INNER JOIN usuario u ON u.id = tu.idUsuario WHERE tu.dni = ? ";
                 break;
 
             default:
@@ -209,8 +212,18 @@ class DaoUsuario
                         ab.disponibilidad = ?
                     WHERE a.dni = ?;";
                     $sentencia = $this->conexion->prepare($sql);
-                    $sentencia->bind_param("sssdssdds", $nombre, $apellidos, $email, $telefono,
-                                            $expLaboral, $residencia,$posViajar,$disponibilidad,$dni);
+                    $sentencia->bind_param(
+                        "sssdssdds",
+                        $nombre,
+                        $apellidos,
+                        $email,
+                        $telefono,
+                        $expLaboral,
+                        $residencia,
+                        $posViajar,
+                        $disponibilidad,
+                        $dni
+                    );
                     break;
                 }
             case 2: // Empresa
@@ -231,17 +244,29 @@ class DaoUsuario
                     break;
                 }
             case 3: // Tutor
-              
+                if ($objeto instanceof Tutor) {
+                    //obtenemos los campos del tutor
+                    $dni = $objeto->getDni();
+                    $nombre = $objeto->getNombre();
+                    $apellidos = $objeto->getApellidos();
+                    $telefono = $objeto->getTelefono();
+                    $correo = $objeto->getCorreo();
+                    $curso = $objeto->getCurso();
+                    
+                    $sql = "UPDATE Tutor SET nombre = ? ,apellidos = ? ,telefono = ?,correo = ? WHERE dni = ? ";
+                    $sentencia = $this->conexion->prepare($sql);
+                    $sentencia->bind_param("ssiss", $nombre, $apellidos, $telefono, $correo, $dni);
+                }
+
                 break;
             default:
                 // Manejar el caso por defecto
                 break;
         }
         if ($sentencia != null) {
-           
+
             $resultado = $sentencia->execute();
 
-          
             if ($resultado) {
                 return json_encode(array("Exito" => "Se actulizaron los datos correspondientes"));
             }

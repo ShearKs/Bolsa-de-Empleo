@@ -43,7 +43,6 @@ class Alumno
         return $this->curso;
     }
 
-
     public function getEmail()
     {
         return $this->email;

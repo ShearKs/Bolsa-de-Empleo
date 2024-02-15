@@ -172,35 +172,6 @@ export function cambioContrasena(solicitud) {
     });
 }
 
-export function cambioContraseñaProcesa(solicitud) {
-
-    // Creamos un objeto con la solictud del usuario
-
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(solicitud)
-    }
-
-    fetch('../Controladores/cambioContrasena.php', requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('La solicitud no fue exitosa');
-            }
-            return response.json()
-        })
-        .then(response => {
-            if (response.hasOwnProperty('Exito')) {
-                alert(response.Exito);
-            } else {
-                alert("Ha surgido algún problema al cambiar la contraseña, Error: ", response.Error)
-            }
-        })
-        .catch(error => {
-            console.error("Error en al solicitud: " + error)
-        })
-
-}
 
 export function editarUsuarioBolsa(usuario, rol) {
     const data = {

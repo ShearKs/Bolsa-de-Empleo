@@ -133,9 +133,12 @@ export function mensajeDialogo(respuesta) {
         dialog.innerHTML += "<p>" + respuesta.Exito + "</p>"
         exito = true
     } else {
-
+        let mensajeError = respuesta.Error
         tituloDia.textContent = "Error"
-        dialog.innerHTML += "<p>" + respuesta.Error + "</p>"
+        if(respuesta.Error == undefined ){
+            mensajeError = "Error no comtemplado."
+        }
+        dialog.innerHTML += "<p>" + mensajeError + "</p>"
 
         dialog.style.backgroundColor = "#ffe6e6";
         dialog.style.border = "5px solid #e60000";

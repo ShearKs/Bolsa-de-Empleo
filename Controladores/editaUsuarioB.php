@@ -5,6 +5,7 @@ session_start();
 include_once '../Modelos/Alumno.php';
 include_once '../Modelos/AlumnoBolsa.php';
 include_once '../Modelos/Empresa.php';
+include_once '../Modelos/Tutor.php';
 include_once '../Dao/DaoUsuario.php';
 
 
@@ -42,6 +43,9 @@ switch ($rol) {
         break;
         //Tutor
     case 3:
+        $objeto = new Tutor($usuario['dni'],$usuario['nombre'],$usuario['apellidos'],
+                                    $usuario['telefono'],$usuario['email'],$usuario['curso']);
+        break;
 
     default:
         break;

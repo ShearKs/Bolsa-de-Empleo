@@ -1,6 +1,8 @@
-import { obtenerUsuario, editarUsuarioBolsa, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa } from './funcionesFetch.js';
+import { obtenerUsuario, editarUsuarioBolsa, generarCodigoTemporal, cambioContrasena, cambioContraseñaProcesa, promesaGeneral } from './funcionesFetch.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect, eliminarExistente } from './utilsDom.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
+
+//Usuarios de la aplicación
 import { anadirTitulacion } from './alumnos.js';
 import { alumnFCTS, enviarOferta, visualizarSolicitudes } from './empresa.js';
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
@@ -12,7 +14,6 @@ const contenedor = document.getElementById('principal');
 //Obtenemos el rol el cual ha iniciado el usuario
 let rolUser = parseInt(sessionStorage.getItem('rol'));
 console.log("Rol del usuario: ", rolUser)
-
 
 // Usuario de la aplicación que puede ser tanto alumno,empresa,tutor...
 let usuario = {};
@@ -32,6 +33,8 @@ window.onload = async (event) => {
          break;
       case 2:
          crearMenuEmpresa();
+         break;
+      case 3:
          break;
 
       default:
@@ -66,8 +69,10 @@ function menuGeneral() {
       case 2:
          cadena = "Área de usuario";
          break;
+      case 3:
+         cadena = "Tu información"
+         break;
    }
-
 
    let datosAlumnos = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
    crearNodo("a", cadena, "", "", datosAlumnos)
@@ -206,7 +211,11 @@ async function crearFormularioDatos() {
          // Creamos un botón para actualizar los datos del alumno
          //let btnProcesar = crearNodo("button", "Edita tu información", "botonProcesa", "", divContenedor);
          let btnProcesar = crearNodoDebajo("button", "Edita tu información", "botonProcesa", "", botonOcultar);
-         btnProcesar.addEventListener("click", async () => {
+         btnProcesar.addEventListener("click", async (event) => {
+
+            //Para que pueda salir el dialogo de confirmación necesitamos hacer un stop propagation para que no se solape con el click del boton y eso haga que se cierre el dialogo
+            event.stopPropagation();
+
             // Creamos un nuevo objeto FormData
             let formData = new FormData();
 
@@ -228,8 +237,11 @@ async function crearFormularioDatos() {
             });
 
             console.log(usuarioBolsa);
+            let confirmacion = await dialogoInformacion("Editar Usuario", "¿Estas seguro de que quieres cambiar tus datos?");
+            if (confirmacion) {
+               await editarUsuarioBolsa(usuarioBolsa, rolUser);
+            }
 
-            await editarUsuarioBolsa(usuarioBolsa, rolUser);
             await obtenerUsuarioBolsa();
          });
       }
@@ -269,8 +281,8 @@ function cambioContrasenaCli() {
                   alert(error);
                });
          });
-
-         alert("Se ha enviado un código a tu correo asociado. Introduce el código para cambiar la contraseña");
+         dialogoSimple("Se ha enviado un código a tu correo asociado. Introduce el código para cambiar la contraseña")
+         //alert();
       })
       .catch(error => {
          // Manejo de errores, si la promesa se rechaza
@@ -293,12 +305,11 @@ function crearCambioContrasena(divContenedor) {
    btnProcesaCambio.addEventListener('click', () => {
       let user = usuario.usuario;
       let contrasena = nuevaClave.value
-      let solicitud = {
-         contrasena: contrasena,
-         usuario: user,
-         modo: 2
-      }
-      cambioContraseñaProcesa(solicitud)
+
+      promesaGeneral({contrasena: contrasena,usuario:user,modo:2},'../Controladores/cambioContrasena.php')
+         .then((respuesta =>{
+            mensajeDialogo(respuesta)
+         }))
    })
 }
 
