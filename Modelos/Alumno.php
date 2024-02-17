@@ -37,7 +37,6 @@ class Alumno
         return $this->dni;
     }
 
-
     public function getCurso()
     {
         return $this->curso;

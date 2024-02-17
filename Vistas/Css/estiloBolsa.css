@@ -8,10 +8,11 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    
-    
+
+
 }
 
+/*---------------------------------------HEADER ------------------------------------------------------------------- */
 /* Resto de tus estilos para el header */
 header {
     display: flex;
@@ -75,7 +76,6 @@ header ul li:hover a {
 input[type="checkbox"] {
     width: 30px;
 }
-
 
 .formEditarAlu {
 
@@ -210,6 +210,38 @@ input[type="checkbox"] {
     border-radius: 5px;
 }
 
+/*lista de cursos    */
+.listaCursos {
+    list-style-type: none; /* Elimina las viñetas */
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo para cada elemento de la lista */
+.listaCursos li {
+    display: flex;
+    background-color: #407ea0;
+    font-size: 12px;
+    /* justify-content: space-between; */
+    margin-bottom: 0.2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color:white;
+    border-radius: 5px;
+    padding: 5px 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+/* Estilo para alternar los colores de fondo de los elementos */
+/* .listaCursos li:nth-child(even) {
+    background-color: #f2f2f2;
+} */
+
+/* Estilo para el primer elemento de la lista */
+/* .listaCursos li:first-child {
+    font-weight: bold;
+} */
+
+
 /*-------------------------------------  Titulaciones  ------------------------------------------------ */
 
 .divTitulacion {
@@ -218,14 +250,31 @@ input[type="checkbox"] {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-
-    padding: 5%;
+    color: white;
+    padding: 7%;
     background-color: #7267b4;
     border-radius: 15px;
+    font-size: 20px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
-
 }
+
+.divTitulacion select {
+    width: 100%;
+}
+
+.divTitulacion button {
+    width: 100%;
+    margin-top: 1.5rem;
+    background-color: #5c00e6;
+    color: white;
+    font-weight: bold;
+    border-radius: 15px;
+    padding: 0.75rem;
+    cursor: pointer;
+}
+
+
 
 /* Ofertas */
 .divOferta {
@@ -251,10 +300,12 @@ input[type="checkbox"] {
     appearance: none;
     cursor: pointer;
 }
-.lbOferta{
+
+.lbOferta {
     margin-bottom: 0.85rem;
 }
-.selectOferta{
+
+.selectOferta {
     margin-bottom: 0.85rem;
 }
 
@@ -271,13 +322,16 @@ option:checked {
 }
 
 .btnOferta {
-    background-color: #005dab;
+    background-color: #0070cb;
     color: white;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     padding: 1rem;
     margin: 1.25rem;
     border-radius: 15px;
     cursor: pointer;
+}
+.btnOferta:hover{
+    background-color: #08365e;
 }
 
 .mostrarAlumnos {
@@ -305,7 +359,7 @@ option:checked {
     /* Alineación de texto */
 }
 
-.mostrarAlumnos th{
+.mostrarAlumnos th {
     background-color: #e0eef5;
 }
 
@@ -332,7 +386,7 @@ option:checked {
 /* -----------  Contratos --------------  */
 .divSolicitudes {
     margin-top: 0;
-  
+
 
     display: flex;
     flex-direction: column;
@@ -344,7 +398,7 @@ option:checked {
     background-color: #b6abf2;
     padding: 20px;
     margin: 30px;
-  
+
 
 }
 
@@ -463,7 +517,7 @@ td {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     width: 100%;
     background-color: #76ffb9;
-    margin:3%;
+    margin: 3%;
     width: 80%;
     padding: 15px;
     border-radius: 15px;

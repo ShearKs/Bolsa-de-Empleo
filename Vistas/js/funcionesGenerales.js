@@ -202,7 +202,7 @@ export function dialogoInformacion(titulo, mensaje) {
 //Dialogo siemple que unicamente comunica un mensaje
 export function dialogoSimple(mensaje) {
 
-    let dialogo = crearNodoDebajo("dialog", "", "dialogoInformarcion", "", document.body)
+    let dialogo = crearNodoDebajo("dialog", "", "dialogoInforma", "", document.body)
     dialogo.innerHTML = "<h1>Información</h1>";
     dialogo.innerHTML += "<p>" + mensaje + "</p>"
 

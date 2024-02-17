@@ -27,8 +27,9 @@ switch ($rol) {
         $objeto = new AlumnoBolsa(
             $usuario['nombre'],
             $usuario['apellidos'],
-            $_SESSION['cif'],
-            $usuario['curso'],
+            $usuario['dni'],
+            //Como de momento no vamos actulizar ni quitar cursos que ya tenga el alumno lo dejamos así
+            null,
             $usuario['email'],
             $usuario['Teléfono'],
             $usuario['residencia'],

@@ -104,7 +104,7 @@ class DaoEmpresa
         return $idUser;
     }
 
-
+    //Petición  de alumnos por parte de una empresa estará marcada según los criterios indicados
     public function realizarSolicitud($alumnosOferta, $empresa, $criterios)
     {
         // Deshabilitar autocommit para iniciar una transacción

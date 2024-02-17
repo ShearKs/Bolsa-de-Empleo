@@ -79,7 +79,6 @@ function crearInicio() {
             return;
         }
 
-
         const formularioLogin = new FormData(formulario);
 
         let usuarioCampo = formularioLogin.get('usuario')
@@ -120,7 +119,6 @@ function crearAlta() {
         event.preventDefault();
         if (inputCif.value == "") {
             parrafoError.textContent = "Debes de introducir algún campo..";
-            //crearNodo("p", "Debes de introducir algún campo..", "mensajeError", "mensajeError", divInicio)
             return;
         }
         
@@ -238,8 +236,8 @@ function crearFormularioAlta(datosAlumno) {
     //INSERTAMOS TODO LO QUE TENEMOS EN EL OBJETO ALUMNOS
     for (let alumn in datosAlumno) {
 
-        //No creamos el input de curso ya que vamos a introducir un desplegable
-        if (alumn !== 'curso') {
+        //No creamos el input de curso ya que vamos a introducir un desplegable y tampoco titulado ya que no nos interesa cambiar esa información ya que un alumno siempre va a estar titulado
+        if (alumn !== 'curso' && alumn !== 'titulado') {
             let divCampo = crearNodo("div", "", "caja", "", formularioAlta)
             let contenido = funciones.cadenaFormateada(alumn)
             crearLabel(alumn, contenido, "lbUsuario", divCampo)

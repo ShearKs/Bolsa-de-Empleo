@@ -334,34 +334,8 @@ export async function modalidadFct(modo, titulo) {
     }
 }
 
-export function insertarTitulo(solicitudCurso) {
 
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(solicitudCurso)
-    }
-
-    fetch('../Controladores/addTitulo.php', requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('La solicitud no ha sido correcta')
-            }
-            return response.json()
-        })
-        .then(data => {
-            console.log(data)
-            if (data.hasOwnProperty('Exito')) {
-                alert(data.Exito)
-            }
-        })
-        .catch(error => {
-            console.error("Error en la solicitud: " + error)
-        })
-}
-
-
-export function enviarSolicitudes(alumnos, empresa,criterios) {
+export function enviarSolicitudes(alumnos, empresa, criterios) {
 
     let solicitud = {
         alumnos: alumnos,

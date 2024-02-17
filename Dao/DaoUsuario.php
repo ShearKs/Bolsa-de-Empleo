@@ -137,7 +137,7 @@ class DaoUsuario
         switch ($rol) {
             case 1:
                 //Para alumno en bolsa
-                $sql = "SELECT al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario',otraResidencia as 'residencia',posiViajar ,expLaboral as 'Experiencia Laboral',c.nombre as 'curso',idCurso ,disponibilidad from alumno_bolsa al " .
+                $sql = "SELECT al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario',otraResidencia as 'residencia',posiViajar ,expLaboral as 'Experiencia Laboral',GROUP_CONCAT(c.nombre SEPARATOR ',') AS cursos,idCurso ,disponibilidad from alumno_bolsa al " .
                     "INNER JOIN alumnoies a ON a.dni = al.dni " .
                     "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
                     "INNER JOIN curso c ON c.id = cur.idCurso " .
@@ -154,7 +154,7 @@ class DaoUsuario
 
             case 3:
                 //Para tutor
-                $sql = "SELECT dni,tu.nombre as 'nombre',apellidos,telefono,correo as 'email',idUsuario,u.nombre as 'usuario',c.nombre as 'curso' FROM TUTOR tu
+                $sql = "SELECT dni,tu.nombre as 'nombre',apellidos,telefono,correo as 'email',idUsuario,u.nombre as 'usuario',c.nombre as 'Curso que tutoriza' FROM TUTOR tu
                         INNER JOIN curso c ON c.id = idCursoT
                         INNER JOIN usuario u ON u.id = tu.idUsuario WHERE tu.dni = ? ";
                 break;
@@ -187,9 +187,6 @@ class DaoUsuario
 
                     $nombre = $objeto->getNombre();
                     $apellidos = $objeto->getApellidos();
-
-                    $curso = $objeto->getCurso();
-
                     $email = $objeto->getEmail();
                     $telefono = $objeto->getTelefono();
                     $expLaboral = $objeto->getExperiencia();

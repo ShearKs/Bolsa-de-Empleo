@@ -61,9 +61,10 @@ export function crearCaja(id, labelText, container) {
     let divCaja = crearNodo("div", "", "caja", id, container);
     crearLabel(id, labelText, "lbOferta", divCaja);
 }
-
-export function crearSelect(className, name, options, container) {
-    let select = crearNodo("select", "", className, "", container);
+//Select especifico que le puedes pasar un array de opciones y este lo cargará automáticamente
+//Este select se usa en la aplicación siempre y cuando se quiera usar un select que no esté cargando en la base de datos
+export function crearSelect(className, name, options, contenedor) {
+    let select = crearNodo("select", "", className, "", contenedor);
     select.name = name
 
     options.forEach(option => {

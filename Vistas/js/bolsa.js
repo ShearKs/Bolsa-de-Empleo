@@ -61,6 +61,7 @@ async function obtenerUsuarioBolsa() {
 }
 
 function menuGeneral() {
+   
    let cadena = ""
    switch (rolUser) {
       case 1:
@@ -74,10 +75,12 @@ function menuGeneral() {
          break;
    }
 
-   let datosAlumnos = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
-   crearNodo("a", cadena, "", "", datosAlumnos)
+   let datosUsuarioApp = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
+   crearNodo("a", cadena, "", "", datosUsuarioApp)
 
-   datosAlumnos.addEventListener('click', () => {
+   datosUsuarioApp.addEventListener('click', async () => {
+      //Para que cuando veamos nuestro datos esten actualizados y lo veamos sin tener que recargar
+      await obtenerUsuarioBolsa() 
       limpiarContenido(contenedor);
       crearFormularioDatos(usuario);
    })
@@ -133,8 +136,6 @@ function crearMenuEmpresa() {
 
 }
 
-
-
 async function crearFormularioDatos() {
    let propEliminarAlum = ["idCurso", "disponibilidad", "posiViajar"]
 
@@ -153,7 +154,7 @@ async function crearFormularioDatos() {
 
    for (let propiedad in usuarioChanged) {
 
-      if (propiedad != 'idUsuario' && propiedad != 'usuario') {
+      if (propiedad != 'idUsuario' && propiedad != 'usuario' && propiedad != 'cursos') {
          let label = crearLabel(propiedad, cadenaFormateada(propiedad), "lbAlumno", formulario)
          label.id = "lb" + propiedad
 
@@ -164,8 +165,17 @@ async function crearFormularioDatos() {
       }
    }
 
-   //Cargamos a mano si es para alumnos
+   //Cargamos a mano si es para alumnos lo que se mostrará si es solo para ellos
    if (rolUser == 1) {
+      crearNodo("label", "Cursos", "lbAlumno", "", formulario)
+      let lista = crearNodo("ul", "", "listaCursos", "", formulario);
+      //de cada curso que tiene el alumno se lo añadimos a la lista para eso lo partimos con split y lo transformamos en un array
+      let arrayCursos = usuario.cursos.split(",")
+      //Recorremos el array que acabamos de crear y le añadimos cada elemento a la lista
+      for (let curso of arrayCursos) {
+         crearNodo("li", curso, "", "", lista)
+      }
+
       let divViaje = crearNodo("div", "", "divCheck", "", formulario)
       crearLabel("posViaje", "Posibilidad de Viajar", "lbAlumno", divViaje)
       let inputViaje = crearInput("posViaje", "inpFormAlum", "checkBox", divViaje)
@@ -237,11 +247,11 @@ async function crearFormularioDatos() {
             });
 
             console.log(usuarioBolsa);
+            
             let confirmacion = await dialogoInformacion("Editar Usuario", "¿Estas seguro de que quieres cambiar tus datos?");
             if (confirmacion) {
                await editarUsuarioBolsa(usuarioBolsa, rolUser);
             }
-
             await obtenerUsuarioBolsa();
          });
       }
@@ -306,8 +316,8 @@ function crearCambioContrasena(divContenedor) {
       let user = usuario.usuario;
       let contrasena = nuevaClave.value
 
-      promesaGeneral({contrasena: contrasena,usuario:user,modo:2},'../Controladores/cambioContrasena.php')
-         .then((respuesta =>{
+      promesaGeneral({ contrasena: contrasena, usuario: user, modo: 2 }, '../Controladores/cambioContrasena.php')
+         .then((respuesta => {
             mensajeDialogo(respuesta)
          }))
    })

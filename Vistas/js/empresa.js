@@ -153,13 +153,13 @@ export async function enviarOferta(contenedor, empresa) {
     }
 
     crearCaja("ofertaViaje", "Disponibilidad para Viajar", divOferta);
-    crearSelect("selectOferta", "posViajar", ["Si", "No"], divOferta);
+    crearSelect("selectOferta", "posViajar", ["Sí", "No"], divOferta);
 
     crearCaja("experienciaSector", "Experiencia en el sector", divOferta);
-    crearSelect("selectOferta", "experienciaLaboral", ["Si", "No"], divOferta);
+    crearSelect("selectOferta", "experienciaLaboral", ["Sí", "No","Todos"], divOferta);
 
     crearCaja("residencia", "Otra residencia", divOferta);
-    crearSelect("selectOferta", "residencia", ["Sí", "No"], divOferta);
+    crearSelect("selectOferta", "residencia", ["Sí", "No","Todos"], divOferta);
 
     let parrafoError = crearNodo("p", "", "mensajeError", "", divOferta)
 
@@ -172,7 +172,7 @@ export async function enviarOferta(contenedor, empresa) {
             return
         }
 
-        //Borro el que haya ya que siempre que le de al botón se va a crear uno nuevo
+        //Borro el que haya ,ya que siempre que le de al botón se va a crear uno nuevo
         eliminarExistente('mostrarAlumnos')
 
         let solicitud = {}
@@ -181,7 +181,7 @@ export async function enviarOferta(contenedor, empresa) {
         // Iterar sobre los valores de formData
         for (let [clave, valor] of formData.entries()) {
             // Si la clave es "cursos[]", significa que es el elemento select múltiple
-            // y debes manejar sus valores seleccionados de manera especial
+            // y manejamos sus valores de manera especial
             if (clave === "cursos[]") {
                 // Los valores de "cursos[]" se pueden recoger directamente de formData
                 // ya que FormData automáticamente maneja elementos select múltiples

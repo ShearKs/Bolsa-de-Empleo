@@ -45,11 +45,10 @@ class DaoAlumno
     public function devuelveAlumno($dni)
     {
 
-        $sql = "SELECT alu.dni, alu.nombre, apellidos, email, telefono,titulado,cur.nombre as 'curso',titulado " .
-            "FROM alumnoies alu " .
-            "INNER JOIN cursa_alumn c ON alu.dni = c.dniAlum " .
-            "INNER JOIN curso cur ON c.idCurso = cur.id " .
-            "WHERE titulado = 1 and alu.dni = ?";
+        $sql = "SELECT alu.dni, alu.nombre, apellidos, email, telefono,titulado,c.nombre as 'curso',titulado
+                    FROM alumnoies alu 
+                    INNER JOIN curso c ON c.id = alu.curso
+                    WHERE titulado = 1 and alu.dni = ? ";
 
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s", $dni);
@@ -95,6 +94,8 @@ class DaoAlumno
 
     private function introducirCamposBdd(AlumnoBolsa $alumnoB, $idUsuario)
     {
+        $exito = false;
+        $this->conexion->autocommit(false);
 
         //Todos los campos pasados
         $dni = $alumnoB->getDni();
@@ -102,14 +103,28 @@ class DaoAlumno
         $residencia = $alumnoB->getResidencia();
         $posViajar = $alumnoB->getPosViajar();
         $disponibilidad = $alumnoB->getDisponibilidad();
+        //Curso del alumno
+        $curso = $alumnoB->getCurso();
 
         $sql = "INSERT INTO Alumno_Bolsa (dni,expLaboral,otraResidencia,posiViajar,disponibilidad,idUsuario)
                     VALUES (?,?,?,?,?,?)";
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("sssddd", $dni, $expLaboral, $residencia, $posViajar, $disponibilidad, $idUsuario);
         $estado = $sentencia->execute();
+        if ($estado) {
+            $sentencia->close();
+            $sqlCurso = "INSERT INTO cursa_alumn (dniAlum,idCurso) VALUES (?,?)";
+            $sentenciaCurso = $this->conexion->prepare($sqlCurso);
+            $sentenciaCurso->bind_param("si",$dni,$curso);
+            $estadoCurso = $sentenciaCurso->execute();
+            if($estadoCurso){
+                //Se ha hecho todo correctamente hacemos un commit
+                $this->conexion->commit();
+                $exito = true;
+            }
+        }
 
-        return $estado;
+        return $exito;
     }
 
 
@@ -163,7 +178,7 @@ class DaoAlumno
         }
     }
 
-    public function actualizaAlumno(AlumnoBolsa $alumno, $esbolsa)
+    public function actualizaAlumno(AlumnoBolsa $alumno)
     {
 
         //Obtenemos los campos pasados
@@ -175,24 +190,10 @@ class DaoAlumno
         $expLaboral = $alumno->getExperiencia();
         $telefono = $alumno->getTelefono();
 
-        $sql = "UPDATE AlumnoIES a JOIN Cursa_Alumn ca ON a.dni = ca.dniAlum ";
-        $sql .= $esbolsa ? "JOIN alumno_bolsa ab ON a.dni = ab.dni " : "";
-        $sql .= "SET 
-                    a.nombre = ?,
-                    a.apellidos = ?,
-                    a.email = ?,
-                    a.telefono = ?,
-                    ca.idCurso = ? ";
-        $sql .= $esbolsa ? " ,ab.expLaboral = ? " :  "";
-        $sql .= " WHERE a.dni = ? ";
+        $sql = "UPDATE alumnoies SET nombre = ?,apellidos = ?,email = ?,telefono = ? ,curso = ? WHERE dni = ?";
 
         $sentencia = $this->conexion->prepare($sql);
-        if ($esbolsa) {
-            $sentencia->bind_param("sssddss", $nombre, $apellidos, $email, $telefono, $idCurso, $expLaboral, $dni);
-        } else {
-            $sentencia->bind_param("sssdds", $nombre, $apellidos, $email, $telefono, $idCurso, $dni);
-        }
-
+        $sentencia->bind_param("sssiis", $nombre, $apellidos, $email, $telefono, $idCurso, $dni);
 
         $estado = $sentencia->execute();
         if ($estado) {
@@ -280,18 +281,26 @@ class DaoAlumno
         $cursos = $criterios['cursos[]'];
 
         //Resto de valores que los tomaremos como si fueran booleanos
-        $posViajar = $criterios["posViajar"] === "Si" ? 1 : 0;
-        $residencia = $criterios["residencia"] === "Si" ? "residencia != ''" : "1";
+        $posViajar = $criterios["posViajar"] === "Sí" ? 1 : 0;
 
+        $otraResidencia = ($criterios['residencia'] === "Todos" )? "1" : ($criterios['residencia'] === "Sí" ? "otraResidencia != ''" : "otraResidencia = '' " );
+        $expLaboral = ($criterios['experienciaLaboral'] === "Todos") ? "1" : ($criterios['experienciaLaboral'] === "Sí" ? "expLaboral != '' " : "expLaboral = '' ");
+        //$otraResidencia = $criterios["residencia"] === "Sí" ? "otraResidencia != ''" : "otraResidencia = ''";
+        //$expLaboral = $criterios['experienciaLaboral'] === "Sí" ? "expLaboral != ''" : "expLaboral = '' ";
+
+        //Lo que hace aquí es coger cursos que es un array y lo transforma en un cadena separado por comas de esta forma lo podemos usar en la consutla
         $cadenaCursos = implode(',', $cursos);
 
-        $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email,a.telefono, c.nombre as 'Curso'" .
-            "FROM alumno_bolsa al " .
-            "INNER JOIN alumnoies a ON al.dni = a.dni " .
-            "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
-            "INNER JOIN curso c ON c.id = cur.idCurso " .
-            "WHERE posiViajar = ? and disponibilidad = 1 and c.id IN ($cadenaCursos) and $residencia GROUP BY a.dni";
-
+        //Ya que un alumno puede tener varios cursos necesitamos agrupar por dni para no tener registros(alummnos) repetidos
+        $sql = "SELECT al.dni, al.nombre, al.apellidos, al.email, al.telefono, GROUP_CONCAT(c.nombre) AS 'Cursos del alumno'
+                    FROM alumnoies al
+                    INNER JOIN alumno_bolsa a ON a.dni = al.dni
+                    INNER JOIN cursa_alumn cur ON cur.dniAlum = a.dni
+                    INNER JOIN curso c ON c.id = cur.idCurso
+                    WHERE posiViajar = ? AND disponibilidad = 1 AND $expLaboral AND $otraResidencia
+                    GROUP BY a.dni
+                    -- Haciendo el having nos aseguramos que se incluyan alumnos que tenga al menos uno de los cursos especificados en cadenaCursos
+                    HAVING SUM(c.id IN ($cadenaCursos)) > 0";
 
         $alumnosOferta = array();
         $sentencia = $this->conexion->prepare($sql);

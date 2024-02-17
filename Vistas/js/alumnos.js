@@ -1,9 +1,9 @@
-import {crearCursos,insertarTitulo} from './funcionesFetch.js';
+import { crearCursos, promesaGeneral } from './funcionesFetch.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
-import { crearNodo,limpiarContenido } from './utilsDom.js';
+import { crearNodo, limpiarContenido } from './utilsDom.js';
 
-export function anadirTitulacion(contenedor,alumno) {
-  
+export function anadirTitulacion(contenedor, alumno) {
+
     //Sobre este div vamos a escribir todos nuestros nodos
     let divTitulacion = crearNodo("div", "", "divTitulacion", "", contenedor)
 
@@ -15,19 +15,19 @@ export function anadirTitulacion(contenedor,alumno) {
 
     let divTitulacionesCentro = crearNodo("div", "", "", "", divTitulacion)
 
-    titulacion(alumno,divTitulacionesCentro, "centro")
+    titulacion(alumno, divTitulacionesCentro, "centro")
 
     selectOption.addEventListener('change', () => {
         if (selectOption.value === "centro") {
-            titulacion(alumno,divTitulacionesCentro, "centro")
+            titulacion(alumno, divTitulacionesCentro, "centro")
         } else {
-            titulacion(alumno,divTitulacionesCentro, "fuera")
+            titulacion(alumno, divTitulacionesCentro, "fuera")
         }
     })
 }
 
-function titulacion(alumno,divPadre, centro) {
-   
+function titulacion(alumno, divPadre, centro) {
+
     limpiarContenido(divPadre)
     let divTitulacionesCentro = crearNodo("div", "", "", "", divPadre)
 
@@ -42,15 +42,24 @@ function titulacion(alumno,divPadre, centro) {
     }
 
     let btnAnadirTitulacion = crearNodo("button", "Añade la titulación", "", "", divPadre)
-    btnAnadirTitulacion.addEventListener('click', () => {
+    btnAnadirTitulacion.addEventListener('click', async (event) => {
+
+        event.stopPropagation();
 
         let selectCurso = document.getElementById('selectCursos');
+        let indexCurso = selectCurso.selectedIndex
+        let cursoSeleccionado = selectCurso.options[indexCurso].textContent
 
-        let solicitudCurso = {
-            idCurso: selectCurso.value,
-            dni: alumno.dni
+        if (!alumno.cursos.includes(cursoSeleccionado)) {
+            let confirma = await dialogoInformacion("Añadir Curso", "¿Estás seguro que quieres añadir " + cursoSeleccionado + " a tus cursos?")
+            if (confirma) {
+                promesaGeneral({ idCurso: selectCurso.value, dni: alumno.dni }, '../Controladores/addTitulo.php')
+                    .then((respuestaServidor => {
+                        mensajeDialogo(respuestaServidor)
+                    }))
+            }
+        } else {
+            dialogoSimple("No puedes añadir ese curso ya que ya lo tienes")
         }
-        insertarTitulo(solicitudCurso)
-
     })
 }
