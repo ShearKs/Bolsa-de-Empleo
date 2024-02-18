@@ -5,6 +5,9 @@ import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDial
 //Usuarios de la aplicación
 import { anadirTitulacion } from './alumnos.js';
 import { alumnFCTS, enviarOferta, visualizarSolicitudes } from './empresa.js';
+import { alumnosPeticiones } from './tutor.js';
+
+
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
 const listaMenu = document.getElementById('lista');
 
@@ -35,6 +38,7 @@ window.onload = async (event) => {
          crearMenuEmpresa();
          break;
       case 3:
+         crearMenuTutor();
          break;
 
       default:
@@ -110,6 +114,16 @@ function crearMenuAlumnos() {
       anadirTitulacion(contenedor, usuario);
    })
 }
+function crearMenuTutor(){
+   let botonPeticiones = crearNodo("li","","liTutor","peticionesEmpresas",listaMenu)
+   crearNodo("a","Alumnos de "+usuario.usuario,"","",botonPeticiones)
+
+   botonPeticiones.addEventListener('click',()=>{
+      limpiarContenido(contenedor);
+      alumnosPeticiones(contenedor,usuario)
+   })
+
+}
 
 function crearMenuEmpresa() {
 
@@ -117,7 +131,7 @@ function crearMenuEmpresa() {
    crearNodo("a", "Seleccionar Alumnos para FCTS", "", "", practicasFCTS)
    practicasFCTS.addEventListener('click', () => {
       limpiarContenido(contenedor)
-      alumnFCTS(contenedor);
+      alumnFCTS(contenedor,usuario);
    })
 
    let mandarOferta = crearNodo("li", "", "liEmpresa", "solicitudOferta", listaMenu)

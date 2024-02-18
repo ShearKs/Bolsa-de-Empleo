@@ -346,15 +346,18 @@ class DaoEmpresa
         }
     }
 
-    public function realizarPeticion($alumnos, $tipo)
+    public function realizarPeticion($alumnos, $tipo,Empresa $empresa)
     {
 
         //Ponemos el autocommit en falso ya que no vamos a crear la peticion sin asignar los alumnos a la petición de fcts
         $this->conexion->autocommit(false);
 
-        $sql = "INSERT INTO peticionfcts (modalidad) VALUES(?)";
+        //Obtenemos el cif de la empresa al que asignaremos la petición....
+        $cifEmpresa = $empresa->getCif();
+
+        $sql = "INSERT INTO peticionfcts (modalidad,cif_empresa_solicitante) VALUES(?,?)";
         $sentecia = $this->conexion->prepare($sql);
-        $sentecia->bind_param("s", $tipo);
+        $sentecia->bind_param("ss", $tipo,$cifEmpresa);
         $estado = $sentecia->execute();
 
         if ($estado) {

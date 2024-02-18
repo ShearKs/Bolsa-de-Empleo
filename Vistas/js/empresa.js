@@ -5,7 +5,7 @@ import {
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple, devolverObjetaTabla } from './funcionesGenerales.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect, eliminarExistente } from './utilsDom.js';
 
-export async function alumnFCTS(contenedor) {
+export async function alumnFCTS(contenedor,empresa) {
 
     let divFCT = crearNodo("div", "", "divFCT", "", contenedor);
 
@@ -33,13 +33,13 @@ export async function alumnFCTS(contenedor) {
                     return
                 }
                 mensajeError.textContent = ""
-                visualizarAlumnosFct(alumnosFcts, tipo, contenedor)
+                visualizarAlumnosFct(alumnosFcts,empresa, tipo, contenedor)
             }))
     })
 }
 
 
-function visualizarAlumnosFct(alumnos, tipo, contenedor) {
+function visualizarAlumnosFct(alumnos,empresa, tipo, contenedor) {
 
     //Array de objetos donde guardaremos todos los alumnos que envie el cliente
     let alumnosPeti = []
@@ -113,6 +113,7 @@ function visualizarAlumnosFct(alumnos, tipo, contenedor) {
     let btnPeticion = crearNodo("button", "Realizar Petición", "", "", divMuestraFct)
     btnPeticion.addEventListener('click', async (event) => {
         event.stopPropagation();
+       
         if (alumnosPeti.length === 0) {
             dialogoSimple("Tienes que seleccionar algun alumno...")
             return
@@ -122,7 +123,7 @@ function visualizarAlumnosFct(alumnos, tipo, contenedor) {
         if (confirmado) {
 
             //Realizamos una petición de los alumnos seleccionados
-            promesaGeneral({ modo: 3, tipo: tipo, alumnos: alumnosPeti }, '../Controladores/realizacionFCT.php')
+            promesaGeneral({ modo: 3, tipo: tipo, alumnos: alumnosPeti,empresa:empresa }, '../Controladores/realizacionFCT.php')
                 .then((respuesta => {
                     mensajeDialogo(respuesta)
                 }))

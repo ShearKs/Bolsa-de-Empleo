@@ -1,6 +1,7 @@
 <?php
 
 include_once '../Dao/DaoEmpresa.php';
+include_once '../Modelos/Empresa.php';
 
 $solicitud = json_decode(file_get_contents('php://input'), true);
 
@@ -23,7 +24,10 @@ switch ($modo) {
     case 3:
         $alumnos = $solicitud['alumnos'];   
         $tipoPeticion = $solicitud['tipo']; 
-        $mensaje = $daoEmpresa->realizarPeticion($alumnos,$tipoPeticion);
+        $empresa = $solicitud['empresa'];
+        $empresaOb = new Empresa($empresa['cif'],$empresa['nombre'],$empresa['lugar'],$empresa['telefono'],$empresa['direccion']
+                    ,$empresa['email'],$empresa['usuario']);
+        $mensaje = $daoEmpresa->realizarPeticion($alumnos,$tipoPeticion,$empresaOb);
         echo $mensaje;
         break;
     default:
