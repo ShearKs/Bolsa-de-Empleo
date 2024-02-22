@@ -20,7 +20,7 @@ export function promesaGeneral(solicitud, ruta) {
                 return response.json();
             })
             .then(respuesta => {
-                console.log(respuesta);
+                //console.log(respuesta);
                 resolve(respuesta)
             })
             .catch(error => {

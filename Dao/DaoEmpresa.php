@@ -323,9 +323,10 @@ class DaoEmpresa
     public function alumnosModalidadFct($modalidad)
     {
 
-        $sql = "SELECT fct.dni,al.nombre,al.apellidos,al.email,mo.tipo FROM alumnofct fct
+        $sql = "SELECT fct.dni,al.nombre,al.apellidos,al.email,mo.tipo,c.nombre as 'curso',c.id as 'idcurso' FROM alumnofct fct
                     INNER JOIN alumnoies al ON al.dni = fct.dni 
-                    INNER JOIN modalidad_fct mo ON mo.id = fct.modalidad WHERE mo.id = ? ";
+                    INNER JOIN curso c ON c.id = al.curso
+                    INNER JOIN modalidad_fct mo ON mo.id = fct.modalidad WHERE fct.en_practicas = 'NO' AND  mo.id = ? ";
 
         $sentecia = $this->conexion->prepare($sql);
         $sentecia->bind_param("i", $modalidad);
@@ -367,10 +368,11 @@ class DaoEmpresa
             foreach ($alumnos as $alum) {
 
                 $dni = $alum['dni'];
+                $idCurso = intval($alum['idcurso']);
 
-                $sqlAsig = "INSERT INTO peticion_alumnos(idPeticion,dniAlumno) VALUES (?,?) ";
+                $sqlAsig = "INSERT INTO peticion_alumnos(idPeticion,dniAlumno,idCurso) VALUES (?,?,?) ";
                 $sentenciaAsig = $this->conexion->prepare($sqlAsig);
-                $sentenciaAsig->bind_param("is", $idPeticion, $dni);
+                $sentenciaAsig->bind_param("isi", $idPeticion, $dni,$idCurso);
                 $estado = $sentenciaAsig->execute();
 
                 if (!$estado) {

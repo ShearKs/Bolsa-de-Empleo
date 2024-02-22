@@ -5,7 +5,7 @@ import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDial
 //Usuarios de la aplicación
 import { anadirTitulacion } from './alumnos.js';
 import { alumnFCTS, enviarOferta, visualizarSolicitudes } from './empresa.js';
-import { alumnosPeticiones } from './tutor.js';
+import { alumnosPeticiones, peticionesFCTS } from './tutor.js';
 
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
@@ -65,7 +65,7 @@ async function obtenerUsuarioBolsa() {
 }
 
 function menuGeneral() {
-   
+
    let cadena = ""
    switch (rolUser) {
       case 1:
@@ -84,7 +84,7 @@ function menuGeneral() {
 
    datosUsuarioApp.addEventListener('click', async () => {
       //Para que cuando veamos nuestro datos esten actualizados y lo veamos sin tener que recargar
-      await obtenerUsuarioBolsa() 
+      await obtenerUsuarioBolsa()
       limpiarContenido(contenedor);
       crearFormularioDatos(usuario);
    })
@@ -106,21 +106,32 @@ function menuGeneral() {
 
 function crearMenuAlumnos() {
 
-   let botonTitulacion = crearNodo("li", "", "liAlumno", "anadirTitulacion", listaMenu);
+   let botonTitulacion = crearNodo("li", "", "liTutor", "anadirTitulacion", listaMenu);
    crearNodo("a", "Añadir Titulación", "", "", botonTitulacion)
 
    botonTitulacion.addEventListener('click', () => {
       limpiarContenido(contenedor);
       anadirTitulacion(contenedor, usuario);
    })
-}
-function crearMenuTutor(){
-   let botonPeticiones = crearNodo("li","","liTutor","peticionesEmpresas",listaMenu)
-   crearNodo("a","Alumnos de "+usuario.usuario,"","",botonPeticiones)
 
-   botonPeticiones.addEventListener('click',()=>{
+
+
+}
+function crearMenuTutor() {
+   let botonPeticiones = crearNodo("li", "", "liTutor", "peticionesEmpresas", listaMenu)
+   crearNodo("a", "Alumnos de " + usuario.curso, "", "", botonPeticiones)
+
+   botonPeticiones.addEventListener('click', () => {
       limpiarContenido(contenedor);
-      alumnosPeticiones(contenedor,usuario)
+      alumnosPeticiones(contenedor, usuario)
+   })
+
+   let btnPeticion = crearNodo("li", "", "liTutor", "peticionesFCTS", listaMenu);
+   crearNodo("a", "Peticiones FCTs", "", "", btnPeticion)
+
+   btnPeticion.addEventListener('click', () => {
+      limpiarContenido(contenedor);
+      peticionesFCTS(contenedor,usuario)
    })
 
 }
@@ -131,7 +142,7 @@ function crearMenuEmpresa() {
    crearNodo("a", "Seleccionar Alumnos para FCTS", "", "", practicasFCTS)
    practicasFCTS.addEventListener('click', () => {
       limpiarContenido(contenedor)
-      alumnFCTS(contenedor,usuario);
+      alumnFCTS(contenedor, usuario);
    })
 
    let mandarOferta = crearNodo("li", "", "liEmpresa", "solicitudOferta", listaMenu)
@@ -261,7 +272,7 @@ async function crearFormularioDatos() {
             });
 
             console.log(usuarioBolsa);
-            
+
             let confirmacion = await dialogoInformacion("Editar Usuario", "¿Estas seguro de que quieres cambiar tus datos?");
             if (confirmacion) {
                await editarUsuarioBolsa(usuarioBolsa, rolUser);
@@ -332,6 +343,7 @@ function crearCambioContrasena(divContenedor) {
 
       promesaGeneral({ contrasena: contrasena, usuario: user, modo: 2 }, '../Controladores/cambioContrasena.php')
          .then((respuesta => {
+            console.log(respuesta);
             mensajeDialogo(respuesta)
          }))
    })

@@ -77,6 +77,15 @@ input[type="checkbox"] {
     width: 30px;
 }
 
+.trAlumno{
+    cursor:pointer;
+}
+
+.btnMasAlumno{
+    cursor: pointer;
+}
+
+
 .formEditarAlu {
 
     display: grid;
@@ -212,7 +221,8 @@ input[type="checkbox"] {
 
 /*lista de cursos    */
 .listaCursos {
-    list-style-type: none; /* Elimina las viñetas */
+    list-style-type: none;
+    /* Elimina las viñetas */
     margin: 0;
     padding: 0;
 }
@@ -225,7 +235,7 @@ input[type="checkbox"] {
     /* justify-content: space-between; */
     margin-bottom: 0.2rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    color:white;
+    color: white;
     border-radius: 5px;
     padding: 5px 10px;
     border-bottom: 1px solid #ccc;
@@ -330,7 +340,8 @@ option:checked {
     border-radius: 15px;
     cursor: pointer;
 }
-.btnOferta:hover{
+
+.btnOferta:hover {
     background-color: #08365e;
 }
 
@@ -559,4 +570,40 @@ td {
 
 .tAlumFcts tr:hover {
     background-color: #74bf87;
+}
+
+
+/* --------------------------------------- TUTOR ----------------------------------------------------         */
+
+.divPeticiones {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    margin: 3%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    background-color: #75caff;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 1.25rem;
+}
+
+.contenedorPeticiones{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; 
+}
+
+.contenedorPeticiones button{
+
+
+    padding:0.8rem;
+    cursor: pointer;
+    background-color:#0066ff;
+    color:white;
+    border-radius: 15px;
+
 }

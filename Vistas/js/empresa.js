@@ -5,7 +5,7 @@ import {
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple, devolverObjetaTabla } from './funcionesGenerales.js';
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, crearBotonImg, crearCaja, crearSelect, eliminarExistente } from './utilsDom.js';
 
-export async function alumnFCTS(contenedor,empresa) {
+export async function alumnFCTS(contenedor, empresa) {
 
     let divFCT = crearNodo("div", "", "divFCT", "", contenedor);
 
@@ -33,13 +33,13 @@ export async function alumnFCTS(contenedor,empresa) {
                     return
                 }
                 mensajeError.textContent = ""
-                visualizarAlumnosFct(alumnosFcts,empresa, tipo, contenedor)
+                visualizarAlumnosFct(alumnosFcts, empresa, tipo, contenedor)
             }))
     })
 }
 
 
-function visualizarAlumnosFct(alumnos,empresa, tipo, contenedor) {
+function visualizarAlumnosFct(alumnos, empresa, tipo, contenedor) {
 
     //Array de objetos donde guardaremos todos los alumnos que envie el cliente
     let alumnosPeti = []
@@ -52,7 +52,7 @@ function visualizarAlumnosFct(alumnos,empresa, tipo, contenedor) {
     let tabla = crearNodo("table", "", "tAlumFcts", "", divMuestraFct)
     let tr = crearNodo("tr", "", "", "", tabla)
     for (let propiedad in alumnos[0]) {
-        if (propiedad !== 'dni') { // Excluir la columna 'dni'
+        if (propiedad !== 'dni') {
             crearNodo("th", cadenaFormateada(propiedad), "", "", tr);
         }
     }
@@ -113,7 +113,7 @@ function visualizarAlumnosFct(alumnos,empresa, tipo, contenedor) {
     let btnPeticion = crearNodo("button", "Realizar Petición", "", "", divMuestraFct)
     btnPeticion.addEventListener('click', async (event) => {
         event.stopPropagation();
-       
+
         if (alumnosPeti.length === 0) {
             dialogoSimple("Tienes que seleccionar algun alumno...")
             return
@@ -123,7 +123,7 @@ function visualizarAlumnosFct(alumnos,empresa, tipo, contenedor) {
         if (confirmado) {
 
             //Realizamos una petición de los alumnos seleccionados
-            promesaGeneral({ modo: 3, tipo: tipo, alumnos: alumnosPeti,empresa:empresa }, '../Controladores/realizacionFCT.php')
+            promesaGeneral({ modo: 3, tipo: tipo, alumnos: alumnosPeti, empresa: empresa }, '../Controladores/realizacionFCT.php')
                 .then((respuesta => {
                     mensajeDialogo(respuesta)
                 }))
@@ -157,10 +157,10 @@ export async function enviarOferta(contenedor, empresa) {
     crearSelect("selectOferta", "posViajar", ["Sí", "No"], divOferta);
 
     crearCaja("experienciaSector", "Experiencia en el sector", divOferta);
-    crearSelect("selectOferta", "experienciaLaboral", ["Sí", "No","Todos"], divOferta);
+    crearSelect("selectOferta", "experienciaLaboral", ["Sí", "No", "Todos"], divOferta);
 
     crearCaja("residencia", "Otra residencia", divOferta);
-    crearSelect("selectOferta", "residencia", ["Sí", "No","Todos"], divOferta);
+    crearSelect("selectOferta", "residencia", ["Sí", "No", "Todos"], divOferta);
 
     let parrafoError = crearNodo("p", "", "mensajeError", "", divOferta)
 
@@ -344,7 +344,7 @@ export async function visualizarSolicitudes(contenedor, empresa) {
                 devuelveAlumnosOferta(objeto)
                     .then(alumnos => {
                         for (let propiedad in alumnos[0]) {
-                            if (propiedad !== 'dni') {
+                            if (propiedad !== 'dni' ) {
                                 crearNodo("th", cadenaFormateada(propiedad), "", "", tablaAlumnos)
                             }
                         }

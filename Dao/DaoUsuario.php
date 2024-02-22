@@ -154,7 +154,7 @@ class DaoUsuario
 
             case 3:
                 //Para tutor
-                $sql = "SELECT dni,tu.nombre as 'nombre',apellidos,telefono,correo as 'email',idUsuario,u.nombre as 'usuario',c.nombre as 'Curso que tutoriza' FROM TUTOR tu
+                $sql = "SELECT dni,tu.nombre as 'nombre',apellidos,telefono,correo as 'email',idUsuario,u.nombre as 'usuario',c.nombre as 'curso',tu.idCursoT FROM TUTOR tu
                         INNER JOIN curso c ON c.id = idCursoT
                         INNER JOIN usuario u ON u.id = tu.idUsuario WHERE tu.dni = ? ";
                 break;
