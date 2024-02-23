@@ -25,7 +25,6 @@ class DaoAlumno
     public function existeAlumnoBolsa($cif)
     {
 
-
         $sql = "SELECT * FROM Alumno_Bolsa WHERE  dni = ?";
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s", $cif);
