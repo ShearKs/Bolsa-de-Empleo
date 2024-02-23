@@ -40,6 +40,9 @@ window.onload = async (event) => {
       case 3:
          crearMenuTutor();
          break;
+      case 4:
+         crearMenuAdministrador();
+         break;
 
       default:
          console.log("Ha habido un error con el rol del Usuario");
@@ -77,6 +80,9 @@ function menuGeneral() {
       case 3:
          cadena = "Tu información"
          break;
+      case 4:
+         cadena = "Datos Administrador";
+         break;   
    }
 
    let datosUsuarioApp = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
@@ -104,6 +110,11 @@ function menuGeneral() {
    })
 }
 
+
+function crearMenuAdministrador(){
+
+   console.log("hola que tal admin")
+}
 function crearMenuAlumnos() {
 
    let botonTitulacion = crearNodo("li", "", "liTutor", "anadirTitulacion", listaMenu);
@@ -113,8 +124,6 @@ function crearMenuAlumnos() {
       limpiarContenido(contenedor);
       anadirTitulacion(contenedor, usuario);
    })
-
-
 
 }
 function crearMenuTutor() {
@@ -131,7 +140,7 @@ function crearMenuTutor() {
 
    btnPeticion.addEventListener('click', () => {
       limpiarContenido(contenedor);
-      peticionesFCTS(contenedor,usuario)
+      peticionesFCTS(contenedor, usuario)
    })
 
 }
@@ -168,7 +177,6 @@ async function crearFormularioDatos() {
    if (rolUser == 1) {
       usuarioChanged = eliminarDatosObjecto(usuario, propEliminarAlum)
    }
-
 
    let divContenedor = crearNodo("div", "", "contenedor", "", contenedor)
 

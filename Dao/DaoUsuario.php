@@ -86,11 +86,13 @@ class DaoUsuario
                         WHEN al.idUsuario IS NOT NULL THEN al.dni -- Si es un alumno
                         WHEN e.idUsuario IS NOT NULL THEN e.cif  -- Si es una empresa
                         WHEN tu.idUsuario IS NOT NULL THEN tu.dni -- Si es un tutor
+                        WHEN a.idUsuario IS NOT NULL THEN a.dni -- Si es el administrador
                     END AS cif
                 FROM usuario u
                 LEFT JOIN alumno_bolsa al ON u.id = al.idUsuario
                 LEFT JOIN empresa e ON u.id = e.idUsuario
                 LEFT JOIN tutor tu ON u.id = tu.idUsuario
+                LEFT JOIN Administrador a ON u.id = a.idUsuario 
                 WHERE u.id = ? ";
 
         $sentencia = $this->conexion->prepare($sql);
@@ -159,6 +161,9 @@ class DaoUsuario
                         INNER JOIN usuario u ON u.id = tu.idUsuario WHERE tu.dni = ? ";
                 break;
 
+            case 4:
+                $sql = "SELECT a.dni,a.nombre,a.apellidos,a.correo as 'email',u.nombre as 'usuario' FROM Administrador a,usuario u WHERE  u.id = a.idUsuario  AND a.dni = ? ";
+                break;
             default:
                 break;
         }
@@ -249,13 +254,25 @@ class DaoUsuario
                     $telefono = $objeto->getTelefono();
                     $correo = $objeto->getCorreo();
                     $curso = $objeto->getCurso();
-                    
+
                     $sql = "UPDATE Tutor SET nombre = ? ,apellidos = ? ,telefono = ?,correo = ? WHERE dni = ? ";
                     $sentencia = $this->conexion->prepare($sql);
                     $sentencia->bind_param("ssiss", $nombre, $apellidos, $telefono, $correo, $dni);
                 }
 
                 break;
+            case 4:
+                if ($objeto instanceof Administrador) {
+                    //Campos del adminitrador
+                    $dni = $objeto->getDni();
+                    $nombre = $objeto->getNombre();
+                    $apellidos = $objeto->getApellidos();
+                    $correo = $objeto->getCorreo();
+
+                    $sql = "UPDATE Administrador SET nombre = ?,apellidos = ? ,correo = ? WHERE dni = ? ";
+                    $sentencia = $this->conexion->prepare($sql);
+                    $sentencia->bind_param("ssss",$nombre,$apellidos,$correo,$dni);
+                }
             default:
                 // Manejar el caso por defecto
                 break;

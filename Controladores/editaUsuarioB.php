@@ -6,6 +6,7 @@ include_once '../Modelos/Alumno.php';
 include_once '../Modelos/AlumnoBolsa.php';
 include_once '../Modelos/Empresa.php';
 include_once '../Modelos/Tutor.php';
+include_once '../Modelos/Administrador.php';
 include_once '../Dao/DaoUsuario.php';
 
 
@@ -44,14 +45,24 @@ switch ($rol) {
         break;
         //Tutor
     case 3:
-        $objeto = new Tutor($usuario['dni'],$usuario['nombre'],$usuario['apellidos'],
-                                    $usuario['telefono'],$usuario['email'],$usuario['curso']);
+        $objeto = new Tutor(
+            $usuario['dni'],
+            $usuario['nombre'],
+            $usuario['apellidos'],
+            $usuario['telefono'],
+            $usuario['email'],
+            $usuario['curso']
+        );
+        break;
+
+    case 4:
+        $objeto = new Administrador($usuario['dni'], $usuario['nombre'], $usuario['apellidos'], $usuario['email']);
         break;
 
     default:
         break;
 }
 
-$mensaje = $daoUser->actualizarUsuarioBolsa($objeto,$rol);
+$mensaje = $daoUser->actualizarUsuarioBolsa($objeto, $rol);
 
 echo $mensaje;
