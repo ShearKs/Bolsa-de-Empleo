@@ -1,6 +1,6 @@
 import { promesaGeneral } from './funcionesFetch.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple } from './funcionesGenerales.js';
-import { crearNodo, limpiarContenido } from './utilsDom.js';
+import { crearBotonImg, crearNodo, limpiarContenido } from './utilsDom.js';
 
 export function alumnosPeticiones(contenedor, tutor) {
 
@@ -91,11 +91,13 @@ async function tablaPeticiones(contenedor, tutor) {
                     let celda = crearNodo("td", "", "", "", trAlumno);
                     celda.colSpan = Object.keys(peticion).length + 1;
 
-                    let btnMas = crearNodo("td", "Más", "btnMasAlumno", "", datosFila);
+                    let btnMas = crearNodo("td", "", "btnMasAlumno", "", datosFila);
+                    crearBotonImg(btnMas,"boton","btnMasAlum","./img/mas.png","#75caff")
 
                     btnMas.addEventListener('click', async () => {
                         btnMas.style.display = 'none'
-                        let botonRemove = crearNodo("td", "menos", "", "", datosFila)
+                        let botonRemove = crearNodo("td", "", "btnMasAlumno", "", datosFila)
+                        crearBotonImg(botonRemove,"boton","btnMasAlum","./img/menos.png","#75caff")
                         botonRemove.addEventListener('click', () => {
                             botonRemove.remove();
                             btnMas.style.display = "flex"
@@ -105,14 +107,17 @@ async function tablaPeticiones(contenedor, tutor) {
                         let tablaAlumnos = crearNodo("table", "", "tAlumnos", "", celda);
                         await promesaGeneral({ modo: 3, id: peticion.id, idCurso: tutor.idCursoT }, "../Controladores/peticionesAlumnos.php")
                             .then((alumnos => {
-                                alumnos.forEach(alumno => {
 
-                                    // let trCabecera = crearNodo("tr", "", "trAlumno", "", tablaAlumnos)
-                                    // //cabecera
-                                    // for (let propiedad in alumno[0]) {
-                                    //     let th = crearNodo("th", cadenaFormateada(propiedad), "", "", trCabecera);
-                                    //     //if (propiedad == 'dniAlumno') th.style.display = 'none'
-                                    // }
+                                let trCabecera = crearNodo("tr", "", "trAlumno", "", tablaAlumnos)
+                                    //cabecera
+                                    for (let propiedad in alumnos[0]) {
+
+                                        if(propiedad != 'dniAlumno'){
+                                            let th = crearNodo("th", cadenaFormateada(propiedad), "", "", trCabecera);
+                                        }
+                                    }
+
+                                alumnos.forEach(alumno => {
 
                                     let trAlum = crearNodo("tr", "", "trAlumno", "", tablaAlumnos);
                                     for (let propiedad in alumno) {
