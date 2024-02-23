@@ -27,7 +27,7 @@ class DaoEmpresa
     public function devuelveCampos()
     {
 
-        $sql = "SELECT column_name FROM information_schema.columns WHERE table_name = 'Empresa'";
+        $sql = "SHOW COLUMNS FROM Empresa";
         $query = $this->conexion->query($sql);
 
         $campos = array();
@@ -35,7 +35,7 @@ class DaoEmpresa
         if ($query->num_rows > 0) {
 
             while ($fila = $query->fetch_assoc()) {
-                $campos[] = $fila;
+                $campos[] = $fila['Field'];
             }
         }
 

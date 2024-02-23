@@ -156,15 +156,14 @@ function creaFormularioEmpresa(camposEmpresa, cif) {
 
     //camposEmpresa es un array donde tendremos todos los nombre de las columnas de empresa
     //Introducimos todos los campos que serán todas las columnas en la base de datos
-    Object.keys(camposEmpresa).forEach(key => {
-        const campo = camposEmpresa[key].column_name;
-
-        if (campo != 'idUsuario') {
-            let caja = crearNodo("div", "", "caja", "caja" + campo, formAltaEmpresa);
-            let campoFormat = funciones.cadenaFormateada(campo);
-            crearLabel(campo, campoFormat, "lbUsuario", caja);
-            let inputEmp = crearInput(campo, "input", "text", caja);
-            inputEmp.id = "inputEmp" + campo;
+    camposEmpresa.forEach(campoEmpresa => {
+        console.log(campoEmpresa)
+        if (campoEmpresa != 'idUsuario') {
+            let caja = crearNodo("div", "", "caja", "caja" + campoEmpresa, formAltaEmpresa);
+            let campoFormat = funciones.cadenaFormateada(campoEmpresa);
+            crearLabel(campoEmpresa, campoFormat, "lbUsuario", caja);
+            let inputEmp = crearInput(campoEmpresa, "input", "text", caja);
+            inputEmp.id = "inputEmp" + campoEmpresa;
             if (inputEmp.name == 'cif') {
 
                 inputEmp.value = cif

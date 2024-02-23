@@ -409,6 +409,7 @@ export function devuelveCamposEmpresa(creaFormularioEmpresa, cif) {
             return response.json()
         })
         .then(data => {
+            console.log(data)
 
             if (data.hasOwnProperty('Error')) {
                 parrafoError.textContent = "Error: " + data.Error
