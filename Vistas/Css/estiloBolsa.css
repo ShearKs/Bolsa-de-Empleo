@@ -611,3 +611,55 @@ td {
     height: 27px;
 }
 
+/* -------------------------------------------------- Administrador Listado ----------------------------------------------------------   */
+.divListadoAlum{
+    background-color: #ccc;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 10px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.divCriterios{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 10px;
+    background-color: #d7c7c7;
+    padding :1.25rem;
+    margin-bottom: 2%;
+}
+
+.divCriterios.children{
+    width: 100%;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

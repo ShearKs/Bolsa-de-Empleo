@@ -70,6 +70,7 @@ export function crearSelect(className, name, options, contenedor) {
     options.forEach(option => {
         crearNodo("option", option, "optionOferta", "", select);
     });
+    return select;
 }
 
 

@@ -55,8 +55,32 @@ class DaoAdministrador
         return $alumnos;
     }
 
+    public function obtenerListadoEmpresas($idCurso){
 
+        $sql = "SELECT a.* from empresa a
+                INNER JOIN solicitud s ON s.cif_empresa = a.cif
+                INNER JOIN solicitud_curso sa ON sa.idSolicitud = s.id ";
+        
+        if($idCurso !== 0){
+            $sql .= " WHERE sa.idCurso = ?";
+        }
+        $sql .= " GROUP BY a.cif";
+        $sentencia = $this->conexion->prepare($sql);
+        if($idCurso !== 0){
+            $sentencia->bind_param("i",$idCurso);
+        }
+        $estado = $sentencia->execute();
+        $resultado = $sentencia->get_result();
 
+        $empresas = array();
 
+        if($estado && $resultado->num_rows > 0){
+            while($fila = $resultado->fetch_assoc()){
+                $empresas[] = $fila;
+            }
+
+        }
+        return $empresas;
+    }
 
 }
