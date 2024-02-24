@@ -6,7 +6,7 @@ import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDial
 import { anadirTitulacion } from './alumnos.js';
 import { alumnFCTS, enviarOferta, visualizarSolicitudes } from './empresa.js';
 import { alumnosPeticiones, peticionesFCTS } from './tutor.js';
-import { listado } from './administrador.js';
+import { consulta, listado } from './administrador.js';
 
 
 //Añadimos nuestro lista para ir pudiendo añadir todos nuestros nodos
@@ -83,7 +83,7 @@ function menuGeneral() {
          break;
       case 4:
          cadena = "Datos Administrador";
-         break;   
+         break;
    }
 
    let datosUsuarioApp = crearNodo("li", "", "liAlumno", "datosAlumno", listaMenu);
@@ -112,15 +112,27 @@ function menuGeneral() {
 }
 
 
-function crearMenuAdministrador(){
+function crearMenuAdministrador() {
 
-   let btnListados = crearNodo("li","","liListado","listados",listaMenu);
-   crearNodo("a","Listado de Alumnos y Empresas","","",btnListados)
 
-   btnListados.addEventListener('click',()=>{
+   let btnConsulta = crearNodo("li", "", "liConsulta", "conultasAdmin", listaMenu)
+   crearNodo("a", "Consulta alumno o empresa", "", "", btnConsulta)
+
+   btnConsulta.addEventListener('click', () => {
+      limpiarContenido(contenedor)
+      consulta(contenedor)
+   })
+
+
+   let btnListados = crearNodo("li", "", "liListado", "listados", listaMenu);
+   crearNodo("a", "Listado de Alumnos y Empresas", "", "", btnListados)
+
+   btnListados.addEventListener('click', () => {
       limpiarContenido(contenedor)
       listado(contenedor)
    })
+
+
 
 
 }

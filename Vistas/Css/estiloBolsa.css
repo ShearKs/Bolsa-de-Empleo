@@ -613,19 +613,22 @@ td {
 
 /* -------------------------------------------------- Administrador Listado ----------------------------------------------------------   */
 .divListado {
-    background-color: #b8efff;
+    background-color: #badef7;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
+    padding: 1.4rem;
     border-radius: 10px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
 }
 
-.divListado h1{
+.divListado h1 {
     color: #2255a3;
+    font-weight: bolder;
+    font-size: 38px;
 }
 
 .contenedorListado {
@@ -642,7 +645,7 @@ td {
     border-radius: 1rem;
     width: 110px;
     background-color: #3882b0;
-    color:#e6f5fe;
+    color: #e6f5fe;
 }
 
 
@@ -653,25 +656,37 @@ td {
     align-items: center;
 
     border-radius: 10px;
-    background-color: #d7c7c7;
+    background-color: #7394dc;
     padding: 1.25rem;
-    margin-bottom: 2%;
+    margin-bottom: 1%;
 }
 
-.divCriterios.children {
-    width: 100%;
+.divCriterios select {
+    margin-bottom: 5px;
+    padding: 0.15rem;
+    width: 140px;
+}
+
+.divCriterios button {
+    padding: 0.40rem;
+    background-color: #0070cb;
+    color: whitesmoke;
+    border-radius: 5px;
+    font-weight: bolder;
+    cursor: pointer;
 }
 
 /*La tabla de los listados  */
 .tablaListado th {
     /* background-color: #e0eef5; */
     background-color: #62b2e4;
-    color:#e6f5fe;
+    color: #e6f5fe;
     font-size: 20px;
-    -webkit-text-stroke-width: 0.3px; /* Ancho del borde */
-    -webkit-text-stroke-color: black; /* Color del borde */
+    -webkit-text-stroke-width: 0.3px;
+    /* Ancho del borde */
+    -webkit-text-stroke-color: black;
+    /* Color del borde */
 }
-
 
 .tablaListado tr:nth-child(even) {
     background-color: #bce3ff;
@@ -681,10 +696,113 @@ td {
 
 .tablaListado tr:nth-child(odd) {
     background-color: #dff0ff;
-    
+
     cursor: pointer;
 }
 
 .tablaListado tr:hover {
     background-color: #499cd0;
+}
+
+
+/* Estilo de la consulta administrador */
+.divConsulta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #e7f0f8;
+    margin: 5px;
+    font-size: 20px;
+    padding: 1.25rem;
+    background-color: #839dd1;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.75);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.inputCDni{
+    width: 175px;
+    height: 30px;
+    border-radius: 5px;
+}
+
+
+
+.divConsulta h1 {
+    color: #262d40;
+}
+
+.divCriteria {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.divCriteria button {
+    margin: 10px;
+    padding: 0.75rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    color: #e7f0f8;
+    border: 3px solid #4a5a89;
+    background-color: #839dd1;
+    background-image: linear-gradient(to bottom, #6a80c1, #4a5a89);
+}
+
+
+.divContenedor {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.divAlumGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+    margin: 2rem;
+    gap: 5px;
+}
+
+.contenidoAlum,
+.propiedadAlum {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 0.75rem;
+}
+
+.propiedadAlum {
+    background-color: #9cb6dd;
+    color: #414e6e;
+    font-size: 22px;
+}
+
+.contenidoAlum:nth-child(even) {
+    background-color: #596ca9;
+}
+
+.contenidoAlum:nth-child(odd) {
+    background-color: black;
+}
+
+
+/* Tabla de contratos  */
+.tablaContratos {
+    max-width: 750px;
+}
+
+.divContratosAdmin,.divConsultasAd{
+    max-height: 300px;
+    /* Define la altura máxima */
+    overflow-y: auto;
+}
+
+/*Para los dos tablas si hay muchas solicitudes o contratos ponemos una altura fija y un scroll   */
+.tablaContratos,
+.tablaConsulta {
+    font-size: 18px; /* Tamaño de la fuente */
 }

@@ -1,23 +1,176 @@
-import { crearCursos, promesaGeneral } from './funcionesFetch.js';
+import { crearCursos, promesaGeneral, solicitudes } from './funcionesFetch.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple, eliminarSiExiste } from './funcionesGenerales.js';
-import { crearBotonImg, crearNodo, crearSelect, limpiarContenido } from './utilsDom.js';
+import { crearBotonImg, crearInput, crearNodo, crearSelect, limpiarContenido } from './utilsDom.js';
 
 //import { jsPDF } from "jspdf";
+
+
+
+export function consulta(contenedor) {
+
+    let divConsulta = crearNodo("div", "", "divConsulta", "", contenedor)
+
+    let titulo = crearNodo("h1", "Consulta de Alumnos", "tituloConsulta", "", divConsulta)
+
+    let divCriteria = crearNodo("div", "", "divCriteria", "", divConsulta)
+    crearNodo("p", "¿Que quieres consultar?", "parrafoCriteria", "", divCriteria)
+    let selectOption = crearSelect("selectUser", "usuario", ["Alumno", "Empresa"], divCriteria)
+    let parrafo = crearNodo("p", "Introduce el dni del Alumno:", "parrafoCriteria", "", divCriteria)
+    let inputDni = crearInput("dni", "inputCDni", "text", divCriteria)
+
+    let botonConsulta = crearNodo("button", "Consulta el alumno", "btnConsulta", "", divCriteria)
+
+    selectOption.addEventListener('change', () => {
+        if (selectOption.value === 'Empresa') {
+            titulo.textContent = "Consulta de Empresas"
+            botonConsulta.textContent = "Consulta la empresa"
+            parrafo.textContent = "Introduce el cif de la Empresa:"
+        } else {
+            titulo.textContent = "Consulta de Alumnos"
+            botonConsulta.textContent = "Consulta el alumno"
+            parrafo.textContent = "Introduce el dni del Alumno:"
+        }
+    })
+
+
+    //Donde imprimos la empresa o la consulta deveulta
+    let divContenedor = crearNodo("div", "", "divContenedor", "", divConsulta)
+
+    botonConsulta.addEventListener('click', (event) => {
+        limpiarContenido(divContenedor)
+        event.stopPropagation();
+
+        if (inputDni.value === "") {
+            dialogoSimple("Tienes que introducir un dni..");
+            return;
+        }
+
+        let tipoUsuario = selectOption.value
+        console.log(tipoUsuario)
+        console.log(inputDni.value)
+        let tituloString = selectOption.value == "Alumno" ? "Alumno Consultado" : "Empresa Consultada"
+        promesaGeneral({ dni: inputDni.value.trim() , tipo: tipoUsuario }, '../Controladores/consultaAdministrador.php')
+
+            .then((user => {
+                if (user.hasOwnProperty('Error')) {
+                    //console.log("No existe ese usuario");
+                    dialogoSimple("No existe ese " + selectOption.value)
+                    return;
+                }
+
+                crearNodo("h2", tituloString, "", "", divContenedor)
+
+                let divAlumno = crearNodo("div", "", "divAlumGrid", "", divContenedor)
+
+                for (let propiedad in user) {
+                    crearNodo("div", cadenaFormateada(propiedad) + "  :", "propiedadAlum", "", divAlumno)
+                    crearNodo("div", user[propiedad], "contenidoAlum", "", divAlumno)
+                }
+
+                //Ademas si es una empresa nos tenemos que encargar de sacar sus contratos y sus solicitudes...
+                if (selectOption.value == 'Empresa') {
+
+                    promesaGeneral({dni:inputDni.value.trim() ,tipo: "solicitudesEmpresa"} ,'../Controladores/consultaAdministrador.php')
+                        .then((solicitudes =>{
+                              //Si la empresa no tiene solicitudes
+                              if(solicitudes.hasOwnProperty('Error')){
+                                crearNodo("p","La empresa no ha realizado ninguna solicitud...","","",divContenedor);
+                                exit;
+                            }
+
+                            crearNodo("h3", "Consultas de la Empresa", "", "", divContenedor)
+                            let divConsultas = crearNodo("div","","divConsultasAd","divConsultasAd",divContenedor)
+                            //Visualizamos todas las solicitudes...
+                            let tablaSolicitud = crearNodo("table", "", "tablaConsulta", "tablaConsulta", divConsultas);
+
+                            //Instancio el primer contrato porque va a ser de donde voy a sacar las cabeceras...
+                            let primeraSoli = solicitudes[0];
+                            let propSolicitud = Object.keys(primeraSoli)
+
+
+                            let trh = crearNodo("tr", "", "", "", tablaSolicitud)
+                            for (let cabecera of propSolicitud) {
+                                crearNodo("td", cadenaFormateada(cabecera), "", "", trh);
+                            }
+
+
+                            for (let solicitud of solicitudes) {
+                                let tr = crearNodo("tr", "", "", "", tablaSolicitud)
+                                for (let propiedad in solicitud) {
+                                    crearNodo("td", solicitud[propiedad], "", "", tr);
+                                }
+                            }
+                        }))
+
+                    promesaGeneral({ dni: inputDni.value.trim(), tipo: "contratosEmpresa" }, '../Controladores/consultaAdministrador.php')
+                        .then((contratos => {
+                            //console.log(contratos)
+
+                            //Si no tiene contratos la empresa...
+                            if(contratos.hasOwnProperty('Error')){
+                                crearNodo("p","La empresa no ha realizado aún ningún contrato...","","",divContenedor);
+                                return;
+                            }
+
+                            crearNodo("h3", "Contratos de la Empresa", "", "", divContenedor)
+
+                            let divContratos = crearNodo("div","","divContratosAd","divContratosAd",divContenedor)
+                            //Visualizamos todos los contratos de la empresa en formato tabla
+                            let tablaContratos = crearNodo("table", "", "tablaContratos", "tablaContratos", divContratos);
+
+                            //Instancio el primer contrato porque va a ser de donde voy a sacar las cabeceras...
+                            let primerContrato = contratos[0];
+                            let propiedadesContrato = Object.keys(primerContrato)
+
+
+                            let trh = crearNodo("tr", "", "", "", tablaContratos)
+                            for (let cabecera of propiedadesContrato) {
+                                crearNodo("td", cadenaFormateada(cabecera), "", "", trh);
+                            }
+
+
+
+                            //Otra forma de hacerlo que ya no me acordaba como lo hacia
+                            // for (let contrato in contratos) {
+
+                            //     let tr = crearNodo("tr", "", "", "", tablaContratos)
+                            //     for (let propiedad in contratos[contrato]) {
+
+                            //         crearNodo("td", contratos[contrato][propiedad], "", "", tr);
+                            //     }
+                            // }
+                            for (let contrato of contratos) {
+                                let tr = crearNodo("tr", "", "", "", tablaContratos)
+                                for (let propiedad in contrato) {
+                                    crearNodo("td", contrato[propiedad], "", "", tr);
+                                }
+                            }
+
+
+                        }))
+
+                    
+
+
+                }
+
+            }))
+    })
+}
 
 
 export async function listado(contenedor) {
 
     let divListado = crearNodo("div", "", "divListado", "", contenedor);
 
-    let select = crearSelect('selectLUsuarios', "usuario", ["Alumnos", "Empresas"], divListado)
-
     //Como siempre está cargado los alumnos de primeras en el select option le ponemos listado de alumnos
     let titulo = crearNodo("h1", "Listado de Alumnos", "", "", divListado)
 
     let divCriterios = crearNodo("div", "", "divCriterios", "divCriterios", divListado)
 
+    let select = crearSelect('selectLUsuarios', "usuario", ["Alumnos", "Empresas"], divCriterios)
+    let perfilProfesional = await crearCursos("DAW", select, true, 1)
     let botonGenerarListado = crearNodo("button", "Generar Listado Alumno", "", "", divCriterios);
-    let perfilProfesional = await crearCursos("DAW", botonGenerarListado, true, 1)
     let optionTodo = crearNodo("option", "TODOS", "", "", perfilProfesional)
     optionTodo.value = 0
 
@@ -60,7 +213,7 @@ export async function listado(contenedor) {
 
         //Creamos una tabla para los alumnos
         let tablaAlum = crearNodo("table", "", "tablaListado", "tablaListado", listado)
-        promesaGeneral(solicitud, '../Controladores/listadoAlumnos.php')
+        promesaGeneral(solicitud, '../Controladores/listadosAdministrador.php')
             //Alumnos obtenidos de la promesa...
             .then((usuarios => {
 
