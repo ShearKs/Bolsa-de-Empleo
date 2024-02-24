@@ -2,24 +2,26 @@ import { crearCursos, promesaGeneral } from './funcionesFetch.js';
 import { cadenaFormateada, eliminarDatosObjecto, dialogoInformacion, mensajeDialogo, dialogoSimple, eliminarSiExiste } from './funcionesGenerales.js';
 import { crearBotonImg, crearNodo, crearSelect, limpiarContenido } from './utilsDom.js';
 
-
-export async function listarAlumnos(contenedor) {
-
-    let divListAlum = crearNodo("div", "", "divListadoAlum", "", contenedor);
-
-    let select = crearSelect('selectLUsuarios', "usuario", ["Alumnos", "Empresas"], divListAlum)
+//import { jsPDF } from "jspdf";
 
 
-    let titulo = crearNodo("h1", "Listado de Alumnos", "", "", divListAlum)
+export async function listado(contenedor) {
 
-    let divCriterios = crearNodo("div", "", "divCriterios", "divCriterios", divListAlum)
+    let divListado = crearNodo("div", "", "divListado", "", contenedor);
+
+    let select = crearSelect('selectLUsuarios', "usuario", ["Alumnos", "Empresas"], divListado)
+
+    //Como siempre está cargado los alumnos de primeras en el select option le ponemos listado de alumnos
+    let titulo = crearNodo("h1", "Listado de Alumnos", "", "", divListado)
+
+    let divCriterios = crearNodo("div", "", "divCriterios", "divCriterios", divListado)
 
     let botonGenerarListado = crearNodo("button", "Generar Listado Alumno", "", "", divCriterios);
     let perfilProfesional = await crearCursos("DAW", botonGenerarListado, true, 1)
-    let optionTodo = crearNodo("option", "Todos", "", "", perfilProfesional)
+    let optionTodo = crearNodo("option", "TODOS", "", "", perfilProfesional)
     optionTodo.value = 0
 
-    let listadoAlumnos = crearNodo("div", "", "", "", divListAlum)
+    let listado = crearNodo("div", "", "contenedorListado", "", divListado)
 
     select.addEventListener('change', () => {
         if (select.value == "Empresas") {
@@ -34,7 +36,7 @@ export async function listarAlumnos(contenedor) {
 
     botonGenerarListado.addEventListener('click', () => {
         console.log(select.value)
-        eliminarSiExiste('tablaListadoAlum')
+        eliminarSiExiste('tablaListado')
         eliminarSiExiste('btnGpdf')
 
         let idCurso = parseInt(perfilProfesional.value)
@@ -48,7 +50,7 @@ export async function listarAlumnos(contenedor) {
                 perfilP: idCurso,
                 modo: 1
             }
-        }else{
+        } else {
             solicitud = {
                 perfilP: idCurso,
                 modo: 2
@@ -57,31 +59,31 @@ export async function listarAlumnos(contenedor) {
 
 
         //Creamos una tabla para los alumnos
-        let tablaAlum = crearNodo("table", "", "tablaListadoAlum", "tablaListadoAlum", listadoAlumnos)
+        let tablaAlum = crearNodo("table", "", "tablaListado", "tablaListado", listado)
         promesaGeneral(solicitud, '../Controladores/listadoAlumnos.php')
             //Alumnos obtenidos de la promesa...
-            .then((alumnos => {
+            .then((usuarios => {
 
-                console.log(alumnos)
+                console.log(usuarios)
 
                 let filaCabecera = crearNodo("tr", "", "", "", tablaAlum)
-                for (let propiedad in alumnos[0]) {
+                for (let propiedad in usuarios[0]) {
                     let th = crearNodo("th", cadenaFormateada(propiedad), "", "", filaCabecera)
                 }
 
-                alumnos.forEach(alumno => {
+                usuarios.forEach(usuario => {
                     //Por cada alumno creamos una fila
                     let filaAlum = crearNodo("tr", "", "", "", tablaAlum)
                     //De cada alumno creamos un td
-                    for (let clave in alumno) {
-                        let td = crearNodo("td", alumno[clave], "", "", filaAlum)
+                    for (let clave in usuario) {
+                        let td = crearNodo("td", usuario[clave], "", "", filaAlum)
                     }
 
                 })
 
-                let btnGeneraPdf = crearNodo("button", "Genera PDF", "btnGpdf", "btnGpdf", listadoAlumnos)
+                let btnGeneraPdf = crearNodo("button", "Genera PDF", "btnGpdf", "btnGpdf", listado)
                 btnGeneraPdf.addEventListener('click', () => {
-                   generarPdf(alumnos,usuario)
+                    generarPdf(usuarios, usuario)
                 })
             }))
     })
@@ -90,20 +92,18 @@ export async function listarAlumnos(contenedor) {
 
 
 
-
-
-function generarPdf(usuario,tipoUsuario) {
+function generarPdf(usuario, tipoUsuario) {
     //Libreria que utilizamos 
-    const pdf = new jsPDF();
+    const pdf = new jsPDF("landscape");
 
     // Definir la fuente y el estilo
-    pdf.setFont("helvetica");
+    pdf.setFont("Verdada");
 
     // Aumentar el tamaño del texto
     pdf.setFontSize(16);
 
     // Agregar un mensaje antes de la tabla
-    pdf.text("Listado de :"+tipoUsuario, 10, 10);
+    pdf.text("Listado de : " + tipoUsuario, 10, 10);
 
     // Restaurar el tamaño de fuente original
     pdf.setFontSize(12);
@@ -119,23 +119,32 @@ function generarPdf(usuario,tipoUsuario) {
     // Ajustar la posición para las filas de datos
     y += 10;
 
+    ///// SIN TABLA
     //Recoremos el objeto con los datos obtenidos
-    usuario.forEach(item => {
+    // usuario.forEach(item => {
+    //     console.log(item)
+    //     Object.values(item).forEach((value, index) => {
 
-        //Utilizamos un object values que devuelve un array con los valores de las propiedades de un objeto
-        Object.values(item).forEach((value, index) => {
+    //         pdf.text(value.toString(), 15 + index * 40, y);
+    //     });
+    //     y += 10;
+    // });
 
-            console.log(typeof value);
+    //CON TABLA
+    const cabeceras = Object.keys(usuario[0]);
+    //Para tener todas en maysuculas
+    const cabecerasFormateadas = cabeceras.map(cadenaFormateada)
 
-            if (typeof value == 'number' && index != 0) {
-                pdf.text(value.toString() + "€", 10 + index * 40, y);
-            } else {
-                pdf.text(value.toString(), 10 + index * 40, y);
-            }
+    const data = usuario.map(obj => cabeceras.map(key => obj[key]));
 
-           
-        });
-        y += 10;
+    pdf.autoTable({
+        startY: 20,
+        head: [cabecerasFormateadas],
+        body: data,
+        //Tema de la tabla hay los siguientes temas: grid,striped,plain
+        theme: 'striped',
+        // headStyles: { fillColor: [0, 0, 255] },
+        // bodyStyles: { textColor: [255, 0, 0] },
     });
 
     // Guardar el PDF

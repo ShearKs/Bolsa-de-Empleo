@@ -77,11 +77,11 @@ input[type="checkbox"] {
     width: 30px;
 }
 
-.trAlumno{
-    cursor:pointer;
+.trAlumno {
+    cursor: pointer;
 }
 
-.btnMasAlumno{
+.btnMasAlumno {
     cursor: pointer;
 }
 
@@ -590,30 +590,30 @@ td {
     padding: 1.25rem;
 }
 
-.contenedorPeticiones{
+.contenedorPeticiones {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center; 
+    align-items: center;
 }
 
-.contenedorPeticiones button{
+.contenedorPeticiones button {
 
-    padding:0.8rem;
+    padding: 0.8rem;
     cursor: pointer;
-    background-color:#0066ff;
-    color:white;
+    background-color: #0066ff;
+    color: white;
     border-radius: 15px;
 }
 
-.btnMasAlum{
+.btnMasAlum {
     width: 27px;
     height: 27px;
 }
 
 /* -------------------------------------------------- Administrador Listado ----------------------------------------------------------   */
-.divListadoAlum{
-    background-color: #ccc;
+.divListado {
+    background-color: #b8efff;
 
     display: flex;
     flex-direction: column;
@@ -624,42 +624,67 @@ td {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.divCriterios{
-    display:flex;
+.divListado h1{
+    color: #2255a3;
+}
+
+.contenedorListado {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.contenedorListado button {
+    cursor: pointer;
+    padding: 0.8rem;
+    margin: 0.75rem;
+    border-radius: 1rem;
+    width: 110px;
+    background-color: #3882b0;
+    color:#e6f5fe;
+}
+
+
+.divCriterios {
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
 
     border-radius: 10px;
     background-color: #d7c7c7;
-    padding :1.25rem;
+    padding: 1.25rem;
     margin-bottom: 2%;
 }
 
-.divCriterios.children{
+.divCriterios.children {
     width: 100%;
 }
 
+/*La tabla de los listados  */
+.tablaListado th {
+    /* background-color: #e0eef5; */
+    background-color: #62b2e4;
+    color:#e6f5fe;
+    font-size: 20px;
+    -webkit-text-stroke-width: 0.3px; /* Ancho del borde */
+    -webkit-text-stroke-color: black; /* Color del borde */
+}
 
 
+.tablaListado tr:nth-child(even) {
+    background-color: #bce3ff;
+    cursor: pointer;
 
+}
 
+.tablaListado tr:nth-child(odd) {
+    background-color: #dff0ff;
+    
+    cursor: pointer;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.tablaListado tr:hover {
+    background-color: #499cd0;
+}

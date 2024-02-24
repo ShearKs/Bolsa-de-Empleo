@@ -71,7 +71,7 @@ export function eventoCheckBox(checkbox, elementoCreado, idNodo, nodo, nodoAnter
 
     })
 }
-
+//No lo he utilizado...
 export function devolverObjetaTabla(filasTabla,arrayObjetos){
     for (let i = 0; i < filasTabla.length; i++) {
         filasTabla[i].addEventListener('click', () => {
