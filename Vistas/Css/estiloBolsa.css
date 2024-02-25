@@ -720,7 +720,7 @@ td {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
-.inputCDni{
+.inputCDni {
     width: 175px;
     height: 30px;
     border-radius: 5px;
@@ -795,14 +795,27 @@ td {
     max-width: 750px;
 }
 
-.divContratosAdmin,.divConsultasAd{
-    max-height: 300px;
+.divContratosAdmin,
+.divConsultasAd {
     /* Define la altura máxima */
+    max-height: 300px;
+
+    /*Para los dos tablas si hay muchas solicitudes o contratos ponemos una altura fija y un scroll   */
     overflow-y: auto;
 }
 
-/*Para los dos tablas si hay muchas solicitudes o contratos ponemos una altura fija y un scroll   */
+
 .tablaContratos,
 .tablaConsulta {
-    font-size: 18px; /* Tamaño de la fuente */
+    font-size: 18px;
+    /* Tamaño de la fuente */
+}
+
+.filaCabecera{
+    background-color:#485585 ;
+    font-weight: bolder;
+}
+
+.filaTabla{
+    background-color: #5f77b1;
 }

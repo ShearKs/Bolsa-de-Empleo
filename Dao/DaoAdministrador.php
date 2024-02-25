@@ -23,7 +23,7 @@ class DaoAdministrador
     public function obtenerAlumno($dni){
 
 
-        $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email,a.telefono,ab.expLaboral as 'Experiencia Laboral' FROM alumnoies a
+        $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email as 'Correo Electronico',a.telefono as 'teléfono',ab.expLaboral as 'Experiencia Laboral' FROM alumnoies a
                 INNER JOIN alumno_bolsa ab ON ab.dni = a.dni  WHERE ab.dni = ?  ;";
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s",$dni);
@@ -36,7 +36,9 @@ class DaoAdministrador
         if($estado !== null && $resultado->num_rows == 1  ){
 
             $alumno = $resultado->fetch_assoc();
-
+            if(empty($alumno["Experiencia Laboral"])){
+                $alumno["Experiencia Laboral"] = "No tiene experiencia laboral...";
+            }
             return json_encode($alumno);
         }else{
             return json_encode(array('Error' => "No se ha encontrado a ningún alummno con el dni: ".$dni));
@@ -55,6 +57,7 @@ class DaoAdministrador
         //Como el cif es único y solo vamos a sacar los datos de una empresa...
         if($estado && $resultado->num_rows == 1){
             $empresa = $resultado->fetch_assoc();
+           
             echo json_encode($empresa);
         }else{
             //Si no existe la empresa que hemos pasado por parámetro...

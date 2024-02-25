@@ -57,6 +57,8 @@ window.onload = async (event) => {
       //Eliminar la sesión antes
       location.href = "../index.html";
    })
+
+   //COMPROBACIÓN DE LA FECHA DEL USUARIO CON LA ACTUAL PARA MANDARLE O UN CORREO SI HACE TIEMPO QUE ESTÁ INACTIVO
 };
 
 async function obtenerUsuarioBolsa() {

@@ -22,7 +22,7 @@ class DaoUsuario
     public function inicioSesion($nombreUsuario, $contrasena)
     {
 
-        //Hacemos una consulta a la base de datos
+        //Hacemos una consulta a la base de datos al usuario 
         $sql = "SELECT * FROM usuario WHERE nombre = ?";
         $setencia = $this->conexion->prepare($sql);
         $setencia->bind_param("s", $nombreUsuario);
@@ -42,13 +42,29 @@ class DaoUsuario
 
                 //Me creo una sesión con el nombre del usuario
                 session_start();
+                //Saco el id del usuario a partir del nombre introducido
                 $idUsuario = $usuario['id'];
                 $dni = $this->devuelveDniUser($idUsuario);
+
+                //Pasamos el dni,cif por sesión lo hacemos así por php ya que nos interesa que el cliente en el navegador no pueda ver el dni..
                 $_SESSION['cif'] = $dni;
+
+                $lastAcces = $this->ultimoAcceso($idUsuario);
+
+                if(!$lastAcces){
+                    return json_encode(array('Error' => 'La actualización de la fecha de inicio no se hizo correctamente'));
+                }
 
                 //Obtenemos el rol al iniciar sesión y se lo pasamos al cliente
                 $rol = $usuario['rol'];
 
+                //Antes de iniciar sesión tenemos que comprobar que ese usuario está activo en la base de datos(solo para Alumno en Bolsa y empresa)
+                if($rol === 1 ){
+
+                    if(!$this->compruebaActivo($idUsuario)){
+                        return json_encode(array('Error' => 'Ese usuario ya no se encuentra activo...'));
+                    }
+                }
                 //return json_encode($usuario);
                 return json_encode(array("Exito" => $rol));
             }
@@ -57,6 +73,31 @@ class DaoUsuario
             return json_encode(array("Error" => "No se ha encontrado ese alumno en la base de datos"));
         }
     }
+    //AÑADIR TAMBIEN LA EMPRESA.....
+    private function compruebaActivo($idUsuario){
+
+        $sql = "SELECT * FROM usuario u
+        INNER JOIN alumno_bolsa ab ON ab.idUsuario = u.id AND u.id = ?
+        WHERE activo = 'SI' ";
+
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("i",$idUsuario);
+        $estado = $sentencia->execute();
+
+        $resultado = $sentencia->get_result();
+        //Si obtiene el usuario significa que está activo y por lo tanto puede pasar en la aplicación
+        if($estado && $resultado->num_rows == 1){
+            return true;
+        }
+
+        //Si no está activo no puede pasar a la aplicación false...
+        return false;
+
+    }
+
+
+
+
 
     public function cambioContrasena(Usuario $usuario)
     {
@@ -78,6 +119,26 @@ class DaoUsuario
 
         return json_encode(array("Error" => "Ha habido un problema al cambiar la contraseña"));
     }
+
+    private function ultimoAcceso($idUsuario)
+    {
+
+        //Obtenemos la fecha de hoy
+        $fechaActual = date('Y-m-d');
+
+        $sql = "UPDATE usuario SET ultimoInicio = ? WHERE id = ?";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("si", $fechaActual, $idUsuario);
+        $estado = $sentencia->execute();
+
+        if ($estado) {
+            return true;
+        }
+
+        return false;
+    }
+
+
 
     public function devuelveDniUser($idUsuario)
     {
@@ -271,7 +332,7 @@ class DaoUsuario
 
                     $sql = "UPDATE Administrador SET nombre = ?,apellidos = ? ,correo = ? WHERE dni = ? ";
                     $sentencia = $this->conexion->prepare($sql);
-                    $sentencia->bind_param("ssss",$nombre,$apellidos,$correo,$dni);
+                    $sentencia->bind_param("ssss", $nombre, $apellidos, $correo, $dni);
                 }
             default:
                 // Manejar el caso por defecto

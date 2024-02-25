@@ -16,5 +16,4 @@ $daoUser = new DaoUsuario();
 
 $usuarioDevuelto = $daoUser->inicioSesion($nombreUsuario,$contrasena);
 
-
 echo $usuarioDevuelto;
