@@ -24,24 +24,77 @@ class DaoEmpresa
         $this->utils = new Utilidades();
     }
 
-    public function devuelveCampos()
+    public function devuelveCampos($cif)
     {
 
-        $sql = "SHOW COLUMNS FROM Empresa";
-        $query = $this->conexion->query($sql);
+        if (!$this->comprobacionCif($cif)) {
+            $sql = "SHOW COLUMNS FROM Empresa";
+            $query = $this->conexion->query($sql);
 
-        $campos = array();
+            $campos = array();
 
-        if ($query->num_rows > 0) {
+            if ($query->num_rows > 0) {
 
-            while ($fila = $query->fetch_assoc()) {
-                $campos[] = $fila['Field'];
+                while ($fila = $query->fetch_assoc()) {
+                    $campos[] = $fila['Field'];
+                }
             }
-        }
 
-        return $campos;
+            return json_encode($campos);
+        } else {
+            return json_encode(array('Error' => 'Ese cif ya existe en la aplicación...'));
+        }
     }
 
+    //Función que comprube si no existe un usuario con ese dni o usuario
+    private function comprobacionCif($cif)
+    {
+
+        $sql = "SELECT 
+                    CASE 
+                        WHEN al.idUsuario IS NOT NULL THEN al.dni 
+                        WHEN e.idUsuario IS NOT NULL THEN e.cif 
+                        WHEN tu.idUsuario IS NOT NULL THEN tu.dni 
+                        WHEN a.idUsuario IS NOT NULL THEN a.dni 
+                    END AS cif
+                FROM usuario u
+                LEFT JOIN alumno_bolsa al ON u.id = al.idUsuario
+                LEFT JOIN empresa e ON u.id = e.idUsuario
+                LEFT JOIN tutor tu ON u.id = tu.idUsuario
+                LEFT JOIN Administrador a ON u.id = a.idUsuario 
+                WHERE cif = ? ";
+        $sentecia = $this->conexion->prepare($sql);
+        $sentecia->bind_param("s", $cif);
+        $estado = $sentecia->execute();
+        $resultado = $sentecia->get_result();
+
+        //Si se cif de usuario existe
+        if ($estado && $resultado->num_rows > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function comprobacionUsuario($usuario)
+    {
+
+        $sql = "SELECT * FROM usuario WHERE nombre = ?";
+        $sentecia = $this->conexion->prepare($sql);
+        $sentecia->bind_param("s", $usuario);
+        $estado = $sentecia->execute();
+        $resultado = $sentecia->get_result();
+
+        //El usuario de ese usuario
+        if ($estado && $resultado->num_rows > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    
     public function insertarEmpresa(Empresa $empresa, $nombreUsuario)
     {
 
@@ -59,23 +112,28 @@ class DaoEmpresa
 
         $usuario = new Usuario($nombreUsuario, $contrasena, 2);
 
-        $idUsuario = $this->insertarUsuarioEmpresa($usuario);
+        //Antes de insertar al usuario de la empresa o en la tabla empresa comprobamso que no existe
+        if (!$this->comprobacionUsuario($nombreUsuario)) {
+            $idUsuario = $this->insertarUsuarioEmpresa($usuario);
 
-        if ($idUsuario != -1) {
+            if ($idUsuario != -1) {
 
-            $sql = "INSERT INTO Empresa(cif,nombre,lugar,telefono,direccion,correo,idUsuario) VALUES (? ,? ,? ,? ,? ,?,?)";
-            $sentencia = $this->conexion->prepare($sql);
-            $sentencia->bind_param("sssdssd", $cif, $nombre, $lugar, $telefono, $direccion, $correo, $idUsuario);
-            $estado = $sentencia->execute();
-            if ($estado && $sentencia->affected_rows == 1) {
-                $this->utils->enviarCorreo($correo, "Esta es tu contraseña : " . $contrasena);
-                $this->conexion->commit();
-                echo json_encode(array("Exito" => "Se ha insertado la empresa correctamente"));
+                $sql = "INSERT INTO Empresa(cif,nombre,lugar,telefono,direccion,correo,idUsuario) VALUES (? ,? ,? ,? ,? ,?,?)";
+                $sentencia = $this->conexion->prepare($sql);
+                $sentencia->bind_param("sssdssd", $cif, $nombre, $lugar, $telefono, $direccion, $correo, $idUsuario);
+                $estado = $sentencia->execute();
+                if ($estado && $sentencia->affected_rows == 1) {
+                    $this->utils->enviarCorreo($correo, "Esta es tu contraseña : " . $contrasena);
+                    $this->conexion->commit();
+                    echo json_encode(array("Exito" => "Se ha insertado la empresa correctamente"));
+                } else {
+                    echo json_encode(array("Error" => "Ha habido algún problema al insertar a la empresa"));
+                }
             } else {
-                echo json_encode(array("Error" => "Ha habido algún problema al insertar a la empresa"));
+                echo json_encode(array("Error" => "No se ha podido añadir un usuario de empresa"));
             }
         } else {
-            echo json_encode(array("Error" => "No se ha podido añadir un usuario de empresa"));
+            echo json_encode(array("Error" => "Existe algun usuario con ese nombre..."));
         }
     }
 
@@ -194,7 +252,7 @@ class DaoEmpresa
             "FROM solicitud s " .
             "JOIN empresa e ON s.cif_empresa = e.cif " .
             "JOIN solicitud_curso sc ON s.id = sc.idSolicitud " .
-            "JOIN curso c ON sc.idCurso = c.id WHERE cif_empresa = ? " .
+            "JOIN curso c ON sc.idCurso = c.id WHERE cif_empresa = ? AND estado = 'ACTIVA' " .
             "GROUP BY s.id;";
 
         $sentecia = $this->conexion->prepare($sql);
@@ -263,19 +321,14 @@ class DaoEmpresa
 
         if ($resultado) {
             $sentencia->close();
-            //Al hacer el insert en empleadora nos encargamos de eliminar la solictud de esa empresa
-            //Para hacer este delete hemos hecho en nuestra base de datos un eliminado en cascada para cuando eliminamos una solicitud podamos borrar en las otras 2 tablas
-            //tambien se podría haber hecho realizando 3 deletes cada una para las 3 tablas
-            $sqlDelete = "DELETE solicitud, solicitud_curso, solicitud_alumno
-                            FROM solicitud
-                            LEFT JOIN solicitud_curso ON solicitud.id = solicitud_curso.idSolicitud
-                            LEFT JOIN solicitud_alumno ON solicitud.id = solicitud_alumno.idSolicitud
-                            WHERE solicitud.id = ?";
-            $senteciaElim = $this->conexion->prepare($sqlDelete);
-            $senteciaElim->bind_param("i", $idSolicitud);
-            $estado = $senteciaElim->execute();
+
+            //Dejamos esa solicitud como no disponible
+            $sqlUpdate = "UPDATE solicitud SET estado = 'INACTIVA' WHERE id = ? ";
+            $sentenciaU = $this->conexion->prepare($sqlUpdate);
+            $sentenciaU->bind_param("i", $idSolicitud);
+            $estado = $sentenciaU->execute();
             if ($estado) {
-                $senteciaElim->close();
+                $sentenciaU->close();
                 //Nos ecargamos de poner la disponibilidad a 0 para el alumno ya que ha sido contratado
                 $sqlUpdate = "UPDATE alumno_bolsa SET disponibilidad = 0 where dni = ?";
                 $sentenciaNoDis = $this->conexion->prepare($sqlUpdate);
@@ -347,7 +400,7 @@ class DaoEmpresa
         }
     }
 
-    public function realizarPeticion($alumnos, $tipo,Empresa $empresa)
+    public function realizarPeticion($alumnos, $tipo, Empresa $empresa)
     {
 
         //Ponemos el autocommit en falso ya que no vamos a crear la peticion sin asignar los alumnos a la petición de fcts
@@ -358,7 +411,7 @@ class DaoEmpresa
 
         $sql = "INSERT INTO peticionfcts (modalidad,cif_empresa_solicitante) VALUES(?,?)";
         $sentecia = $this->conexion->prepare($sql);
-        $sentecia->bind_param("ss", $tipo,$cifEmpresa);
+        $sentecia->bind_param("ss", $tipo, $cifEmpresa);
         $estado = $sentecia->execute();
 
         if ($estado) {
@@ -372,7 +425,7 @@ class DaoEmpresa
 
                 $sqlAsig = "INSERT INTO peticion_alumnos(idPeticion,dniAlumno,idCurso) VALUES (?,?,?) ";
                 $sentenciaAsig = $this->conexion->prepare($sqlAsig);
-                $sentenciaAsig->bind_param("isi", $idPeticion, $dni,$idCurso);
+                $sentenciaAsig->bind_param("isi", $idPeticion, $dni, $idCurso);
                 $estado = $sentenciaAsig->execute();
 
                 if (!$estado) {

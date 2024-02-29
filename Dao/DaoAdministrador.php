@@ -20,7 +20,8 @@ class DaoAdministrador
         $this->utils = new Utilidades();
     }
 
-    public function obtenerAlumno($dni){
+    public function obtenerAlumno($dni)
+    {
 
 
         $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email as 'Correo Electronico',a.telefono as 'teléfono',ab.expLaboral as 'Experiencia Laboral',group_concat(c.nombre) as Cursos FROM alumnoies a
@@ -30,46 +31,47 @@ class DaoAdministrador
                     WHERE ab.dni = ?
                     group by ab.dni ";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("s",$dni);
+        $sentencia->bind_param("s", $dni);
         $estado = $sentencia->execute();
         $resultado = $sentencia->get_result();
 
         $alumno = array();
 
         //Una fila como es por dni obtendremos solo a un alumno...
-        if($estado !== null && $resultado->num_rows == 1  ){
+        if ($estado !== null && $resultado->num_rows == 1) {
 
             $alumno = $resultado->fetch_assoc();
-            if(empty($alumno["Experiencia Laboral"])){
+            if (empty($alumno["Experiencia Laboral"])) {
                 $alumno["Experiencia Laboral"] = "No tiene experiencia laboral...";
             }
             return json_encode($alumno);
-        }else{
-            return json_encode(array('Error' => "No se ha encontrado a ningún alummno con el dni: ".$dni));
+        } else {
+            return json_encode(array('Error' => "No se ha encontrado a ningún alummno con el dni: " . $dni));
         }
-
     }
 
-    public function obtenerEmpresa($cif){
+    public function obtenerEmpresa($cif)
+    {
         $sql = "SELECT nombre,lugar,direccion as 'dirección',correo,telefono as 'teléfono' FROM Empresa WHERE cif = ? ";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("s",$cif);
+        $sentencia->bind_param("s", $cif);
 
         $estado = $sentencia->execute();
         $resultado = $sentencia->get_result();
 
         //Como el cif es único y solo vamos a sacar los datos de una empresa...
-        if($estado && $resultado->num_rows == 1){
+        if ($estado && $resultado->num_rows == 1) {
             $empresa = $resultado->fetch_assoc();
-           
+
             echo json_encode($empresa);
-        }else{
+        } else {
             //Si no existe la empresa que hemos pasado por parámetro...
             echo json_encode(array("Error" => "La empresa que has indicado no existe.."));
         }
     }
-    
-    public function solicitudesEmpresa($cif){
+
+    public function solicitudesEmpresa($cif)
+    {
 
         $sql = "SELECT s.nombre as 'Nombre Oferta',s.fecha_solicitud as 'fecha',group_concat(c.nombre) as 'Cursos de la Oferta'  from solicitud s 
                     INNER JOIN solicitud_curso sc ON s.id = sc.idSolicitud
@@ -77,27 +79,54 @@ class DaoAdministrador
                     where cif_empresa = ?
                     group by s.id;";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("s",$cif);
+        $sentencia->bind_param("s", $cif);
         $estado = $sentencia->execute();
         $resultado = $sentencia->get_result();
 
         $solicitudes = array();
 
-        if($estado && $resultado->num_rows > 0){
+        if ($estado && $resultado->num_rows > 0) {
 
-            while($fila = $resultado->fetch_assoc()){
+            while ($fila = $resultado->fetch_assoc()) {
                 $solicitudes[] = $fila;
             }
 
             return json_encode($solicitudes);
-
-        }else{
+        } else {
             return json_encode(array('Error' => "La empresa indicada no tiene solicitudes.."));
         }
-
     }
 
-    public function contratosEmpresa($cif){
+    public function peticionesEmpresa($cif)
+    {
+
+        $sql = "SELECT p.*,e.nombre as 'Nombre Empresa',group_concat(aies.nombre,' ',aies.apellidos) as alumnos,group_concat( distinct c.nombre) as 'Curso de la Aplicación'   FROM peticionfcts p
+                    INNER JOIN peticion_alumnos pa ON pa.idPeticion = p.id
+                    INNER JOIN curso c ON c.id = pa.idCurso
+                    INNER JOIN empresa e ON e.cif = p.cif_empresa_solicitante
+                    INNER JOIN alumnofct af ON af.dni = pa.dniAlumno
+                    INNER JOIN alumnoies aies ON aies.dni = af.dni
+                    WHERE e.cif = ?
+                    GROUP BY p.id;";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("s", $cif);
+        $estado = $sentencia->execute();
+        $resultado = $sentencia->get_result();
+
+        $petciones = array();
+
+        if ($estado && $resultado->num_rows > 0) {
+            while ($fila = $resultado->fetch_assoc()) {
+                $petciones[] = $fila;
+            }
+            return json_encode($petciones);
+        } else {
+            return json_encode(array('Error'  => 'La empresa no tiene peticiones'));
+        }
+    }
+
+    public function contratosEmpresa($cif)
+    {
 
         $sql = "SELECT ab.dni,concat(a.nombre,' ',a.apellidos) as 'Alumno contratado',group_concat(c.nombre) as 'Cursos del alumno',expLaboral as 'Experiencia Laboral',ab.activo,fecha_contrato as 'Fecha Contrato' FROM empleadora e
                 INNER JOIN alumno_bolsa ab ON ab.dni = e.dniAlum
@@ -107,27 +136,23 @@ class DaoAdministrador
                 WHERE cifEmpresa = ?
                 group by e.id;";
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("s",$cif);
+        $sentencia->bind_param("s", $cif);
         $estado = $sentencia->execute();
         $resultado = $sentencia->get_result();
 
         $contratos = array();
 
-        if($estado && $resultado->num_rows > 0){
+        if ($estado && $resultado->num_rows > 0) {
 
-            while($fila = $resultado->fetch_assoc()){
+            while ($fila = $resultado->fetch_assoc()) {
                 $contratos[] = $fila;
             }
 
             return json_encode($contratos);
-
-        }else{
+        } else {
             return json_encode(array('Error' => "La empresa indicada no tiene contratos"));
         }
-
     }
-
-
 
     public function obtenerListadoAlumnos($idCurso)
     {
@@ -137,26 +162,26 @@ class DaoAdministrador
                     INNER JOIN alumno_bolsa ab ON ab.dni = a.dni
                     INNER JOIN cursa_alumn cur ON cur.dniAlum = ab.dni
                     INNER JOIN curso c ON c.id = cur.idCurso
-                    WHERE activo ='SI' "; 
-                
-        if ($idCurso !== 0){
+                    WHERE activo ='SI' ";
+
+        if ($idCurso !== 0) {
             $sql .=  " AND c.id = ? ";
         }
 
         $sql .= "GROUP BY ab.dni";
-        
+
         $sentencia = $this->conexion->prepare($sql);
 
-        if($idCurso !== 0){
-            $sentencia->bind_param("i",$idCurso);
+        if ($idCurso !== 0) {
+            $sentencia->bind_param("i", $idCurso);
         }
-    
+
         $estado = $sentencia->execute();
         $resultado = $sentencia->get_result();
 
         $alumnos = array();
 
-        if ($estado && $resultado->num_rows > 0 ) {
+        if ($estado && $resultado->num_rows > 0) {
             while ($fila = $resultado->fetch_assoc()) {
                 $alumnos[] = $fila;
             }
@@ -164,32 +189,31 @@ class DaoAdministrador
         return $alumnos;
     }
 
-    public function obtenerListadoEmpresas($idCurso){
+    public function obtenerListadoEmpresas($idCurso)
+    {
 
         $sql = "SELECT a.* from empresa a
                 INNER JOIN solicitud s ON s.cif_empresa = a.cif
                 INNER JOIN solicitud_curso sa ON sa.idSolicitud = s.id ";
-        
-        if($idCurso !== 0){
+
+        if ($idCurso !== 0) {
             $sql .= " WHERE sa.idCurso = ?";
         }
         $sql .= " GROUP BY a.cif";
         $sentencia = $this->conexion->prepare($sql);
-        if($idCurso !== 0){
-            $sentencia->bind_param("i",$idCurso);
+        if ($idCurso !== 0) {
+            $sentencia->bind_param("i", $idCurso);
         }
         $estado = $sentencia->execute();
         $resultado = $sentencia->get_result();
 
         $empresas = array();
 
-        if($estado && $resultado->num_rows > 0){
-            while($fila = $resultado->fetch_assoc()){
+        if ($estado && $resultado->num_rows > 0) {
+            while ($fila = $resultado->fetch_assoc()) {
                 $empresas[] = $fila;
             }
-
         }
         return $empresas;
     }
-
 }

@@ -154,7 +154,7 @@ export async function enviarOferta(contenedor, empresa) {
     }
 
     crearCaja("ofertaViaje", "Disponibilidad para Viajar", divOferta);
-    crearSelect("selectOferta", "posViajar", ["Sí", "No"], divOferta);
+    crearSelect("selectOferta", "posViajar", ["Sí", "No", "Todos"], divOferta);
 
     crearCaja("experienciaSector", "Experiencia en el sector", divOferta);
     crearSelect("selectOferta", "experienciaLaboral", ["Sí", "No", "Todos"], divOferta);
@@ -191,6 +191,7 @@ export async function enviarOferta(contenedor, empresa) {
                 solicitud[clave] = valor;
             }
         }
+        console.log(solicitud)
         promesaGeneral({ criterios: solicitud, empresa: empresa }, '../Controladores/devuelveAlumnoOferta.php')
             .then((alumnos => {
                 if (alumnos.length === 0) {
@@ -304,119 +305,128 @@ export async function visualizarSolicitudes(contenedor, empresa) {
 
     //booleano para saber si está seleccionado
     let ultimoSelec = null
-    //Solicitud en la que está el empresa estará representada en una tabla
-    let tablaSeleccionada;
 
     let divSolicitudes = crearNodo("div", "", "divSolicitudes", "divSolicitudes", contenedor);
 
     crearNodo("h1", "Solicitudes de " + empresa.nombre, "", "", divSolicitudes)
 
+    let contenedorTablas = crearNodo("div", "", "", "", divSolicitudes)
+
     let solicitud = { cif: empresa.cif, modo: 1 }
 
-    await solicitudes(solicitud, divSolicitudes)
+    let botonContratar;
 
-        .then((solicitudes => {
-            solicitudes.forEach(solicitud => {
-                let tablaSolicitud = crearNodo("table", "", "tablaSolicitud", "", divSolicitudes);
-                let encabezado = crearNodo("thead", "", "theadTablaSoli", "", tablaSolicitud);
-                let cuerpoTabla = crearNodo("tbody", "", "tbodyTablaSoli", "", tablaSolicitud);
+    async function crearTablaSolicitudes() {
+        await solicitudes(solicitud, divSolicitudes)
 
-                // Crea la fila de encabezado con las columnas
-                let encabezadoFila = crearNodo("tr", "", "trEncabezado", "", encabezado);
-                for (let clave in solicitud) {
-                    let th = crearNodo("th", clave, "", "", encabezadoFila);
-                }
+            .then((solicitudes => {
+                
+                solicitudes.forEach(solicitud => {
+                    let tablaSolicitud = crearNodo("table", "", "tablaSolicitud", "", contenedorTablas);
+                    let encabezado = crearNodo("thead", "", "theadTablaSoli", "", tablaSolicitud);
+                    let cuerpoTabla = crearNodo("tbody", "", "tbodyTablaSoli", "", tablaSolicitud);
 
-                // Crea una fila de datos para cada solicitud
-                let datosFila = crearNodo("tr", "", "trDatos", "", cuerpoTabla);
-                for (let clave in solicitud) {
-                    let td = crearNodo("td", solicitud[clave], "", "", datosFila);
-                }
+                    // Crea la fila de encabezado con las columnas
+                    let encabezadoFila = crearNodo("tr", "", "trEncabezado", "", encabezado);
+                    for (let clave in solicitud) {
+                        let th = crearNodo("th", clave, "", "", encabezadoFila);
+                    }
 
-                // Crear una fila para la tabla anidada de alumnos
-                let filaAlumnos = crearNodo("tr", "", "filaAlumnos", "", cuerpoTabla);
-                let celdaAlumnos = crearNodo("td", "", "", "", filaAlumnos);
-                celdaAlumnos.colSpan = Object.keys(solicitud).length; // Hacer que la celda ocupe todas las columnas
-                let tablaAlumnos = crearNodo("table", "", "tablaAlumnos", "", celdaAlumnos);
+                    // Crea una fila de datos para cada solicitud
+                    let datosFila = crearNodo("tr", "", "trDatos", "", cuerpoTabla);
+                    for (let clave in solicitud) {
+                        let td = crearNodo("td", solicitud[clave], "", "", datosFila);
+                    }
 
-                let objeto = { cif: solicitud.cif_empresa, id: solicitud.id, modo: 2 }
-                // Obtener los alumnos de esta solicitud y construir la tabla anidada
-                devuelveAlumnosOferta(objeto)
-                    .then(alumnos => {
-                        for (let propiedad in alumnos[0]) {
-                            if (propiedad !== 'dni' ) {
-                                crearNodo("th", cadenaFormateada(propiedad), "", "", tablaAlumnos)
-                            }
-                        }
+                    // Crear una fila para la tabla anidada de alumnos
+                    let filaAlumnos = crearNodo("tr", "", "filaAlumnos", "", cuerpoTabla);
+                    let celdaAlumnos = crearNodo("td", "", "", "", filaAlumnos);
+                    celdaAlumnos.colSpan = Object.keys(solicitud).length; // Hacer que la celda ocupe todas las columnas
+                    let tablaAlumnos = crearNodo("table", "", "tablaAlumnos", "", celdaAlumnos);
 
-                        alumnos.forEach(alumno => {
-
-                            let filaAlumno = crearNodo("tr", "", "filaAlumno", "", tablaAlumnos);
-                            for (let clave in alumno) {
-                                let td = crearNodo("td", alumno[clave], clave, "", filaAlumno);
-                                if (clave == 'dni') td.style.display = 'none'
-                            }
-                            filaAlumno.addEventListener('click', (event) => {
-                                // Guardar la tabla seleccionada
-                                tablaSeleccionada = tablaAlumnos.parentNode.parentNode.parentNode.parentNode;
-
-                                // Cambiar de color y gestionar la selección
-                                if (ultimoSelec === filaAlumno) {
-                                    // Deseleccionar el alumno si ya estaba seleccionado
-                                    filaAlumno.style.backgroundColor = '';
-                                    alumSeleccionado = {};
-                                    ultimoSelec = null;
-                                } else {
-                                    // Seleccionar el alumno y guardar sus datos
-                                    if (ultimoSelec !== null) {
-                                        // Si había otro alumno seleccionado, deseleccionarlo
-                                        ultimoSelec.style.backgroundColor = '';
-                                    }
-                                    filaAlumno.style.backgroundColor = "#6f5ed0";
-                                    //recogemos las celdas (td) que contiene cada tr(fila) que clico
-                                    //recoge los datos sobre el que hemos pinchado
-                                    let celdas = filaAlumno.querySelectorAll("td");
-                                    //Cargamos en el objeto el ultimo seleccionado
-                                    alumSeleccionado["id"] = solicitud.id
-                                    for (let i = 0; i < celdas.length; i++) {
-                                        let atributo = celdas[i].className;
-                                        let contenido = celdas[i].textContent;
-
-                                        alumSeleccionado[atributo] = contenido;
-                                    }
-                                    ultimoSelec = filaAlumno;
+                    let objeto = { cif: solicitud.cif_empresa, id: solicitud.id, modo: 2 }
+                    // Obtener los alumnos de esta solicitud y construir la tabla anidada
+                    devuelveAlumnosOferta(objeto)
+                        .then(alumnos => {
+                            for (let propiedad in alumnos[0]) {
+                                if (propiedad !== 'dni') {
+                                    crearNodo("th", cadenaFormateada(propiedad), "", "", tablaAlumnos)
                                 }
+                            }
 
-                            })
+                            alumnos.forEach(alumno => {
+
+                                let filaAlumno = crearNodo("tr", "", "filaAlumno", "", tablaAlumnos);
+                                for (let clave in alumno) {
+                                    let td = crearNodo("td", alumno[clave], clave, "", filaAlumno);
+                                    if (clave == 'dni') td.style.display = 'none'
+                                }
+                                filaAlumno.addEventListener('click', (event) => {
+
+                                    // Cambiar de color y gestionar la selección
+                                    if (ultimoSelec === filaAlumno) {
+                                        // Deseleccionar el alumno si ya estaba seleccionado
+                                        filaAlumno.style.backgroundColor = '';
+                                        alumSeleccionado = {};
+                                        ultimoSelec = null;
+                                    } else {
+                                        // Seleccionar el alumno y guardar sus datos
+                                        if (ultimoSelec !== null) {
+                                            // Si había otro alumno seleccionado, deseleccionarlo
+                                            ultimoSelec.style.backgroundColor = '';
+                                        }
+                                        filaAlumno.style.backgroundColor = "#6f5ed0";
+                                        //recogemos las celdas (td) que contiene cada tr(fila) que clico
+                                        //recoge los datos sobre el que hemos pinchado
+                                        let celdas = filaAlumno.querySelectorAll("td");
+                                        //Cargamos en el objeto el ultimo seleccionado
+                                        alumSeleccionado["id"] = solicitud.id
+                                        for (let i = 0; i < celdas.length; i++) {
+                                            let atributo = celdas[i].className;
+                                            let contenido = celdas[i].textContent;
+
+                                            alumSeleccionado[atributo] = contenido;
+                                        }
+                                        ultimoSelec = filaAlumno;
+                                    }
+
+                                })
+                            });
                         });
-                    });
-            });
+                });
 
-        }));
+                botonContratar = crearNodo("button", "Contratar", "btnContrato", "", divSolicitudes)
 
+            }));
 
-    let botonContrato = crearNodo("button", "Contratar", "btnContrato", "", divSolicitudes)
-    botonContrato.addEventListener("click", async (event) => {
+    }
+    await crearTablaSolicitudes()
+
+    botonContratar.addEventListener("click", async (event) => {
         event.stopPropagation()
         if (Object.keys(alumSeleccionado).length !== 0) {
 
             const confirmado = await dialogoInformacion("Realizar Contrato", "¿Quieres contratar a " + alumSeleccionado.nombre + " ?");
             if (confirmado) {
-                console.log(alumSeleccionado)
-                console.log(tablaSeleccionada)
 
                 let alumno = { alumno: alumSeleccionado, cif: empresa.cif, modo: 3 }
 
                 promesaGeneral(alumno, '../Controladores/contratacion.php')
                     .then(respuesta => {
                         mensajeDialogo(respuesta)
-                        tablaSeleccionada.remove()
-                        console.log(divSolicitudes.children.length)
+
                         //Significa que solo queda el titulo y el boton y no hay ninguna solicitud por lo que procedemos a quitar
                         //el boton y a decirle al empresa que no tiene ninguna solicitud...
                         if (divSolicitudes.children.length == 2) {
-                            botonContrato.remove()
+                            botonContratar.remove()
+                            crearNodo("h1", "Solicitudes de " + empresa.nombre, "", "", divSolicitudes)
                             crearNodo("p", "No hay ninguna solicitud aún..", "", "", divSolicitudes)
+                        }
+
+                        if (respuesta.hasOwnProperty('Exito')) {
+                            limpiarContenido(divSolicitudes)
+                            crearNodo("h1", "Solicitudes de " + empresa.nombre, "", "", divSolicitudes)
+                            crearTablaSolicitudes()
                         }
                     })
 

@@ -30,9 +30,14 @@ switch ($tipo) {
         $solicitudesEmpresa = $daoAdmin->solicitudesEmpresa($dni);
         echo $solicitudesEmpresa;
         break;
-        
+
     case 'contratosEmpresa':
         $contratosEmpresas = $daoAdmin->contratosEmpresa($dni);
         echo $contratosEmpresas;
-        break;    
+        break;
+
+    case 'peticionesEmpresa':
+        $petciones = $daoAdmin->peticionesEmpresa($dni);
+        echo $petciones;
+        break;
 }

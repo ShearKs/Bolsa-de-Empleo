@@ -214,7 +214,7 @@ async function crearFormularioDatos() {
 
    for (let propiedad in usuarioChanged) {
 
-      if (propiedad != 'idUsuario' && propiedad != 'usuario' && propiedad != 'cursos' && propiedad != 'iduser') {
+      if (propiedad != 'idUsuario' && propiedad != 'usuario' && propiedad != 'cursos' && propiedad != 'iduser' && propiedad != 'idCursoT')  {
          let label = crearLabel(propiedad, cadenaFormateada(propiedad), "lbAlumno", formulario)
          label.id = "lb" + propiedad
 
@@ -380,6 +380,7 @@ function crearCambioContrasena(divContenedor) {
          .then((respuesta => {
             console.log(respuesta);
             mensajeDialogo(respuesta)
+           
          }))
    })
 }

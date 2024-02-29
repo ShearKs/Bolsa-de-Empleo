@@ -1,0 +1,17 @@
+////COSAS ARREGLADAS O CORREGIDAS
+
+
+-En la posibilidades de Viajar se le ha añadido la opción de todos
+
+
+-Añadido que la solicitud se ponga en inactiva cuando se realice un contrato , tambien mi muestra de solicitudes ahora se hace de forma dinamica
+eliminado eliminado su div y haciendo que se vuelva a hacer el fetch antes lo hacia eliminando los nodos de la solicitud.
+
+-Añadido que la empresa no se pueda registrar si ya hay otra empresa con ese cif o usuario...
+
+
+
+
+
+
+

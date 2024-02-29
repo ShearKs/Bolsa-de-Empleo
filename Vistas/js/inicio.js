@@ -1,5 +1,5 @@
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, eliminarExistente } from './utilsDom.js';
-import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos, devuelveCamposEmpresa, insertaEmpresa } from './funcionesFetch.js';
+import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos, devuelveCamposEmpresa, promesaGeneral } from './funcionesFetch.js';
 import * as funciones from './funcionesGenerales.js';
 
 //Div donde se encuentra todo
@@ -129,7 +129,19 @@ function crearAlta() {
             alumnoDevuelto(inputCif.value, crearFormularioAlta, parrafoError);
         } else {
 
-            devuelveCamposEmpresa(creaFormularioEmpresa, inputCif.value)
+            //devuelveCamposEmpresa(creaFormularioEmpresa, inputCif.value)
+            promesaGeneral({ cif: inputCif.value }, 'Controladores/devuelveCamposEmpresa.php')
+                .then((respuesta => {
+
+                    if (respuesta.hasOwnProperty('Error')) {
+                        funciones.dialogoSimple('Ya existe una empresa con ese cif')
+                        return;
+                    }
+
+                    creaFormularioEmpresa(respuesta, inputCif.value)
+
+                }))
+
         }
     });
 
@@ -187,8 +199,11 @@ function creaFormularioEmpresa(camposEmpresa, cif) {
         if (funciones.comprobarFormulario(inputsForm)) {
             let formData = new FormData(formAltaEmpresa);
             let empresa = recogeDatosEmpresa(formData)
-            console.log(empresa)
-            insertaEmpresa(empresa)
+            //console.log(empresa)
+            promesaGeneral(empresa, './Controladores/insertaEmpresa.php')
+                .then((respuesta => {
+                    funciones.mensajeDialogo(respuesta)
+                }))
         }
     })
 

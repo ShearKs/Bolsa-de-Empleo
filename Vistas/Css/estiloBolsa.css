@@ -811,11 +811,45 @@ td {
     /* Tamaño de la fuente */
 }
 
-.filaCabecera{
-    background-color:#485585 ;
+.filaCabecera {
+    background-color: #485585;
     font-weight: bolder;
 }
 
-.filaTabla{
+.filaTabla {
     background-color: #5f77b1;
+}
+
+/* Estilo para el select */
+.selectUser {
+    width: 200px;
+    /* Ancho personalizado */
+    padding: 10px;
+    /* Espaciado interno */
+    border: 1px solid #ccc;
+    /* Borde */
+    border-radius: 5px;
+    /* Borde redondeado */
+    background-color: #f9f9f9;
+    /* Color de fondo */
+    font-size: 16px;
+    /* Tamaño de fuente */
+}
+
+/* Estilo para las opciones */
+.selectUser option {
+    background-color: #fff;
+    /* Color de fondo de las opciones */
+    color: #333;
+    /* Color del texto de las opciones */
+    font-size: 16px;
+    /* Tamaño de fuente de las opciones */
+}
+
+/* Estilo para la opción seleccionada */
+.selectUser option:checked {
+    background-color: #007bff;
+    /* Color de fondo de la opción seleccionada */
+    color: #fff;
+    /* Color del texto de la opción seleccionada */
 }

@@ -422,31 +422,3 @@ export function devuelveCamposEmpresa(creaFormularioEmpresa, cif) {
             console.error("Error en la solicitud: " + error)
         })
 }
-
-export function insertaEmpresa(empresa) {
-
-    const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(empresa)
-    }
-    fetch('./Controladores/insertaEmpresa.php', requestOptions)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('La solicitud no se ha enviado correctamente')
-            }
-            return response.json()
-        })
-        .then(mensaje => {
-            console.log(mensaje)
-            if (mensaje.hasOwnProperty('Exito')) {
-                alert(mensaje.Exito)
-            } else {
-                console.log(mensaje.Error);
-            }
-
-        })
-        .catch(error => {
-            console.error("Error en la solicitud: ", error)
-        })
-}

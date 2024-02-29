@@ -114,9 +114,9 @@ class DaoAlumno
             $sentencia->close();
             $sqlCurso = "INSERT INTO cursa_alumn (dniAlum,idCurso) VALUES (?,?)";
             $sentenciaCurso = $this->conexion->prepare($sqlCurso);
-            $sentenciaCurso->bind_param("si",$dni,$curso);
+            $sentenciaCurso->bind_param("si", $dni, $curso);
             $estadoCurso = $sentenciaCurso->execute();
-            if($estadoCurso){
+            if ($estadoCurso) {
                 //Se ha hecho todo correctamente hacemos un commit
                 $this->conexion->commit();
                 $exito = true;
@@ -279,10 +279,10 @@ class DaoAlumno
         //Cursos que ha seleccionado la empresa
         $cursos = $criterios['cursos[]'];
 
-        //Resto de valores que los tomaremos como si fueran booleanos
-        $posViajar = $criterios["posViajar"] === "Sí" ? 1 : 0;
 
-        $otraResidencia = ($criterios['residencia'] === "Todos" )? "1" : ($criterios['residencia'] === "Sí" ? "otraResidencia != ''" : "otraResidencia = '' " );
+        $posViajar = ($criterios['posViajar'] === "Todos") ? 1 : (($criterios['posViajar'] === "Sí") ? "posiViajar = 1 " : " posiViajar = 0 ");
+
+        $otraResidencia = ($criterios['residencia'] === "Todos") ? "1" : ($criterios['residencia'] === "Sí" ? "otraResidencia != '' " : "otraResidencia = '' ");
         $expLaboral = ($criterios['experienciaLaboral'] === "Todos") ? "1" : ($criterios['experienciaLaboral'] === "Sí" ? "expLaboral != '' " : "expLaboral = '' ");
         //$otraResidencia = $criterios["residencia"] === "Sí" ? "otraResidencia != ''" : "otraResidencia = ''";
         //$expLaboral = $criterios['experienciaLaboral'] === "Sí" ? "expLaboral != ''" : "expLaboral = '' ";
@@ -296,14 +296,13 @@ class DaoAlumno
                     INNER JOIN alumno_bolsa a ON a.dni = al.dni
                     INNER JOIN cursa_alumn cur ON cur.dniAlum = a.dni
                     INNER JOIN curso c ON c.id = cur.idCurso
-                    WHERE posiViajar = ? AND disponibilidad = 1 AND $expLaboral AND $otraResidencia
+                    WHERE  disponibilidad = 1 AND $posViajar AND $expLaboral AND $otraResidencia
                     GROUP BY a.dni
                     -- Haciendo el having nos aseguramos que se incluyan alumnos que tenga al menos uno de los cursos especificados en cadenaCursos
                     HAVING SUM(c.id IN ($cadenaCursos)) > 0";
 
         $alumnosOferta = array();
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("i", $posViajar);
         $estado = $sentencia->execute();
 
         $resultados = $sentencia->get_result();

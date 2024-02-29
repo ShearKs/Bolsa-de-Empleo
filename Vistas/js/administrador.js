@@ -5,7 +5,6 @@ import { crearBotonImg, crearInput, crearNodo, crearSelect, limpiarContenido } f
 //import { jsPDF } from "jspdf";
 
 
-
 export function consulta(contenedor) {
 
     let divConsulta = crearNodo("div", "", "divConsulta", "", contenedor)
@@ -53,8 +52,13 @@ export function consulta(contenedor) {
             const user = await promesaGeneral({ dni: inputDni.value.trim(), tipo: tipoUsuario }, '../Controladores/consultaAdministrador.php')
 
             if (user.hasOwnProperty('Error')) {
-                //console.log("No existe ese usuario");
-                dialogoSimple("No existe ese " + selectOption.value)
+                let parrafo = "No existe ese "
+
+                if (selectOption.value !== 'Alumno') {
+                    parrafo = "No existe esa "
+                }
+
+                dialogoSimple(parrafo + selectOption.value)
                 return;
             }
 
@@ -72,87 +76,69 @@ export function consulta(contenedor) {
 
                 await promesaGeneral({ dni: inputDni.value.trim(), tipo: "solicitudesEmpresa" }, '../Controladores/consultaAdministrador.php')
                     .then((solicitudes => {
-                        //Si la empresa no tiene solicitudes
-                        if (solicitudes.hasOwnProperty('Error')) {
-                            crearNodo("p", "La empresa no ha realizado ninguna solicitud...", "", "", divContenedor);
-                            return;
-                          
-                        }
 
-                        crearNodo("h3", "Consultas de la Empresa", "", "", divContenedor)
-                        let divConsultas = crearNodo("div", "", "divConsultasAd", "divConsultasAd", divContenedor)
-                        //Visualizamos todas las solicitudes...
-                        let tablaSolicitud = crearNodo("table", "", "tablaConsulta", "tablaConsulta", divConsultas);
+                        crearTablaEmpresa(solicitudes, divContenedor, "solicitudes");
 
-                        //Instancio el primer contrato porque va a ser de donde voy a sacar las cabeceras...
-                        let primeraSoli = solicitudes[0];
-                        //Cojo las propiedades de la primera solicitud.
-                        let propSolicitud = Object.keys(primeraSoli)
-
-
-                        let trh = crearNodo("tr", "", "filaCabecera", "", tablaSolicitud)
-                        for (let cabecera of propSolicitud) {
-                            crearNodo("td", cadenaFormateada(cabecera), "", "", trh);
-                        }
-
-                        for (let solicitud of solicitudes) {
-                            let tr = crearNodo("tr", "", "filaTabla", "", tablaSolicitud)
-                            for (let propiedad in solicitud) {
-                                crearNodo("td", solicitud[propiedad], "", "", tr);
-                            }
-                        }
                     }))
 
                 await promesaGeneral({ dni: inputDni.value.trim(), tipo: "contratosEmpresa" }, '../Controladores/consultaAdministrador.php')
                     .then((contratos => {
-                        //console.log(contratos)
 
-                        //Si no tiene contratos la empresa...
-                        if (contratos.hasOwnProperty('Error')) {
-                            crearNodo("p", "La empresa no ha realizado aún ningún contrato...", "", "", divContenedor);
-                            return;
-                            
-                        }
-
-                        crearNodo("h3", "Contratos de la Empresa", "", "", divContenedor)
-
-                        let divContratos = crearNodo("div", "", "divContratosAd", "divContratosAd", divContenedor)
-                        //Visualizamos todos los contratos de la empresa en formato tabla
-                        let tablaContratos = crearNodo("table", "", "tablaContratos", "tablaContratos", divContratos);
-
-                        //Instancio el primer contrato porque va a ser de donde voy a sacar las cabeceras...
-                        let primerContrato = contratos[0];
-                        let propiedadesContrato = Object.keys(primerContrato)
-
-
-                        let trh = crearNodo("tr", "", "filaCabecera", "", tablaContratos)
-                        for (let cabecera of propiedadesContrato) {
-                            crearNodo("td", cadenaFormateada(cabecera), "", "", trh);
-                        }
-
-                        //Otra forma de hacerlo que ya no me acordaba como lo hacia
-                        // for (let contrato in contratos) {
-
-                        //     let tr = crearNodo("tr", "", "", "", tablaContratos)
-                        //     for (let propiedad in contratos[contrato]) {
-
-                        //         crearNodo("td", contratos[contrato][propiedad], "", "", tr);
-                        //     }
-                        // }
-                        for (let contrato of contratos) {
-                            let tr = crearNodo("tr", "", "filaTabla", "", tablaContratos)
-                            for (let propiedad in contrato) {
-                                crearNodo("td", contrato[propiedad], "", "", tr);
-                            }
-                        }
-
-
+                        crearTablaEmpresa(contratos, divContenedor, "contratos");
                     }))
+
+                await promesaGeneral({ dni: inputDni.value.trim(), tipo: "peticionesEmpresa" }, '../Controladores/consultaAdministrador.php')
+                    .then((peticiones => {
+
+                        crearTablaEmpresa(peticiones, divContenedor, "peticiones");
+                    }))
+
             }
         } catch (error) {
             console.error(error);
         }
     });
+}
+
+
+//Solicitud es un objeto el cual nos encargaremos de realizar la tabla
+//Le tenems que indicar el tipo realizar para que indique de que solicitud es ...
+function crearTablaEmpresa(solicitudes, contenedor, tipo) {
+
+
+    if (solicitudes.hasOwnProperty('Error')) {
+
+        crearNodo("h4", "no dispone de " + tipo + "...", "", "", contenedor);
+        return;
+    }
+
+    crearNodo("h3", cadenaFormateada(tipo), "", "", contenedor)
+
+    //Div que contendrá la tabla de cada solicitud
+    let divContenedor = crearNodo("div", "", "divRempresa", "divRempresa", contenedor)
+
+    //Visualizamos todos los contratos de la empresa en formato tabla
+    let tablaSolicitud = crearNodo("table", "", "tablaContratos", "tablaContratos", divContenedor);
+
+
+    //Obtenemos los datos de la primera solicitud 
+    let primerSoli = solicitudes[0];
+    let propiedadesSolicitud = Object.keys(primerSoli);
+
+    //Creamos aquí la cabecera
+    let trh = crearNodo("tr", "", "filaCabecera", "", tablaSolicitud)
+    for (let cabecera of propiedadesSolicitud) {
+        crearNodo("td", cadenaFormateada(cabecera), "", "", trh)
+    }
+
+    //Imprimos la solicitud
+    for (let solicitud of solicitudes) {
+        console.log(solicitud)
+        let tr = crearNodo("tr", "", "filaTabla", "", tablaSolicitud)
+        for (let propiedad in solicitud) {
+            crearNodo("td", solicitud[propiedad], "", "", tr);
+        }
+    }
 }
 
 
