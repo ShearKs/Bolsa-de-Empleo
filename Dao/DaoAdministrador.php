@@ -23,8 +23,12 @@ class DaoAdministrador
     public function obtenerAlumno($dni){
 
 
-        $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email as 'Correo Electronico',a.telefono as 'teléfono',ab.expLaboral as 'Experiencia Laboral' FROM alumnoies a
-                INNER JOIN alumno_bolsa ab ON ab.dni = a.dni  WHERE ab.dni = ?  ;";
+        $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email as 'Correo Electronico',a.telefono as 'teléfono',ab.expLaboral as 'Experiencia Laboral',group_concat(c.nombre) as Cursos FROM alumnoies a
+                    INNER JOIN alumno_bolsa ab ON ab.dni = a.dni
+                    INNER JOIN cursa_alumn cur ON cur.dniAlum = ab.dni
+                    INNER JOIN curso c ON c.id = cur.idCurso
+                    WHERE ab.dni = ?
+                    group by ab.dni ";
         $sentencia = $this->conexion->prepare($sql);
         $sentencia->bind_param("s",$dni);
         $estado = $sentencia->execute();

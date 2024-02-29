@@ -75,7 +75,8 @@ export function consulta(contenedor) {
                         //Si la empresa no tiene solicitudes
                         if (solicitudes.hasOwnProperty('Error')) {
                             crearNodo("p", "La empresa no ha realizado ninguna solicitud...", "", "", divContenedor);
-                            exit;
+                            return;
+                          
                         }
 
                         crearNodo("h3", "Consultas de la Empresa", "", "", divContenedor)
@@ -110,6 +111,7 @@ export function consulta(contenedor) {
                         if (contratos.hasOwnProperty('Error')) {
                             crearNodo("p", "La empresa no ha realizado aún ningún contrato...", "", "", divContenedor);
                             return;
+                            
                         }
 
                         crearNodo("h3", "Contratos de la Empresa", "", "", divContenedor)

@@ -58,7 +58,11 @@ window.onload = async (event) => {
       location.href = "../index.html";
    })
 
-   //COMPROBACIÓN DE LA FECHA DEL USUARIO CON LA ACTUAL PARA MANDARLE O UN CORREO SI HACE TIEMPO QUE ESTÁ INACTIVO
+   await promesaGeneral({idUsuario:usuario.iduser , nombreUser:usuario.usuario},'../Controladores/comprobacionAcceso.php')
+      .then((respuesta =>{
+         console.log(respuesta)
+      }))
+
 };
 
 async function obtenerUsuarioBolsa() {
@@ -210,7 +214,7 @@ async function crearFormularioDatos() {
 
    for (let propiedad in usuarioChanged) {
 
-      if (propiedad != 'idUsuario' && propiedad != 'usuario' && propiedad != 'cursos') {
+      if (propiedad != 'idUsuario' && propiedad != 'usuario' && propiedad != 'cursos' && propiedad != 'iduser') {
          let label = crearLabel(propiedad, cadenaFormateada(propiedad), "lbAlumno", formulario)
          label.id = "lb" + propiedad
 

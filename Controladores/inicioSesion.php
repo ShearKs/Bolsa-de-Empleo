@@ -14,6 +14,6 @@ $usuarioCliente = new Usuario($nombreUsuario, $contrasena);
 
 $daoUser = new DaoUsuario();
 
-$usuarioDevuelto = $daoUser->inicioSesion($nombreUsuario,$contrasena);
+$usuarioDevuelto = $daoUser->inicioSesion($usuarioCliente);
 
 echo $usuarioDevuelto;

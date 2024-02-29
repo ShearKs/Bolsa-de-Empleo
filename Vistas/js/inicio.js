@@ -1,5 +1,5 @@
 import { crearLabel, crearInput, crearNodo, crearNodoDebajo, limpiarContenido, eliminarExistente } from './utilsDom.js';
-import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos, devuelveCamposEmpresa,insertaEmpresa } from './funcionesFetch.js';
+import { inicioSesion, crearUsuario, alumnoDevuelto, crearCursos, devuelveCamposEmpresa, insertaEmpresa } from './funcionesFetch.js';
 import * as funciones from './funcionesGenerales.js';
 
 //Div donde se encuentra todo
@@ -121,7 +121,7 @@ function crearAlta() {
             parrafoError.textContent = "Debes de introducir algún campo..";
             return;
         }
-        
+
         console.log(select.value)
         // Verificar la opción seleccionada en ese momento
         if (select.value === 'alumno') {
@@ -133,13 +133,13 @@ function crearAlta() {
         }
     });
 
-    select.addEventListener('change',(event)=>{
+    select.addEventListener('change', (event) => {
         event.preventDefault();
 
-        if(select.value === 'empresa'){
+        if (select.value === 'empresa') {
             labelAlta.textContent = "Introduce tu cif para poder iniciarte en la bolsa";
-        }else{
-            labelAlta.textContent = "Introduce tu dni para darte de alta en la bolsa"; 
+        } else {
+            labelAlta.textContent = "Introduce tu dni para darte de alta en la bolsa";
         }
     })
 
@@ -157,8 +157,8 @@ function creaFormularioEmpresa(camposEmpresa, cif) {
     //camposEmpresa es un array donde tendremos todos los nombre de las columnas de empresa
     //Introducimos todos los campos que serán todas las columnas en la base de datos
     camposEmpresa.forEach(campoEmpresa => {
-        console.log(campoEmpresa)
-        if (campoEmpresa != 'idUsuario') {
+        //console.log(campoEmpresa)
+        if (campoEmpresa != 'idUsuario' && campoEmpresa != 'activo') {
             let caja = crearNodo("div", "", "caja", "caja" + campoEmpresa, formAltaEmpresa);
             let campoFormat = funciones.cadenaFormateada(campoEmpresa);
             crearLabel(campoEmpresa, campoFormat, "lbUsuario", caja);
@@ -279,7 +279,7 @@ function crearFormularioAlta(datosAlumno) {
     let botonAlta = crearNodo("button", "Registrate en la bolsa de Empleo", "btnResgistroAlumn", "formAlta", formularioAlta);
     botonAlta.addEventListener('click', (event) => {
         event.preventDefault()
-        let alumnos = alumnoFormularioAlta(formularioAlta, checkBoxExp, checkBoxRes,cbxViajar)
+        let alumnos = alumnoFormularioAlta(formularioAlta, checkBoxExp, checkBoxRes, cbxViajar)
         console.log(alumnos)
         let inputsComprueba = document.getElementsByClassName("inputAlta")
         //console.log(inputsComprueba)
@@ -298,7 +298,7 @@ function crearFormularioAlta(datosAlumno) {
     })
 }
 //Devuelve un objeto alumno con los datos recogidos del formulario de 
-function alumnoFormularioAlta(formularioAlta, cbxExperiencia, checkBoxRes,cbxViajar) {
+function alumnoFormularioAlta(formularioAlta, cbxExperiencia, checkBoxRes, cbxViajar) {
     let datosAlumno = {};
     let inputs = formularioAlta.querySelectorAll('input');
 
@@ -309,7 +309,7 @@ function alumnoFormularioAlta(formularioAlta, cbxExperiencia, checkBoxRes,cbxVia
     });
 
     //Recogemos el valor del textarea
-    let textAreaExp= document.getElementById('txtExpLaboral');
+    let textAreaExp = document.getElementById('txtExpLaboral');
     // Si el checkbox de experiencia laboral está marcado, añadir el campo correspondiente
     if (cbxExperiencia.checked) {
         // Acceder al valor del textarea a través de textExp.value
@@ -320,9 +320,9 @@ function alumnoFormularioAlta(formularioAlta, cbxExperiencia, checkBoxRes,cbxVia
 
     let textAreaRes = document.getElementById('txtResidencia');
 
-    if (checkBoxRes.checked){
+    if (checkBoxRes.checked) {
         datosAlumno['residencia'] = textAreaRes.value
-    }else{
+    } else {
         datosAlumno['residencia'] = ""
     }
     datosAlumno['posViajar'] = cbxViajar.checked

@@ -19,8 +19,10 @@ class DaoUsuario
         $this->utils = new Utilidades();
     }
 
-    public function inicioSesion($nombreUsuario, $contrasena)
+    public function inicioSesion(Usuario $usuario)
     {
+        $nombreUsuario = $usuario->getNombreUsuario();
+        $contrasena = $usuario->getContrasena();
 
         //Hacemos una consulta a la base de datos al usuario 
         $sql = "SELECT * FROM usuario WHERE nombre = ?";
@@ -49,22 +51,22 @@ class DaoUsuario
                 //Pasamos el dni,cif por sesión lo hacemos así por php ya que nos interesa que el cliente en el navegador no pueda ver el dni..
                 $_SESSION['cif'] = $dni;
 
-                $lastAcces = $this->ultimoAcceso($idUsuario);
 
-                if(!$lastAcces){
-                    return json_encode(array('Error' => 'La actualización de la fecha de inicio no se hizo correctamente'));
-                }
 
                 //Obtenemos el rol al iniciar sesión y se lo pasamos al cliente
                 $rol = $usuario['rol'];
 
                 //Antes de iniciar sesión tenemos que comprobar que ese usuario está activo en la base de datos(solo para Alumno en Bolsa y empresa)
-                if($rol === 1 ){
+                if ($rol === 1 || $rol === 2) {
 
-                    if(!$this->compruebaActivo($idUsuario)){
+                    if (!$this->compruebaActivo($idUsuario)) {
                         return json_encode(array('Error' => 'Ese usuario ya no se encuentra activo...'));
                     }
                 }
+
+                $this->desactivarInactivos();
+
+            
                 //return json_encode($usuario);
                 return json_encode(array("Exito" => $rol));
             }
@@ -73,29 +75,82 @@ class DaoUsuario
             return json_encode(array("Error" => "No se ha encontrado ese alumno en la base de datos"));
         }
     }
-    //AÑADIR TAMBIEN LA EMPRESA.....
-    private function compruebaActivo($idUsuario){
+    public  function avisoUsuarios()
+    {
 
-        $sql = "SELECT * FROM usuario u
-        INNER JOIN alumno_bolsa ab ON ab.idUsuario = u.id AND u.id = ?
-        WHERE activo = 'SI' ";
+        $sql = "SELECT 
+                CASE 
+                    WHEN ab.idUsuario IS NOT NULL THEN ai.email
+                    WHEN e.idUsuario IS NOT NULL THEN e.correo   
+                END AS correo
+                FROM usuario u
+                LEFT JOIN alumno_bolsa ab ON ab.idUsuario = u.id
+                LEFT JOIN alumnoies ai ON ai.dni = ab.dni
+                LEFT JOIN empresa e ON e.idUsuario = u.id
+                WHERE ((ab.activo = 'SI' AND u.ultimoInicio < DATE_SUB(NOW(), INTERVAL 11 MONTH))
+                    OR (e.activo = 'SI' AND u.ultimoInicio < DATE_SUB(NOW(), INTERVAL 5 MONTH)))
+                    -- para que me salga solo los usarios de bolsa y empresa ya que si no me salian en la conuslta nulos por el tutor y admin.
+                    AND (ab.idUsuario IS NOT NULL OR e.idUsuario IS NOT NULL);";
+
+        $resultado = $this->conexion->query($sql);
+        if ($resultado->num_rows > 0) {
+
+            while ($fila = $resultado->fetch_assoc()) {
+                $correo = $fila['correo'];
+                $this->utils->enviarCorreo($correo, "Llevas tiempo sin entrar en la bolsa de empleo de IES Leonardo Da Vinci ,pronto tu usuario caducará");
+            }
+        }
+    }
+
+    private function desactivarInactivos()
+    {
+
+        // Actualización para desactivar usuarios inactivos en alumno_bolsa y empresa
+        $update = "UPDATE alumno_bolsa ab
+                    LEFT JOIN usuario u_ab ON ab.idUsuario = u_ab.id
+                    SET ab.activo = 'NO'
+                    WHERE ab.idUsuario IS NOT NULL 
+                    AND u_ab.ultimoInicio < DATE_SUB(NOW(), INTERVAL 12 MONTH);
+                    
+                    UPDATE empresa e
+                    LEFT JOIN usuario u_e ON e.idUsuario = u_e.id
+                    SET e.activo = 'NO'
+                    WHERE e.idUsuario IS NOT NULL 
+                    AND u_e.ultimoInicio < DATE_SUB(NOW(), INTERVAL 6 MONTH)";
+
+        // Ejecutar las consultas
+        if ($this->conexion->multi_query($update)) {
+            // Vaciar resultados
+            while ($this->conexion->more_results() && $this->conexion->next_result()) {
+                if ($result = $this->conexion->store_result()) {
+                    $result->free();
+                }
+            }
+        }
+    }
+
+
+    public function compruebaActivo($idUsuario)
+    {
+
+        $sql = "SELECT u.id FROM usuario u
+                    LEFT JOIN alumno_bolsa ab ON ab.idUsuario = u.id
+                    LEFT JOIN empresa e ON e.idUsuario = u.id
+                    WHERE u.id = ? AND  (  ab.activo = 'SI' OR e.activo = 'SI' )";
 
         $sentencia = $this->conexion->prepare($sql);
-        $sentencia->bind_param("i",$idUsuario);
+        $sentencia->bind_param("i", $idUsuario);
         $estado = $sentencia->execute();
 
         $resultado = $sentencia->get_result();
         //Si obtiene el usuario significa que está activo y por lo tanto puede pasar en la aplicación
-        if($estado && $resultado->num_rows == 1){
+        if ($estado && $resultado->num_rows == 1) {
             return true;
         }
 
         //Si no está activo no puede pasar a la aplicación false...
         return false;
-
     }
-
-
 
 
 
@@ -120,9 +175,10 @@ class DaoUsuario
         return json_encode(array("Error" => "Ha habido un problema al cambiar la contraseña"));
     }
 
-    private function ultimoAcceso($idUsuario)
-    {
 
+
+    public function ultimoAcceso($idUsuario)
+    {
         //Obtenemos la fecha de hoy
         $fechaActual = date('Y-m-d');
 
@@ -134,10 +190,8 @@ class DaoUsuario
         if ($estado) {
             return true;
         }
-
         return false;
     }
-
 
 
     public function devuelveDniUser($idUsuario)
@@ -200,7 +254,7 @@ class DaoUsuario
         switch ($rol) {
             case 1:
                 //Para alumno en bolsa
-                $sql = "SELECT al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario',otraResidencia as 'residencia',posiViajar ,expLaboral as 'Experiencia Laboral',GROUP_CONCAT(c.nombre SEPARATOR ',') AS cursos,idCurso ,disponibilidad from alumno_bolsa al " .
+                $sql = "SELECT u.id as 'iduser',al.dni, a.nombre, a.apellidos, email, telefono as 'Teléfono',u.nombre as 'usuario',otraResidencia as 'residencia',posiViajar ,expLaboral as 'Experiencia Laboral',GROUP_CONCAT(c.nombre SEPARATOR ',') AS cursos,idCurso ,disponibilidad from alumno_bolsa al " .
                     "INNER JOIN alumnoies a ON a.dni = al.dni " .
                     "INNER JOIN cursa_alumn cur ON a.dni = cur.dniAlum " .
                     "INNER JOIN curso c ON c.id = cur.idCurso " .
@@ -211,19 +265,19 @@ class DaoUsuario
 
             case 2:
                 //Para empresa
-                $sql = "SELECT cif,e.nombre,lugar,idUsuario,u.nombre as 'usuario',direccion,correo as 'email',telefono from empresa e " .
+                $sql = "SELECT u.id as 'iduser',cif,e.nombre,lugar,idUsuario,u.nombre as 'usuario',direccion,correo as 'email',telefono from empresa e " .
                     "INNER JOIN usuario u ON u.id = e.idUsuario WHERE e.cif = ?";
                 break;
 
             case 3:
                 //Para tutor
-                $sql = "SELECT dni,tu.nombre as 'nombre',apellidos,telefono,correo as 'email',idUsuario,u.nombre as 'usuario',c.nombre as 'curso',tu.idCursoT FROM TUTOR tu
+                $sql = "SELECT u.id as 'iduser',dni,tu.nombre as 'nombre',apellidos,telefono,correo as 'email',idUsuario,u.nombre as 'usuario',c.nombre as 'curso',tu.idCursoT FROM TUTOR tu
                         INNER JOIN curso c ON c.id = idCursoT
                         INNER JOIN usuario u ON u.id = tu.idUsuario WHERE tu.dni = ? ";
                 break;
 
             case 4:
-                $sql = "SELECT a.dni,a.nombre,a.apellidos,a.correo as 'email',u.nombre as 'usuario' FROM Administrador a,usuario u WHERE  u.id = a.idUsuario  AND a.dni = ? ";
+                $sql = "SELECT u.id as 'iduser',a.dni,a.nombre,a.apellidos,a.correo as 'email',u.nombre as 'usuario' FROM Administrador a,usuario u WHERE  u.id = a.idUsuario  AND a.dni = ? ";
                 break;
             default:
                 break;
@@ -343,10 +397,10 @@ class DaoUsuario
             $resultado = $sentencia->execute();
 
             if ($resultado) {
-                return json_encode(array("Exito" => "Se actulizaron los datos correspondientes"));
+                return json_encode(array("Exito" => "Se actulizarón los datos correspondientes"));
             }
 
-            return json_encode(array("Error" => "No se puedieron actulizar los datos..."));
+            return json_encode(array("Error" => "No se puedieron actualizar los datos..."));
         } else {
             return json_encode(array("Error" => "Rol no válido"));
         }

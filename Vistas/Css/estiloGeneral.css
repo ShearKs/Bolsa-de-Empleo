@@ -45,9 +45,6 @@ dialog {
 
 
 
-
-
-
 dialog h1 {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 35px;
@@ -89,10 +86,6 @@ dialog h1 {
 
 /*De forma predeterminada está de forma de exxito  */
 .dialogMensaje button {
-
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
 
     width: 130px;
     border-radius: 10px;
