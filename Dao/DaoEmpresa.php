@@ -441,7 +441,4 @@ class DaoEmpresa
     }
 
 
-    public function existeCifEmpresa($cifEmpresa)
-    {
-    }
 }

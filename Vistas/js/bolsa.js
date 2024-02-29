@@ -214,7 +214,7 @@ async function crearFormularioDatos() {
 
    for (let propiedad in usuarioChanged) {
 
-      if (propiedad != 'idUsuario' && propiedad != 'usuario' && propiedad != 'cursos' && propiedad != 'iduser' && propiedad != 'idCursoT')  {
+      if (propiedad != 'idUsuario' && propiedad != 'usuario' && propiedad != 'cursos' && propiedad != 'iduser' && propiedad != 'idCursoT' && propiedad != 'curso')  {
          let label = crearLabel(propiedad, cadenaFormateada(propiedad), "lbAlumno", formulario)
          label.id = "lb" + propiedad
 

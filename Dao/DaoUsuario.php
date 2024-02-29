@@ -66,7 +66,7 @@ class DaoUsuario
 
                 $this->desactivarInactivos();
 
-            
+
                 //return json_encode($usuario);
                 return json_encode(array("Exito" => $rol));
             }
@@ -79,10 +79,16 @@ class DaoUsuario
     {
 
         $sql = "SELECT 
-                CASE 
-                    WHEN ab.idUsuario IS NOT NULL THEN ai.email
-                    WHEN e.idUsuario IS NOT NULL THEN e.correo   
-                END AS correo
+                    CASE 
+                        WHEN ab.idUsuario IS NOT NULL THEN ai.email
+                        WHEN e.idUsuario IS NOT NULL THEN e.correo   
+                    END AS correo,
+                    
+                    CASE 
+                        WHEN ab.dni IS NOT NULL THEN ab.dni
+                        WHEN e.cif IS NOT NULL THEN e.cif
+                        END AS cif
+        
                 FROM usuario u
                 LEFT JOIN alumno_bolsa ab ON ab.idUsuario = u.id
                 LEFT JOIN alumnoies ai ON ai.dni = ab.dni
@@ -97,10 +103,52 @@ class DaoUsuario
 
             while ($fila = $resultado->fetch_assoc()) {
                 $correo = $fila['correo'];
-                $this->utils->enviarCorreo($correo, "Llevas tiempo sin entrar en la bolsa de empleo de IES Leonardo Da Vinci ,pronto tu usuario caducará");
+                $cif = $fila['cif'];
+
+                //Si no hay avisos le envio el correo
+                if (!$this->hayAvisos($cif)) {
+
+                    //Registramos que le hemos hecho un aviso con la hora..
+                    //Si el aviso se ha registrado correctamente mandamos los correos...
+                    if ($this->registrarAviso($cif)) {
+                        $this->utils->enviarCorreo($correo, "Llevas tiempo sin entrar en la bolsa de empleo de IES Leonardo Da Vinci ,pronto tu usuario caducará");
+                    }
+                }
             }
         }
     }
+
+    private function registrarAviso($cif)
+    {
+
+        $sql = "INSERT INTO Aviso(cif) VALUES(?)";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("s", $cif);
+
+        $estado = $sentencia->execute();
+        if ($estado && $sentencia->affected_rows == 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function hayAvisos($cif)
+    {
+
+        $sql = "SELECT idAviso FROM Aviso WHERE cif = ?";
+        $sentencia = $this->conexion->prepare($sql);
+        $sentencia->bind_param("s", $cif);
+        $estado = $sentencia->execute();
+        $resul = $sentencia->get_result();
+
+        if ($estado && $resul->num_rows > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
 
     private function desactivarInactivos()
     {

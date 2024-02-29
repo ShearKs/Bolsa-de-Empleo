@@ -49,7 +49,7 @@ header ul li a {
 }
 
 header ul li:hover {
-    background: green;
+    background: #309ce8;
     border-radius: 5px;
     color: #FFF;
     animation: rubberBand 0.9s;
@@ -134,6 +134,13 @@ input[type="checkbox"] {
 .formularioAlumnoBolsa input {
     width: 100%;
     border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 8px;
+  
+}
+.formularioAlumnoBolsa input:focus {
+   
+    border-color: rgb(54, 141, 223);
 }
 
 
@@ -656,9 +663,9 @@ td {
     align-items: center;
 
     border-radius: 10px;
-    background-color: #7394dc;
-    padding: 1.25rem;
-    margin-bottom: 1%;
+    background-color: #8cc8f2;
+    padding: 1.5rem;
+    margin: 2%;
 }
 
 .divCriterios select {

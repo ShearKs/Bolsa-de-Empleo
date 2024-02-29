@@ -10,7 +10,7 @@ $modo = $solicitud['modo'];
 $daoAdmin = new DaoAdministrador();
 
 switch ($modo) {
-    //Para el lista
+    //Para el listados
     case 1:
         $alumnos = $daoAdmin->obtenerListadoAlumnos($idCurso);
         echo json_encode($alumnos);
@@ -18,5 +18,5 @@ switch ($modo) {
     case 2:
         $empresas = $daoAdmin->obtenerListadoEmpresas($idCurso);
         echo json_encode($empresas);
-        break;    
+        break;       
 }

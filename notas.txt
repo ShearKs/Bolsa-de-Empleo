@@ -1,17 +1,24 @@
 ////COSAS ARREGLADAS O CORREGIDAS
 
-
 -En la posibilidades de Viajar se le ha añadido la opción de todos
 
 
--Añadido que la solicitud se ponga en inactiva cuando se realice un contrato , tambien mi muestra de solicitudes ahora se hace de forma dinamica
-eliminado eliminado su div y haciendo que se vuelva a hacer el fetch antes lo hacia eliminando los nodos de la solicitud.
+-Añadido que la solicitud se ponga en inactiva cuando se realice un contrato ,
+tambien me muestra las solicitudes ahora de forma dinamica
+eliminado eliminado su div y haciendo que se vuelva a hacer el fetch.Antes lo hacia eliminando los nodos de la solicitud.
 
 -Añadido que la empresa no se pueda registrar si ya hay otra empresa con ese cif o usuario...
 
+-He cambiado en los listados SOLO EN LOS PDF (porque en no me gustaba que saliera en la página) que salgan de cada ciclo cuando sean todos...
 
+-He retocado un poco el diseño
 
+-En peticiones fcts me faltaba que en la misma peticion pudieras desclicar el alumno y añadirlo otra vez,como tenía que retocar los listados no lo 
+hecho,para deseleccionar hay que recargar la pagina .Con diferentes peticiones funciona perfectamente.
 
+-----usuario administrador
 
+usuario : admin
+contraseña :admin
 
 

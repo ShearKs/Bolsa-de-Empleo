@@ -189,6 +189,43 @@ class DaoAdministrador
         return $alumnos;
     }
 
+    public function obtenerListadoTodosPDF($tipo)
+    {
+        $sql = "";
+
+        if ($tipo == 'Alumnos') {
+            $sql = "SELECT a.dni,a.nombre,a.apellidos,a.email,c.nombre as 'ciclo' FROM alumnoies a
+            INNER JOIN alumno_bolsa ab ON ab.dni = a.dni
+            INNER JOIN cursa_alumn cur ON cur.dniAlum = ab.dni
+            INNER JOIN curso c ON c.id = cur.idCurso
+            WHERE activo ='SI' order by c.nombre";
+        } else {
+
+            //Es empresa
+            $sql = "  SELECT distinct a.*,sa.idCurso,c.nombre as 'ciclo' from empresa a
+            INNER JOIN solicitud s ON s.cif_empresa = a.cif
+            INNER JOIN solicitud_curso sa ON sa.idSolicitud = s.id 
+            INNER JOIN curso c ON c.id = sa.idCurso
+            WHERE activo = 'SI' order by c.nombre";
+        }
+
+
+        $resultado = $this->conexion->query($sql);
+        $usuarios = array();
+
+        if ($resultado->num_rows > 0) {
+            while ($fila = $resultado->fetch_assoc()) {
+                $usuarios[] = $fila;
+            }
+            return json_encode($usuarios);
+        } else {
+            return json_encode(array('Error' => 'No se ha obtenido ningun usuario activo para el pdf..'));
+        }
+    }
+
+
+
+
     public function obtenerListadoEmpresas($idCurso)
     {
 

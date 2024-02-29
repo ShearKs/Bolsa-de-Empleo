@@ -173,13 +173,14 @@ export async function listado(contenedor) {
 
 
     botonGenerarListado.addEventListener('click', () => {
+        
         console.log(select.value)
         eliminarSiExiste('tablaListado')
         eliminarSiExiste('btnGpdf')
 
         let idCurso = parseInt(perfilProfesional.value)
 
-        //Necesitamos sabe si es alumno o empresa
+        //Necesitamos saber si es alumno o empresa
         let usuario = select.value;
         let solicitud = {}
 
@@ -194,7 +195,7 @@ export async function listado(contenedor) {
                 modo: 2
             }
         }
-
+        console.log(usuario)
 
         //Creamos una tabla para los alumnos
         let tablaAlum = crearNodo("table", "", "tablaListado", "tablaListado", listado)
@@ -220,14 +221,64 @@ export async function listado(contenedor) {
                 })
 
                 let btnGeneraPdf = crearNodo("button", "Genera PDF", "btnGpdf", "btnGpdf", listado)
-                btnGeneraPdf.addEventListener('click', () => {
-                    generarPdf(usuarios, usuario)
+                btnGeneraPdf.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    //Si es 0 siginifica que son todos...
+                    console.log(idCurso)
+                    if (idCurso != 0) {
+                        generarPdf(usuarios, usuario)
+                    } else {
+
+                        //para todos hacemos algo diferente..
+                        promesaGeneral({ tipo: usuario }, '../Controladores/listadoTodosPDF.php')
+                            .then((usuarios => {
+                                if (usuarios.hasOwnProperty('Error')) {
+                                    dialogoSimple(usuarios.Error);
+                                    return;
+                                }
+                                
+                                generarPdfTodos(usuarios);
+                            }))
+                    }
+
                 })
             }))
     })
 }
 
+function generarPdfTodos(usuario) {
+    const pdf = new jsPDF("landscape");
+    pdf.setFont("Verdana");
+    pdf.setFontSize(16);
 
+    // Hacemos un set para guardarlos y que no se nos reptina..
+    const ciclos = [...new Set(usuario.map(alumno => alumno.ciclo))];
+
+    // Por cada ciclo sacamos una tablilla juju
+    ciclos.forEach(ciclo => {
+        pdf.setFontSize(20);
+        pdf.text("Ciclo: " + ciclo, 10, 10);
+        pdf.setFontSize(12);
+
+        // Filtramos el usuario por el ciclo
+        const alumnosCiclo = usuario.filter(alumno => alumno.ciclo === ciclo);
+
+        const cabeceras = Object.keys(alumnosCiclo[0]);
+        const cabecerasFormateadas = cabeceras.map(cadenaFormateada);
+        const data = alumnosCiclo.map(obj => cabeceras.map(key => obj[key]));
+
+        pdf.autoTable({
+            startY: 20,
+            head: [cabecerasFormateadas],
+            body: data,
+            theme: 'striped',
+        });
+        //En cada ciclo añadimos una página..
+        pdf.addPage(); 
+    });
+
+    pdf.save("listado.pdf");
+}
 
 
 function generarPdf(usuario, tipoUsuario) {
